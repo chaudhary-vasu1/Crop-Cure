@@ -7,6 +7,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Layout from './components/Layout'; 
 import Dashboard from './pages/Dashboard'; 
+import Crops from './pages/Crops';       // ✅ IMPORTED NEW PAGE
+import Settings from './pages/Settings'; // ✅ IMPORTED NEW PAGE
 
 function App() {
     return (
@@ -29,7 +31,9 @@ function App() {
                         {/* The 'index' route loads Dashboard automatically at '/' */}
                         <Route index element={<Dashboard />} />
                         
-                        {/* We will add more pages here in the next phase! */}
+                        {/* ✅ CONNECTED THE NEW PAGES */}
+                        <Route path="crops" element={<Crops />} />
+                        <Route path="settings" element={<Settings />} />
                     </Route>
                 </Routes>
             </Router>
