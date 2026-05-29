@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from 'react';
 
+// We ONLY want AppContext in this file
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
