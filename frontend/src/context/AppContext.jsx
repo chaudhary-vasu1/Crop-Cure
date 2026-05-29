@@ -7,7 +7,6 @@ export const AppProvider = ({ children }) => {
     const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
 
     useEffect(() => {
-        // Handle tailwind dark mode class switching on the HTML element
         const root = window.document.documentElement;
         if (theme === 'dark') {
             root.classList.add('dark');
