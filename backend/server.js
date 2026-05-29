@@ -4,8 +4,13 @@ import cors from 'cors';
 
 import connectDB from './config/db.js';
 
-// Routes
+// =============================
+// Route Imports
+// =============================
 import authRoutes from './routes/authRoutes.js';
+import plotRoutes from './routes/plotRoutes.js';
+import diagnosisRoutes from './routes/diagnosisRoutes.js';
+import irrigationRoutes from './routes/irrigationRoutes.js';
 
 // Load environment variables FIRST
 dotenv.config();
@@ -15,7 +20,6 @@ const app = express();
 
 // Connect Database
 connectDB();
-
 
 // =============================
 // Global Middleware
@@ -30,51 +34,17 @@ app.use(express.json());
 // Parse URL encoded bodies
 app.use(express.urlencoded({ extended: true }));
 
-
 // =============================
 // API Routes
 // =============================
-
-// Authentication Routes
-app.use('/api/auth', authRoutes);
-
-// ... existing imports ...
-import authRoutes from './routes/authRoutes.js';
-import plotRoutes from './routes/plotRoutes.js'; // <-- ADD THIS
-
-// ... middleware ...
-
-// Route Integrations
-app.use('/api/auth', authRoutes);
-app.use('/api/plots', plotRoutes); // <-- ADD THIS
-
-// ... rest of server.js ...
-// ... existing imports ...
-import diagnosisRoutes from './routes/diagnosisRoutes.js'; // <-- ADD THIS
-// ... existing imports ...
-import diagnosisRoutes from './routes/diagnosisRoutes.js';
-import irrigationRoutes from './routes/irrigationRoutes.js'; // <-- ADD THIS
-
-// ... middleware ...
-
-// Route Integrations
 app.use('/api/auth', authRoutes);
 app.use('/api/plots', plotRoutes);
 app.use('/api/diagnostics', diagnosisRoutes);
-app.use('/api/irrigation', irrigationRoutes); // <-- ADD THIS
-
-// ... middleware ...
-
-// Route Integrations
-app.use('/api/auth', authRoutes);
-app.use('/api/plots', plotRoutes);
-app.use('/api/diagnostics', diagnosisRoutes); // <-- ADD THIS
-
+app.use('/api/irrigation', irrigationRoutes);
 
 // =============================
 // Health Check Route
 // =============================
-
 app.get('/api/health', (req, res) => {
     res.status(200).json({
         status: 'success',
@@ -82,11 +52,9 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-
 // =============================
 // 404 Route Handler
 // =============================
-
 app.use((req, res) => {
     res.status(404).json({
         status: 'error',
@@ -94,30 +62,22 @@ app.use((req, res) => {
     });
 });
 
-
 // =============================
 // Global Error Handler
 // =============================
-
 app.use((err, req, res, next) => {
     console.error('GLOBAL ERROR:', err);
 
     res.status(err.statusCode || 500).json({
         status: 'error',
-        message:
-            err.message || 'An internal server error occurred.',
-        stack:
-            process.env.NODE_ENV === 'development'
-                ? err.stack
-                : null
+        message: err.message || 'An internal server error occurred.',
+        stack: process.env.NODE_ENV === 'development' ? err.stack : null
     });
 });
-
 
 // =============================
 // Start Server
 // =============================
-
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
