@@ -3,17 +3,17 @@ import Sidebar from './Sidebar';
 
 const Layout = () => {
     return (
-        <div className="flex min-h-screen bg-gray-50">
-            {/* The persistent Sidebar on the left */}
-            <div className="hidden md:block fixed h-full z-10">
+        // 👇 ADDED dark:bg-gray-900 for dark mode 👇
+        <div className="flex min-h-screen transition-colors duration-200 bg-gray-50 dark:bg-gray-900">
+            
+            {/* 👇 REMOVED 'hidden' and ADDED 'w-64' so it stays visible 👇 */}
+            <div className="fixed z-10 w-64 h-full">
                 <Sidebar />
             </div>
             
             {/* The dynamic page content on the right */}
-            {/* Adding margin-left (ml-64) so it doesn't hide behind the 64-width sidebar */}
             <div className="flex-1 overflow-y-auto md:ml-64">
                 <div className="p-8">
-                    {/* The <Outlet /> is where Dashboard, Crops, or Settings will appear */}
                     <Outlet /> 
                 </div>
             </div>
