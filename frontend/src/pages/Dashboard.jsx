@@ -4,7 +4,8 @@ import api from '../utils/api';
 import PlotCard from '../components/PlotCard';
 import AddPlotModal from '../components/AddPlotModal';
 import DiagnoseModal from '../components/DiagnoseModal';
-import IrrigationModal from '../components/IrrigationModal'; // ✅ ADDED IMPORT
+import IrrigationModal from '../components/IrrigationModal';
+import WeatherWidget from '../components/WeatherWidget'; // ✅ NEW: Imported the widget
 
 const Dashboard = () => {
     const { user, logout } = useContext(AuthContext);
@@ -12,10 +13,7 @@ const Dashboard = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    // ✅ DIAGNOSIS STATE
     const [selectedPlotForDiagnosis, setSelectedPlotForDiagnosis] = useState(null);
-
-    // ✅ NEW IRRIGATION STATE
     const [selectedPlotForIrrigation, setSelectedPlotForIrrigation] = useState(null);
 
     // Fetch plots when dashboard loads
@@ -72,6 +70,9 @@ const Dashboard = () => {
             </nav>
 
             <main className="max-w-6xl p-4 mx-auto mt-8">
+                
+                {/* ✅ NEW: Weather Widget is now rendering at the very top of the dashboard */}
+                <WeatherWidget />
 
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-bold text-gray-800">
@@ -80,7 +81,7 @@ const Dashboard = () => {
 
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="px-4 py-2 font-bold text-white bg-green-600 rounded hover:bg-green-700 shadow-sm"
+                        className="px-4 py-2 font-bold text-white bg-green-600 rounded shadow-sm hover:bg-green-700"
                     >
                         + Add Plot
                     </button>
@@ -96,8 +97,6 @@ const Dashboard = () => {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-
-                        {/* UPDATED PLOT CARD WITH BOTH HANDLERS */}
                         {plots.map(plot => (
                             <PlotCard
                                 key={plot._id}
@@ -108,28 +107,26 @@ const Dashboard = () => {
                                 }
                                 onIrrigation={(selectedPlot) =>
                                     setSelectedPlotForIrrigation(selectedPlot)
-                                } // ✅ ADDED
+                                }
                             />
                         ))}
                     </div>
                 )}
             </main>
 
-            {/* Add Plot Modal */}
+            {/* Modals */}
             <AddPlotModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onPlotAdded={handlePlotAdded}
             />
 
-            {/* Diagnosis Modal */}
             <DiagnoseModal
                 isOpen={!!selectedPlotForDiagnosis}
                 onClose={() => setSelectedPlotForDiagnosis(null)}
                 plot={selectedPlotForDiagnosis}
             />
 
-            {/* Irrigation Modal */}
             <IrrigationModal
                 isOpen={!!selectedPlotForIrrigation}
                 onClose={() => setSelectedPlotForIrrigation(null)}
