@@ -1,34 +1,39 @@
 import { createContext, useState, useEffect } from 'react';
 
-
+// ✅ 1. This is AuthContext
 export const AuthContext = createContext();
 
-export const AppProvider = ({ children }) => {
-    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
-    const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
+// ✅ 2. This is AuthProvider
+export const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
 
+    // Check if user is already logged in when the app loads
     useEffect(() => {
-        // Handle tailwind dark mode class switching on the HTML element
-        const root = window.document.documentElement;
-        if (theme === 'dark') {
-            root.classList.add('dark');
-        } else {
-            root.classList.remove('dark');
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
         }
-        localStorage.setItem('theme', theme);
-    }, [theme]);
+    }, []);
 
-    useEffect(() => {
-        localStorage.setItem('language', language);
-    }, [language]);
+    // Login function
+    const login = (userData, token) => {
+        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('token', token);
+        setUser(userData);
+    };
 
-    const toggleTheme = () => {
-        setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+    // Logout function (This is what your Sidebar button uses!)
+    const logout = () => {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        setUser(null);
+        window.location.href = '/login'; // Send them back to login page
     };
 
     return (
-        <AppContext.Provider value={{ theme, setTheme, toggleTheme, language, setLanguage }}>
+        // ✅ 3. This returns AuthContext.Provider
+        <AuthContext.Provider value={{ user, login, logout }}>
             {children}
-        </AppContext.Provider>
+        </AuthContext.Provider>
     );
 };

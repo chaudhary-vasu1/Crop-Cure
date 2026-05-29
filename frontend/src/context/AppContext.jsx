@@ -1,8 +1,9 @@
 import { createContext, useState, useEffect } from 'react';
 
-// We ONLY want AppContext in this file
+// ✅ 1. This must be AppContext
 export const AppContext = createContext();
 
+// ✅ 2. This must be AppProvider
 export const AppProvider = ({ children }) => {
     const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
     const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
@@ -26,6 +27,7 @@ export const AppProvider = ({ children }) => {
     };
 
     return (
+        // ✅ 3. This must match the AppContext created at the top
         <AppContext.Provider value={{ theme, setTheme, toggleTheme, language, setLanguage }}>
             {children}
         </AppContext.Provider>
