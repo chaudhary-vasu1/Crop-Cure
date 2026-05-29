@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-    // Replace with your production URL later
-    baseURL: 'https://crop-cure-backend-f2zf.onrender.com',
+    // Notice the /api added to the end!
+    baseURL: 'https://crop-cure-backend-f2zf.onrender.com/api',
 });
 
 // Request interceptor to add the JWT token to headers
