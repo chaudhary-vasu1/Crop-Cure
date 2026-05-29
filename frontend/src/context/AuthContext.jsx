@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from 'react';
 
 export const AppContext = createContext();
+export const AuthContext = createContext();
 
 export const AppProvider = ({ children }) => {
     const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
