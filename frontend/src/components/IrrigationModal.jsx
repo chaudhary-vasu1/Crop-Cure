@@ -1,78 +1,111 @@
-import { useState } from 'react';
-import api from '../utils/api'; // Your custom axios setup!
+import { useState, useEffect } from 'react';
 
-const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
-    const [name, setName] = useState('');
-    const [cropType, setCropType] = useState('');
-    const [area, setArea] = useState('');
-    const [loading, setLoading] = useState(false);
+const IrrigationModal = ({ isOpen, onClose, plot }) => {
+    const [loading, setLoading] = useState(true);
+    const [schedule, setSchedule] = useState(null);
 
-    if (!isOpen) return null;
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        try {
-            // This sends the new plot to your Render backend
-            const response = await api.post('/plots', { 
-                name, 
-                cropType, 
-                area: Number(area) 
-            });
+    // This runs automatically whenever the modal opens
+    useEffect(() => {
+        if (isOpen && plot) {
+            setLoading(true);
             
-            onPlotAdded(response.data); // Updates the UI instantly!
-            
-            // Reset form and close
-            setName(''); setCropType(''); setArea('');
-            onClose();
-        } catch (error) {
-            console.error("Failed to add plot:", error);
-            alert("Error saving plot. Check your backend logs!");
-        } finally {
-            setLoading(false);
+            // We use a slight delay to simulate complex AI/Backend calculations for better UX
+            setTimeout(() => {
+                const plan = calculateWaterNeeds(plot.cropType, plot.area);
+                setSchedule(plan);
+                setLoading(false);
+            }, 800);
         }
+    }, [isOpen, plot]);
+
+    // The core calculation logic
+    const calculateWaterNeeds = (crop, area) => {
+        const normalizedCrop = crop.toLowerCase().trim();
+        
+        // Base water needs in liters per acre per day
+        const cropData = {
+            sugarcane: { base: 25000, frequency: "Daily", type: "Heavy" },
+            rice: { base: 30000, frequency: "Daily", type: "Flooded" },
+            wheat: { base: 15000, frequency: "Every 2-3 Days", type: "Moderate" },
+            corn: { base: 18000, frequency: "Every 2 Days", type: "Moderate" },
+            cotton: { base: 20000, frequency: "Every 3 Days", type: "Deep soaking" },
+            default: { base: 15000, frequency: "Check soil moisture daily", type: "Moderate" }
+        };
+
+        const cropStats = cropData[normalizedCrop] || cropData.default;
+        const totalLiters = cropStats.base * area;
+        const totalGallons = Math.round(totalLiters * 0.264172);
+
+        return {
+            liters: totalLiters.toLocaleString(),
+            gallons: totalGallons.toLocaleString(),
+            frequency: cropStats.frequency,
+            type: cropStats.type,
+        };
     };
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-xl">
-                <h2 className="mb-4 text-2xl font-bold text-green-700">Add New Plot</h2>
-                
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Plot Name (e.g., North Field)</label>
-                        <input 
-                            type="text" required value={name} onChange={(e) => setName(e.target.value)}
-                            className="w-full p-2 mt-1 border rounded focus:ring-green-500 focus:border-green-500"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Crop Type (e.g., Wheat, Corn)</label>
-                        <input 
-                            type="text" required value={cropType} onChange={(e) => setCropType(e.target.value)}
-                            className="w-full p-2 mt-1 border rounded focus:ring-green-500 focus:border-green-500"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Area (in acres)</label>
-                        <input 
-                            type="number" required min="0.1" step="0.1" value={area} onChange={(e) => setArea(e.target.value)}
-                            className="w-full p-2 mt-1 border rounded focus:ring-green-500 focus:border-green-500"
-                        />
-                    </div>
+    if (!isOpen || !plot) return null;
 
-                    <div className="flex justify-end gap-2 mt-4">
-                        <button type="button" onClick={onClose} className="px-4 py-2 text-gray-600 bg-gray-200 rounded hover:bg-gray-300">
-                            Cancel
-                        </button>
-                        <button type="submit" disabled={loading} className="px-4 py-2 font-bold text-white bg-green-600 rounded hover:bg-green-700">
-                            {loading ? 'Saving...' : 'Save Plot'}
-                        </button>
-                    </div>
-                </form>
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+            <div className="w-full max-w-md bg-white rounded-lg shadow-xl overflow-hidden relative">
+                
+                {/* Header */}
+                <div className="bg-blue-600 p-6 text-white text-center">
+                    <button onClick={onClose} className="absolute text-blue-200 top-4 right-4 hover:text-white font-bold">
+                        ✕
+                    </button>
+                    <h2 className="text-2xl font-bold flex justify-center items-center gap-2">
+                        💧 Irrigation Plan
+                    </h2>
+                    <p className="opacity-90 mt-1">{plot.name} ({plot.area} Acres of {plot.cropType})</p>
+                </div>
+
+                <div className="p-6">
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                            <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                            <p className="text-blue-600 font-semibold animate-pulse">Calculating optimal water volume...</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-6 animate-fade-in">
+                            
+                            {/* Water Volume Cards */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-blue-50 border border-blue-100 p-4 rounded-lg text-center">
+                                    <p className="text-sm text-gray-500 font-semibold">Daily Requirement</p>
+                                    <p className="text-2xl font-bold text-blue-700">{schedule.liters} L</p>
+                                </div>
+                                <div className="bg-blue-50 border border-blue-100 p-4 rounded-lg text-center">
+                                    <p className="text-sm text-gray-500 font-semibold">In Gallons</p>
+                                    <p className="text-2xl font-bold text-blue-700">{schedule.gallons} G</p>
+                                </div>
+                            </div>
+
+                            {/* Schedule Details */}
+                            <div className="space-y-3 border-t pt-4">
+                                <div className="flex justify-between items-center bg-gray-50 p-3 rounded">
+                                    <span className="text-gray-600 font-semibold">⏱️ Frequency:</span>
+                                    <span className="font-bold text-gray-800">{schedule.frequency}</span>
+                                </div>
+                                <div className="flex justify-between items-center bg-gray-50 p-3 rounded">
+                                    <span className="text-gray-600 font-semibold">🚰 Watering Type:</span>
+                                    <span className="font-bold text-gray-800">{schedule.type}</span>
+                                </div>
+                            </div>
+
+                            <button 
+                                onClick={onClose}
+                                className="w-full py-3 font-bold text-white bg-blue-600 rounded hover:bg-blue-700 transition shadow-sm"
+                            >
+                                Acknowledge Schedule
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
 };
 
-export default AddPlotModal;
+export default IrrigationModal;
