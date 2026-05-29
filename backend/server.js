@@ -1,3 +1,4 @@
+import weatherRoutes from './routes/weatherRoutes.js';
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -41,6 +42,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/plots', plotRoutes);
 app.use('/api/diagnostics', diagnosisRoutes);
 app.use('/api/irrigation', irrigationRoutes);
+app.use('/api/weather', weatherRoutes);
 
 // =============================
 // Health Check Route
