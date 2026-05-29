@@ -2,13 +2,11 @@ import { Link, useLocation } from 'react-router-dom';
 import { Home, Sprout, Settings, LogOut, Moon, Sun } from 'lucide-react';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { AppContext } from '../context/AppContext'; // ✅ Import our AppContext
+import { AppContext } from '../context/AppContext';
 
 const Sidebar = () => {
     const location = useLocation();
     const { logout } = useContext(AuthContext);
-    
-    // ✅ Pull the theme state and toggle function from our global context
     const { theme, toggleTheme } = useContext(AppContext); 
 
     const menuItems = [
@@ -52,7 +50,7 @@ const Sidebar = () => {
             {/* Bottom Actions Area */}
             <div className="p-4 border-t border-green-700 dark:border-gray-800">
                 
-                {/* ✅ QUICK THEME TOGGLE BUTTON */}
+                {/* Theme Toggle Button */}
                 <button 
                     onClick={toggleTheme}
                     className="flex items-center w-full gap-3 px-4 py-3 mb-2 transition-colors rounded-lg text-green-50 hover:bg-green-700 dark:text-gray-300 dark:hover:bg-gray-900"
