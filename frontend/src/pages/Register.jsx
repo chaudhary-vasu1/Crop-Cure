@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // <-- 1. Import useNavigate
 
 const Register = () => {
-    const [username, setUsername] = useState(''); // <-- Added username state
+    const [username, setUsername] = useState(''); 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    
+    const navigate = useNavigate(); // <-- 2. Initialize navigate
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -12,14 +15,14 @@ const Register = () => {
             const response = await fetch('https://crop-cure-backend-f2zf.onrender.com/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                // <-- Now sending username along with email and password
                 body: JSON.stringify({ username, email, password }) 
             });
             
             const data = await response.json();
             
             if (response.ok) {
-                alert("Account created successfully! Welcome to Crop Cure.");
+                alert("Account created successfully! Redirecting to login...");
+                navigate('/login'); // <-- 3. Redirect to login page instantly
             } else {
                 alert("Error: " + data.message);
             }
@@ -31,9 +34,8 @@ const Register = () => {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen p-4">
-            <h2 className="text-2xl font-bold mb-4 text-green-700">Create an Account</h2>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-xs">
-                {/* <-- Added Username Input --> */}
+            <h2 className="mb-4 text-2xl font-bold text-green-700">Create an Account</h2>
+            <form onSubmit={handleSubmit} className="flex flex-col w-full max-w-xs gap-4">
                 <input 
                     type="text" 
                     placeholder="Username" 
@@ -59,7 +61,7 @@ const Register = () => {
                     minLength="6"
                     required
                 />
-                <button type="submit" className="p-2 bg-green-600 text-white rounded font-bold hover:bg-green-700">
+                <button type="submit" className="p-2 font-bold text-white bg-green-600 rounded hover:bg-green-700">
                     Register
                 </button>
             </form>
