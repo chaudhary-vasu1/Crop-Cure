@@ -18,19 +18,20 @@ export const getPlots = async (req, res) => {
 // @access  Private
 export const createPlot = async (req, res) => {
     try {
-        const { name, cropType, location, soilType, irrigationMethod } = req.body;
+        // 1. Grab only what the frontend is actually sending
+        const { name, cropType, area } = req.body;
 
-        if (!name || !cropType || !location || !soilType || !irrigationMethod) {
-            return res.status(400).json({ message: 'Please provide all required fields' });
+        // 2. Validate only those 3 fields
+        if (!name || !cropType || !area) {
+            return res.status(400).json({ message: 'Please provide name, crop type, and area' });
         }
 
+        // 3. Create the plot and attach the logged-in user's ID
         const plot = await Plot.create({
             user: req.user.id,
             name,
             cropType,
-            location,
-            soilType,
-            irrigationMethod,
+            area,
         });
 
         res.status(201).json(plot);

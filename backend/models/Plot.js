@@ -5,30 +5,33 @@ const plotSchema = new mongoose.Schema(
         user: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
-            ref: 'User', // References the User model
+            ref: 'User',
         },
         name: {
             type: String,
-            required: [true, 'Please provide a name for this plot (e.g., North Field)'],
-            trim: true,
+            required: [true, 'Please add a plot name'],
         },
         cropType: {
             type: String,
-            required: [true, 'Please specify the crop type (e.g., Tomato, Wheat)'],
-            trim: true,
+            required: [true, 'Please add a crop type'],
         },
+        area: {
+            type: Number,
+            required: [true, 'Please add the area in acres'],
+        },
+        // We set these to false so they are optional for now! 
+        // You can add them to the frontend form later if you want.
         location: {
             type: String,
-            required: [true, 'Please provide the location (City, State)'],
-            trim: true,
+            required: false, 
         },
         soilType: {
             type: String,
-            required: [true, 'Please specify the soil type (e.g., Loamy, Clay, Sandy)'],
+            required: false,
         },
         irrigationMethod: {
             type: String,
-            required: [true, 'Please specify the irrigation method (e.g., Drip, Sprinkler)'],
+            required: false,
         }
     },
     {
