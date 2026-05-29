@@ -62,8 +62,8 @@ export const analyzeCrop = async (req, res) => {
             }
         });
 
-        // 6. Parse the AI response
-        const aiData = JSON.parse(response.text());
+        // 6. Parse the AI response (PARENTHESES REMOVED HERE!)
+        const aiData = JSON.parse(response.text);
 
         // 7. Save the diagnosis to MongoDB
         const diagnosis = await Diagnosis.create({
