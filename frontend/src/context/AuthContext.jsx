@@ -16,9 +16,12 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     // Login function
-    const login = (userData, token) => {
+const login = (userData) => {
+        // Automatically extract the token from the backend response
+        const userToken = userData.token; 
+        
         localStorage.setItem('user', JSON.stringify(userData));
-        localStorage.setItem('token', token);
+        localStorage.setItem('token', userToken); // Safely store the real token
         setUser(userData);
     };
 
