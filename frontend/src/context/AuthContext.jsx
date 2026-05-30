@@ -1,22 +1,19 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState } from 'react';
 
 // ✅ 1. This is AuthContext
 export const AuthContext = createContext();
 
 // ✅ 2. This is AuthProvider
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-
-    // Check if user is already logged in when the app loads
-    useEffect(() => {
+    
+    // 🔥 THE FIX: Check local storage synchronously before the very first render
+    const [user, setUser] = useState(() => {
         const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        }
-    }, []);
+        return storedUser ? JSON.parse(storedUser) : null;
+    });
 
     // Login function
-const login = (userData) => {
+    const login = (userData) => {
         // Automatically extract the token from the backend response
         const userToken = userData.token; 
         
