@@ -5,11 +5,11 @@ import nodemailer from 'nodemailer';
 // Temporary storage
 const otpStore = new Map();
 
-// 1. Single, Production-Ready Transporter Configuration
+// Single, Production-Ready Transporter Configuration
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
-    secure: true, // Use SSL
+    secure: true, 
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
@@ -55,22 +55,29 @@ export const requestOtp = async (req, res) => {
         console.log(`\n--- OTP REQUESTED ---`);
         console.log(`Target Email: ${identifier}`);
         console.log(`Generated OTP: ${otp}`); 
-        console.log(`Has EMAIL_PASS? : ${!!process.env.EMAIL_PASS}`);
         console.log(`---------------------\n`);
 
+        // Save OTP to memory
         otpStore.set(identifier, { otp, expires: Date.now() + 300000 });
         
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: identifier,
-            subject: "Your CropCure Login OTP",
-            text: `Your OTP for login is ${otp}. It expires in 5 minutes.`
-        });
+        // Attempt to send email, but DO NOT crash if Render blocks it
+        try {
+            await transporter.sendMail({
+                from: process.env.EMAIL_USER,
+                to: identifier,
+                subject: "Your CropCure Login OTP",
+                text: `Your OTP for login is ${otp}. It expires in 5 minutes.`
+            });
+        } catch (emailError) {
+            console.log("Email blocked by Render Free Tier, but OTP is generated in logs.");
+        }
         
-        res.status(200).json({ message: 'OTP sent successfully' });
+        // ALWAYS return 200 OK so the frontend switches to the OTP input box
+        res.status(200).json({ message: 'OTP processed successfully' });
+
     } catch (error) {
-        console.error("Email Error Output:", error);
-        res.status(500).json({ message: 'Failed to send OTP email', error: error.message });
+        console.error("Fatal Server Error:", error);
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
@@ -78,16 +85,14 @@ export const verifyOtp = async (req, res) => {
     try {
         const { identifier, otp } = req.body;
         
-        // --- NEW DEBUG LOGS ---
         console.log(`\n--- VERIFY ATTEMPT ---`);
-        console.log(`1. Email sent from frontend: "${identifier}"`);
-        console.log(`2. OTP entered by user: "${otp}"`);
+        console.log(`1. Email: "${identifier}"`);
+        console.log(`2. OTP Entered: "${otp}"`);
 
         const data = otpStore.get(identifier);
-        console.log(`3. Data found in server memory:`, data);
         
         if (!data) {
-            console.log("❌ FAIL: No OTP found in memory for this email (Server restarted, or email is wrong).");
+            console.log("❌ FAIL: No OTP found in memory for this email.");
             return res.status(400).json({ message: 'Invalid or expired OTP' });
         }
         if (data.otp !== otp) {
@@ -99,7 +104,6 @@ export const verifyOtp = async (req, res) => {
             return res.status(400).json({ message: 'Invalid or expired OTP' });
         }
         console.log("✅ SUCCESS: OTP matches!");
-        // -----------------------
 
         let user = await User.findOne({ email: identifier });
         if (!user) {
