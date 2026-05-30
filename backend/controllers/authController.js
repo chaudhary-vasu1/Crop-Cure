@@ -60,6 +60,7 @@ export const requestOtp = async (req, res) => {
         // Save OTP to memory
         otpStore.set(identifier, { otp, expires: Date.now() + 300000 });
         
+        // 🚨 THE FIX IS HERE 🚨
         // Attempt to send email, but DO NOT crash if Render blocks it
         try {
             await transporter.sendMail({
@@ -72,7 +73,7 @@ export const requestOtp = async (req, res) => {
             console.log("Email blocked by Render Free Tier, but OTP is generated in logs.");
         }
         
-        // ALWAYS return 200 OK so the frontend switches to the OTP input box
+        // ALWAYS return 200 OK so the frontend switches to the OTP input box!
         res.status(200).json({ message: 'OTP processed successfully' });
 
     } catch (error) {
