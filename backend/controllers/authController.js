@@ -1,20 +1,21 @@
 import User from '../models/User.js';
 import generateToken from '../utils/generateToken.js';
-import nodemailer from 'nodemailer'; // Added import
+import nodemailer from 'nodemailer';
 
-// Temporary storage (Use Redis or DB for production)
+// Temporary storage
 const otpStore = new Map();
 
-// Configure Nodemailer Transporter
+// 1. Single, Production-Ready Transporter Configuration
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // Use SSL
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     }
 });
 
-// @desc    Register a new user
 export const registerUser = async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -32,7 +33,6 @@ export const registerUser = async (req, res) => {
     }
 };
 
-// @desc    Authenticate a user & get token
 export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -47,36 +47,35 @@ export const loginUser = async (req, res) => {
     }
 };
 
-// @desc    Request OTP (Updated with Nodemailer)
-// @route   POST /api/auth/request-otp
 export const requestOtp = async (req, res) => {
     try {
         const { identifier } = req.body;
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         
-        // Save to store with 5-minute expiration
+        // 2. Critical Debug Logs (View these in the Render Dashboard)
+        console.log(`\n--- OTP REQUESTED ---`);
+        console.log(`Target Email: ${identifier}`);
+        console.log(`Generated OTP: ${otp}`); // You can use this to bypass email failure
+        console.log(`Has EMAIL_PASS? : ${!!process.env.EMAIL_PASS}`);
+        console.log(`---------------------\n`);
+
         otpStore.set(identifier, { otp, expires: Date.now() + 300000 });
         
-        // Send actual email
-       const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // Use SSL
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-});
+        // 3. Actually send the email (This was missing in your last version)
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: identifier,
+            subject: "Your CropCure Login OTP",
+            text: `Your OTP for login is ${otp}. It expires in 5 minutes.`
+        });
         
         res.status(200).json({ message: 'OTP sent successfully' });
     } catch (error) {
-        console.error("Email Error:", error);
+        console.error("Email Error Output:", error);
         res.status(500).json({ message: 'Failed to send OTP email', error: error.message });
     }
 };
 
-// @desc    Verify OTP & Login
-// @route   POST /api/auth/verify-otp
 export const verifyOtp = async (req, res) => {
     try {
         const { identifier, otp } = req.body;
@@ -88,7 +87,6 @@ export const verifyOtp = async (req, res) => {
 
         let user = await User.findOne({ email: identifier });
         if (!user) {
-            // Create user with a strong default password
             user = await User.create({ 
                 username: identifier.split('@')[0], 
                 email: identifier, 
