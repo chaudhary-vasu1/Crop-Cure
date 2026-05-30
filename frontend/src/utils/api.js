@@ -1,17 +1,17 @@
 import axios from 'axios';
 
 const api = axios.create({
-    // Make sure this points to your Render backend!
+    // Ensure this matches your live backend URL
     baseURL: 'https://crop-cure-backend-f2zf.onrender.com/api' 
 });
 
-// 👇 ADD THIS INTERCEPTOR 👇
+// Interceptor to attach the token to every request automatically
 api.interceptors.request.use(
     (config) => {
-        // Look in local storage for the token
+        // Read the token from localStorage (set by AuthContext after login/OTP verify)
         const token = localStorage.getItem('token');
         
-        // If we have a token, attach it to the Authorization header
+        // If the token exists, attach it to the Authorization header
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
