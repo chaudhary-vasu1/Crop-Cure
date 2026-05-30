@@ -1,67 +1,72 @@
 import { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import api from '../utils/api'; // ✅ Import your custom api!
+import api from '../utils/api';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState(null);
-    
+    const [identifier, setIdentifier] = useState('');
+    const [otp, setOtp] = useState('');
+    const [step, setStep] = useState(1); // 1 = Request, 2 = Verify
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
+    const handleRequestOtp = async (e) => {
         e.preventDefault();
-        setError(null);
         try {
-            // ✅ 1. Actually ask the backend to log the user in
-            const response = await api.post('/auth/login', { email, password });
-            
-            // ✅ 2. Hand the real data (which contains the JWT token) to AuthContext
-            login(response.data);
-            
-            // ✅ 3. Redirect to dashboard
-            navigate('/'); 
+            // Using your existing api utility
+            await api.post('/auth/request-otp', { identifier });
+            setStep(2);
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to login');
+            alert('Failed to send OTP. Please check your network.');
+        }
+    };
+
+    const handleVerifyOtp = async (e) => {
+        e.preventDefault();
+        try {
+            // This verifies the OTP and returns the same token structure as your old login
+            const res = await api.post('/auth/verify-otp', { identifier, otp });
+            
+            // Reusing your existing login function from AuthContext keeps everything else working
+            login(res.data);
+            navigate('/');
+        } catch (err) {
+            alert('Invalid or expired OTP. Please try again.');
         }
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
-                <h2 className="text-2xl font-bold text-center text-green-700">Crop Doctor Login</h2>
-                {error && <div className="p-3 text-sm text-red-700 bg-red-100 rounded">{error}</div>}
-                
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Email</label>
+        <div style={{ padding: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+            <div style={{ width: '100%', maxWidth: '400px', padding: '2rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem', backgroundColor: 'white' }}>
+                {step === 1 ? (
+                    <form onSubmit={handleRequestOtp}>
+                        <h2 style={{ marginBottom: '1.5rem', fontSize: '1.25rem', fontWeight: 'bold' }}>Login with Email/Phone</h2>
                         <input 
-                            type="email" 
+                            type="text" 
+                            placeholder="Enter Email or Phone" 
+                            onChange={(e) => setIdentifier(e.target.value)} 
+                            style={{ width: '100%', padding: '0.75rem', marginBottom: '1rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} 
                             required 
-                            className="w-full px-3 py-2 mt-1 border rounded-md focus:outline-none focus:ring focus:ring-green-200"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
                         />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Password</label>
+                        <button type="submit" style={{ width: '100%', padding: '0.75rem', backgroundColor: '#059669', color: 'white', border: 'none', borderRadius: '0.25rem', cursor: 'pointer' }}>
+                            Send OTP
+                        </button>
+                    </form>
+                ) : (
+                    <form onSubmit={handleVerifyOtp}>
+                        <h2 style={{ marginBottom: '1.5rem', fontSize: '1.25rem', fontWeight: 'bold' }}>Verify OTP</h2>
                         <input 
-                            type="password" 
+                            type="text" 
+                            placeholder="Enter 6-digit OTP" 
+                            onChange={(e) => setOtp(e.target.value)} 
+                            style={{ width: '100%', padding: '0.75rem', marginBottom: '1rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} 
                             required 
-                            className="w-full px-3 py-2 mt-1 border rounded-md focus:outline-none focus:ring focus:ring-green-200"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
                         />
-                    </div>
-                    <button type="submit" className="w-full px-4 py-2 font-bold text-white bg-green-600 rounded hover:bg-green-700">
-                        Sign In
-                    </button>
-                </form>
-                <p className="text-sm text-center text-gray-600">
-                    Don't have an account? <Link to="/register" className="text-green-600 hover:underline">Register</Link>
-                </p>
+                        <button type="submit" style={{ width: '100%', padding: '0.75rem', backgroundColor: '#059669', color: 'white', border: 'none', borderRadius: '0.25rem', cursor: 'pointer' }}>
+                            Verify & Login
+                        </button>
+                    </form>
+                )}
             </div>
         </div>
     );
