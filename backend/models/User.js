@@ -6,36 +6,39 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    // 🚨 UPDATED: sparse allows the email to be empty if they use a phone
     email: {
         type: String,
         unique: true,
-        sparse: true, 
+        sparse: true, // <--- FIX: Allows multiple users to have 'null' or missing emails
     },
-    // 🚨 UPDATED: sparse allows the phone to be empty if they use an email
     phone: {
         type: String,
         unique: true,
-        sparse: true, 
+        sparse: true, // <--- FIX: Allows multiple users to have 'null' or missing phones
     },
     password: {
         type: String,
         required: true,
-        select: false, // Hides password by default in queries
-    },
-}, { timestamps: true });
+        select: false, // Hides password from normal database queries for security
+    }
+}, {
+    timestamps: true
+});
 
-// Hash password before saving
+// Automatically hash the password before saving a new user or updating a password
 userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
+    if (!this.isModified('password')) {
+        next();
+    }
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Compare passwords for login
+// Helper method used in authController to check if passwords match during login
 userSchema.methods.matchPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
 const User = mongoose.model('User', userSchema);
+
 export default User;
