@@ -1,148 +1,87 @@
-import User from '../models/User.js';
-import generateToken from '../utils/generateToken.js';
-import nodemailer from 'nodemailer';
-import twilio from 'twilio';
+import { useState, useContext } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
+import api from '../utils/api';
 
-const otpStore = new Map();
+const Register = () => {
+    const [username, setUsername] = useState('');
+    const [identifier, setIdentifier] = useState(''); // Handles both Email or Phone
+    const [password, setPassword] = useState('');
+    const { login } = useContext(AuthContext);
+    const navigate = useNavigate();
 
-// --- SETUP NODEMAILER (Email) ---
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, 
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-});
-
-// --- SETUP TWILIO (SMS) ---
-const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-
-// Helper function to detect Email vs Phone Number
-const isEmail = (identifier) => identifier.includes('@');
-
-// 🚨 UPDATED: Now handles both Email and Phone manual registration 🚨
-export const registerUser = async (req, res) => {
-    try {
-        // We now expect 'identifier' from the frontend instead of 'email'
-        const { username, identifier, password } = req.body;
+    const handleRegister = async (e) => {
+        e.preventDefault();
         
-        // Search by email OR phone depending on what they typed
-        const searchQuery = isEmail(identifier) ? { email: identifier } : { phone: identifier };
-        const userExists = await User.findOne(searchQuery);
-        
-        if (userExists) return res.status(400).json({ message: 'User already exists with this email or phone number' });
+        // Smart Formatting: Add +91 if they typed a 10-digit Indian phone number
+        let finalIdentifier = identifier;
+        if (!identifier.includes('@') && !identifier.startsWith('+') && identifier.length === 10) {
+            finalIdentifier = `+91${identifier}`;
+        }
 
-        // Save to the correct column in MongoDB
-        const user = await User.create({ 
-            username, 
-            email: isEmail(identifier) ? identifier : undefined, 
-            phone: isEmail(identifier) ? undefined : identifier,
-            password 
-        });
-
-        if (user) {
-            res.status(201).json({ 
-                _id: user._id, 
-                username: user.username, 
-                email: user.email, 
-                phone: user.phone,
-                token: generateToken(user._id) 
+        try {
+            // We now send 'identifier' instead of 'email'
+            const res = await api.post('/auth/register', { 
+                username, 
+                identifier: finalIdentifier, 
+                password 
             });
-        } else {
-            res.status(400).json({ message: 'Invalid user data received' });
+            
+            // Automatically log them in after successful registration
+            login(res.data);
+            navigate('/');
+        } catch (err) {
+            alert(err.response?.data?.message || 'Registration failed. Please try again.');
         }
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
+    };
+
+    return (
+        <div style={{ padding: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+            <div style={{ width: '100%', maxWidth: '400px', padding: '2rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem', backgroundColor: 'white' }}>
+                <form onSubmit={handleRegister}>
+                    <h2 style={{ marginBottom: '1.5rem', fontSize: '1.25rem', fontWeight: 'bold' }}>Create an Account</h2>
+                    
+                    <input 
+                        type="text" 
+                        placeholder="Choose a Username" 
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)} 
+                        style={{ width: '100%', padding: '0.75rem', marginBottom: '1rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} 
+                        required 
+                    />
+                    
+                    <input 
+                        type="text" 
+                        placeholder="Email or Phone Number" 
+                        value={identifier}
+                        onChange={(e) => setIdentifier(e.target.value)} 
+                        style={{ width: '100%', padding: '0.75rem', marginBottom: '1rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} 
+                        required 
+                    />
+                    
+                    <input 
+                        type="password" 
+                        placeholder="Create a Password" 
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)} 
+                        style={{ width: '100%', padding: '0.75rem', marginBottom: '1.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} 
+                        required 
+                    />
+                    
+                    <button type="submit" style={{ width: '100%', padding: '0.75rem', backgroundColor: '#059669', color: 'white', border: 'none', borderRadius: '0.25rem', cursor: 'pointer', fontWeight: 'bold' }}>
+                        Register
+                    </button>
+                </form>
+
+                <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: '#4b5563' }}>
+                    Already have an account?{' '}
+                    <Link to="/login" style={{ color: '#059669', textDecoration: 'none', fontWeight: 'bold' }}>
+                        Login here
+                    </Link>
+                </div>
+            </div>
+        </div>
+    );
 };
 
-export const loginUser = async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email }).select('+password');
-        if (user && (await user.matchPassword(password))) {
-            res.status(200).json({ _id: user._id, username: user.username, email: user.email, token: generateToken(user._id) });
-        } else {
-            res.status(401).json({ message: 'Invalid email or password' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-};
-
-export const requestOtp = async (req, res) => {
-    try {
-        const { identifier } = req.body;
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        
-        console.log(`\n--- OTP REQUESTED ---`);
-        console.log(`Target: ${identifier}`);
-        console.log(`Type: ${isEmail(identifier) ? 'Email' : 'Phone Number'}`);
-        console.log(`Generated OTP: ${otp}`); 
-        console.log(`---------------------\n`);
-
-        otpStore.set(identifier, { otp, expires: Date.now() + 300000 });
-        
-        if (isEmail(identifier)) {
-            transporter.sendMail({
-                from: process.env.EMAIL_USER,
-                to: identifier,
-                subject: "Your CropCure Login OTP",
-                text: `Your OTP for login is ${otp}. It expires in 5 minutes.`
-            }).catch(emailError => console.log("Email blocked by Render Free Tier, but OTP is in logs."));
-        } else {
-            twilioClient.messages.create({
-                body: `Your CropCure OTP is ${otp}. It expires in 5 minutes.`,
-                from: process.env.TWILIO_PHONE_NUMBER,
-                to: identifier
-            }).then(() => {
-                console.log("✅ SMS successfully sent to phone!");
-            }).catch(smsError => {
-                console.log("❌ Twilio Error: SMS failed. Did you include the +91 country code?");
-            });
-        }
-        
-        res.status(200).json({ message: 'OTP processed successfully' });
-
-    } catch (error) {
-        console.error("Fatal Server Error:", error);
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-};
-
-export const verifyOtp = async (req, res) => {
-    try {
-        const { identifier, otp } = req.body;
-        const data = otpStore.get(identifier);
-        
-        if (!data || data.otp !== otp || Date.now() > data.expires) {
-            return res.status(400).json({ message: 'Invalid or expired OTP' });
-        }
-
-        const searchQuery = isEmail(identifier) ? { email: identifier } : { phone: identifier };
-        let user = await User.findOne(searchQuery);
-
-        if (!user) {
-            user = await User.create({ 
-                username: isEmail(identifier) ? identifier.split('@')[0] : `User_${identifier.slice(-4)}`, 
-                email: isEmail(identifier) ? identifier : undefined, 
-                phone: isEmail(identifier) ? undefined : identifier,
-                password: Math.random().toString(36).slice(-8) + 'A1!' 
-            });
-        }
-
-        otpStore.delete(identifier);
-        res.status(200).json({ 
-            _id: user._id, 
-            username: user.username, 
-            email: user.email, 
-            phone: user.phone,
-            token: generateToken(user._id) 
-        });
-    } catch (error) {
-        console.error("Verify Error:", error);
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-};
+export default Register;
