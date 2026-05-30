@@ -1,70 +1,83 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // <-- 1. Import useNavigate
+import { useState, useContext } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
+import api from '../utils/api'; // ✅ Import your custom api!
 
 const Register = () => {
-    const [username, setUsername] = useState(''); 
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
     
-    const navigate = useNavigate(); // <-- 2. Initialize navigate
+    const { login } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+        setError(null);
+        setLoading(true);
         try {
-            const response = await fetch('https://crop-cure-backend-f2zf.onrender.com/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, email, password }) 
-            });
+            // ✅ 1. Actually ask the backend to register the user
+            const response = await api.post('/auth/register', { username, email, password });
             
-            const data = await response.json();
+            // ✅ 2. Hand the REAL data (which contains the JWT token) to AuthContext
+            login(response.data);
             
-            if (response.ok) {
-                alert("Account created successfully! Redirecting to login...");
-                navigate('/login'); // <-- 3. Redirect to login page instantly
-            } else {
-                alert("Error: " + data.message);
-            }
-        } catch (error) {
-            console.error("Failed to register:", error);
-            alert("Network error. Check console.");
+            // ✅ 3. Redirect to dashboard
+            navigate('/'); 
+        } catch (err) {
+            setError(err.response?.data?.message || 'Failed to register');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-4">
-            <h2 className="mb-4 text-2xl font-bold text-green-700">Create an Account</h2>
-            <form onSubmit={handleSubmit} className="flex flex-col w-full max-w-xs gap-4">
-                <input 
-                    type="text" 
-                    placeholder="Username" 
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="p-2 border rounded"
-                    required
-                />
-                <input 
-                    type="email" 
-                    placeholder="Email" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="p-2 border rounded"
-                    required
-                />
-                <input 
-                    type="password" 
-                    placeholder="Password" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="p-2 border rounded"
-                    minLength="6"
-                    required
-                />
-                <button type="submit" className="p-2 font-bold text-white bg-green-600 rounded hover:bg-green-700">
-                    Register
-                </button>
-            </form>
+        <div className="flex items-center justify-center min-h-screen bg-gray-100">
+            <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
+                <h2 className="text-2xl font-bold text-center text-green-700">Create Account</h2>
+                {error && <div className="p-3 text-sm text-red-700 bg-red-100 rounded">{error}</div>}
+                
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Username</label>
+                        <input 
+                            type="text" 
+                            required 
+                            className="w-full px-3 py-2 mt-1 border rounded-md focus:outline-none focus:ring focus:ring-green-200"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Email</label>
+                        <input 
+                            type="email" 
+                            required 
+                            className="w-full px-3 py-2 mt-1 border rounded-md focus:outline-none focus:ring focus:ring-green-200"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Password</label>
+                        <input 
+                            type="password" 
+                            required 
+                            className="w-full px-3 py-2 mt-1 border rounded-md focus:outline-none focus:ring focus:ring-green-200"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </div>
+                    <button type="submit" disabled={loading} className="w-full px-4 py-2 font-bold text-white bg-green-600 rounded hover:bg-green-700">
+                        {loading ? 'Creating...' : 'Register'}
+                    </button>
+                </form>
+                <p className="text-sm text-center text-gray-600">
+                    Already have an account? <Link to="/login" className="text-green-600 hover:underline">Login</Link>
+                </p>
+            </div>
         </div>
     );
 };
