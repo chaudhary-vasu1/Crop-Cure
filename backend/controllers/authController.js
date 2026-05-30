@@ -22,14 +22,27 @@ const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_A
 // Helper function to detect Email vs Phone Number
 const isEmail = (identifier) => identifier.includes('@');
 
-// 🚨 UPDATED: Now handles both Email and Phone manual registration 🚨
+// Helper function to automatically format 10-digit Indian numbers to E.164 standard
+const formatIdentifier = (identifier) => {
+    if (!isEmail(identifier)) {
+        let clean = identifier.trim();
+        // If it's a 10-digit number, prepend +91
+        if (!clean.startsWith('+') && clean.length === 10) {
+            return `+91${clean}`;
+        }
+        return clean;
+    }
+    return identifier.trim().toLowerCase();
+};
+
+// --- REGISTER USER (Manual Registration) ---
 export const registerUser = async (req, res) => {
     try {
-        // We now expect 'identifier' from the frontend instead of 'email'
         const { username, identifier, password } = req.body;
+        const formattedIdentifier = formatIdentifier(identifier);
         
         // Search by email OR phone depending on what they typed
-        const searchQuery = isEmail(identifier) ? { email: identifier } : { phone: identifier };
+        const searchQuery = isEmail(formattedIdentifier) ? { email: formattedIdentifier } : { phone: formattedIdentifier };
         const userExists = await User.findOne(searchQuery);
         
         if (userExists) return res.status(400).json({ message: 'User already exists with this email or phone number' });
@@ -37,8 +50,8 @@ export const registerUser = async (req, res) => {
         // Save to the correct column in MongoDB
         const user = await User.create({ 
             username, 
-            email: isEmail(identifier) ? identifier : undefined, 
-            phone: isEmail(identifier) ? undefined : identifier,
+            email: isEmail(formattedIdentifier) ? formattedIdentifier : undefined, 
+            phone: isEmail(formattedIdentifier) ? undefined : formattedIdentifier,
             password 
         });
 
@@ -58,49 +71,63 @@ export const registerUser = async (req, res) => {
     }
 };
 
+// --- LOGIN USER (Manual Login) ---
 export const loginUser = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email }).select('+password');
+        const { email, password } = req.body; // 'email' field field handles both identifiers here
+        const formattedIdentifier = formatIdentifier(email);
+
+        const searchQuery = isEmail(formattedIdentifier) ? { email: formattedIdentifier } : { phone: formattedIdentifier };
+        const user = await User.findOne(searchQuery).select('+password');
+
         if (user && (await user.matchPassword(password))) {
-            res.status(200).json({ _id: user._id, username: user.username, email: user.email, token: generateToken(user._id) });
+            res.status(200).json({ 
+                _id: user._id, 
+                username: user.username, 
+                email: user.email, 
+                phone: user.phone,
+                token: generateToken(user._id) 
+            });
         } else {
-            res.status(401).json({ message: 'Invalid email or password' });
+            res.status(401).json({ message: 'Invalid credentials' });
         }
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
+// --- REQUEST OTP ---
 export const requestOtp = async (req, res) => {
     try {
         const { identifier } = req.body;
+        const formattedIdentifier = formatIdentifier(identifier);
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         
         console.log(`\n--- OTP REQUESTED ---`);
-        console.log(`Target: ${identifier}`);
-        console.log(`Type: ${isEmail(identifier) ? 'Email' : 'Phone Number'}`);
+        console.log(`Target: ${formattedIdentifier}`);
+        console.log(`Type: ${isEmail(formattedIdentifier) ? 'Email' : 'Phone Number'}`);
         console.log(`Generated OTP: ${otp}`); 
         console.log(`---------------------\n`);
 
-        otpStore.set(identifier, { otp, expires: Date.now() + 300000 });
+        otpStore.set(formattedIdentifier, { otp, expires: Date.now() + 300000 });
         
-        if (isEmail(identifier)) {
+        if (isEmail(formattedIdentifier)) {
             transporter.sendMail({
                 from: process.env.EMAIL_USER,
-                to: identifier,
+                to: formattedIdentifier,
                 subject: "Your CropCure Login OTP",
                 text: `Your OTP for login is ${otp}. It expires in 5 minutes.`
-            }).catch(emailError => console.log("Email blocked by Render Free Tier, but OTP is in logs."));
+            }).catch(emailError => console.log("Email tracking blocked or failed, check log file."));
         } else {
             twilioClient.messages.create({
                 body: `Your CropCure OTP is ${otp}. It expires in 5 minutes.`,
                 from: process.env.TWILIO_PHONE_NUMBER,
-                to: identifier
+                to: formattedIdentifier
             }).then(() => {
-                console.log("✅ SMS successfully sent to phone!");
+                console.log(`✅ SMS successfully sent to phone: ${formattedIdentifier}`);
             }).catch(smsError => {
-                console.log("❌ Twilio Error: SMS failed. Did you include the +91 country code?");
+                console.log(`❌ Twilio Error: SMS execution failed for target ${formattedIdentifier}`);
+                console.error(smsError);
             });
         }
         
@@ -112,28 +139,30 @@ export const requestOtp = async (req, res) => {
     }
 };
 
+// --- VERIFY OTP ---
 export const verifyOtp = async (req, res) => {
     try {
         const { identifier, otp } = req.body;
-        const data = otpStore.get(identifier);
+        const formattedIdentifier = formatIdentifier(identifier);
+        const data = otpStore.get(formattedIdentifier);
         
         if (!data || data.otp !== otp || Date.now() > data.expires) {
             return res.status(400).json({ message: 'Invalid or expired OTP' });
         }
 
-        const searchQuery = isEmail(identifier) ? { email: identifier } : { phone: identifier };
+        const searchQuery = isEmail(formattedIdentifier) ? { email: formattedIdentifier } : { phone: formattedIdentifier };
         let user = await User.findOne(searchQuery);
 
         if (!user) {
             user = await User.create({ 
-                username: isEmail(identifier) ? identifier.split('@')[0] : `User_${identifier.slice(-4)}`, 
-                email: isEmail(identifier) ? identifier : undefined, 
-                phone: isEmail(identifier) ? undefined : identifier,
+                username: isEmail(formattedIdentifier) ? formattedIdentifier.split('@')[0] : `User_${formattedIdentifier.slice(-4)}`, 
+                email: isEmail(formattedIdentifier) ? formattedIdentifier : undefined, 
+                phone: isEmail(formattedIdentifier) ? undefined : formattedIdentifier,
                 password: Math.random().toString(36).slice(-8) + 'A1!' 
             });
         }
 
-        otpStore.delete(identifier);
+        otpStore.delete(formattedIdentifier);
         res.status(200).json({ 
             _id: user._id, 
             username: user.username, 
