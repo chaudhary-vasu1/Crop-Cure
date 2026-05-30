@@ -13,9 +13,15 @@ export const protect = async (req, res, next) => {
             // Verify token
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+            // ✅ THE FIX: Changed decoded._id to decoded.id
             // Get user from the token payload (excluding the password)
             // and attach it to the request object for the next route to use
-            req.user = await User.findById(decoded._id).select('-password');
+            req.user = await User.findById(decoded.id).select('-password');
+
+            // 🛡️ Extra Safety Check: If user was deleted but token still exists
+            if (!req.user) {
+                return res.status(401).json({ message: 'Not authorized, user no longer exists' });
+            }
 
             next(); // Move to the next middleware or controller
         } catch (error) {
