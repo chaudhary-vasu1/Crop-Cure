@@ -44,7 +44,7 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="w-full px-8">
+        <div style={{ width: '100%', padding: '2rem' }}>
             {/* Weather Widget */}
             <WeatherWidget />
 
@@ -63,13 +63,13 @@ const Dashboard = () => {
             {loading ? (
                 <p className="text-gray-600">Loading your plots...</p>
             ) : plots.length === 0 ? (
-                <div className="p-8 text-center bg-white border border-gray-200 rounded-lg">
+                <div className="p-8 text-center bg-white border border-gray-200 rounded-lg w-full">
                     <p className="text-gray-500">
                         You haven't added any plots yet.
                     </p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 w-full">
                     {plots.map(plot => (
                         <PlotCard
                             key={plot._id}
