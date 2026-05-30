@@ -58,12 +58,15 @@ export const requestOtp = async (req, res) => {
         otpStore.set(identifier, { otp, expires: Date.now() + 300000 });
         
         // Send actual email
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: identifier,
-            subject: "Your CropCure Login OTP",
-            text: `Your OTP for login is ${otp}. It expires in 5 minutes.`
-        });
+       const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // Use SSL
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
         
         res.status(200).json({ message: 'OTP sent successfully' });
     } catch (error) {

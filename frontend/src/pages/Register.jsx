@@ -28,19 +28,19 @@ const Register = () => {
         }
     };
 
-    // Step 2: Verify OTP and Register
+    // Step 2: Verify OTP and Login
     const handleVerifyAndRegister = async (e) => {
         e.preventDefault();
         setError(null);
         setLoading(true);
         try {
-            // 1. Verify the OTP
-            await api.post('/auth/verify-otp', { identifier: formData.email, otp });
+            // Verify OTP and get user/token data from backend
+            const response = await api.post('/auth/verify-otp', { 
+                identifier: formData.email, 
+                otp 
+            });
             
-            // 2. If OTP is valid, create the account
-            const response = await api.post('/auth/register', formData);
-            
-            // 3. Login the user
+            // Log user in automatically using the response from verify-otp
             login(response.data);
             navigate('/'); 
         } catch (err) {
@@ -95,7 +95,9 @@ const Register = () => {
                 ) : (
                     <form onSubmit={handleVerifyAndRegister} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Enter 6-digit OTP sent to {formData.email}</label>
+                            <label className="block text-sm font-medium text-gray-700">
+                                Enter 6-digit OTP sent to {formData.email}
+                            </label>
                             <input 
                                 type="text" required maxLength="6"
                                 className="w-full px-3 py-2 mt-1 border rounded-md focus:outline-none focus:ring focus:ring-green-200 text-center text-xl tracking-widest"
