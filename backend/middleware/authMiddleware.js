@@ -15,7 +15,7 @@ export const protect = async (req, res, next) => {
 
             // Get user from the token payload (excluding the password)
             // and attach it to the request object for the next route to use
-            req.user = await User.findById(decoded.id).select('-password');
+            req.user = await User.findById(decoded._id).select('-password');
 
             next(); // Move to the next middleware or controller
         } catch (error) {
