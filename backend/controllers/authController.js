@@ -60,9 +60,9 @@ export const requestOtp = async (req, res) => {
         // Save OTP to memory
         otpStore.set(identifier, { otp, expires: Date.now() + 300000 });
         
-        // 🚨 THE FIX: "FIRE AND FORGET" 🚨
-        // Notice there is NO 'await' here. The server will start trying to send the email 
-        // in the background but will instantly move to the next line of code.
+        // 🚨 "FIRE AND FORGET" FIX 🚨
+        // No 'await' here. The server starts the email task but immediately 
+        // moves to the next line so your frontend doesn't freeze.
         transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: identifier,
@@ -72,7 +72,7 @@ export const requestOtp = async (req, res) => {
             console.log("Email blocked by Render Free Tier, but OTP is generated in logs.");
         });
         
-        // This line runs instantly now, unfreezing your frontend UI!
+        // This runs instantly, unfreezing your React UI!
         res.status(200).json({ message: 'OTP processed successfully' });
 
     } catch (error) {
@@ -107,6 +107,7 @@ export const verifyOtp = async (req, res) => {
 
         let user = await User.findOne({ email: identifier });
         if (!user) {
+            // Instantly register new users using passwordless auth
             user = await User.create({ 
                 username: identifier.split('@')[0], 
                 email: identifier, 
