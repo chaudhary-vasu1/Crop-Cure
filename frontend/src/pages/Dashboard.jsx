@@ -44,7 +44,7 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full px-8">
             {/* Weather Widget */}
             <WeatherWidget />
 
