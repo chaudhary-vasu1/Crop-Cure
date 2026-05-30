@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import api from '../utils/api'; // ✅ Import your custom api!
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -14,8 +15,14 @@ const Login = () => {
         e.preventDefault();
         setError(null);
         try {
-            await login(email, password);
-            navigate('/'); // Redirect to dashboard on success
+            // ✅ 1. Actually ask the backend to log the user in
+            const response = await api.post('/auth/login', { email, password });
+            
+            // ✅ 2. Hand the real data (which contains the JWT token) to AuthContext
+            login(response.data);
+            
+            // ✅ 3. Redirect to dashboard
+            navigate('/'); 
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to login');
         }
