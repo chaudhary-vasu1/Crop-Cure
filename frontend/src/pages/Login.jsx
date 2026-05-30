@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // <-- Added Link here
+import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from '../utils/api';
 
@@ -39,6 +39,8 @@ const Login = () => {
                         <h2 style={{ marginBottom: '1.5rem', fontSize: '1.25rem', fontWeight: 'bold' }}>Login with Email/Phone</h2>
                         <input 
                             type="text" 
+                            name="identifier"
+                            value={identifier} // Forces the box to show the exact state
                             placeholder="Enter Email or Phone" 
                             onChange={(e) => setIdentifier(e.target.value)} 
                             style={{ width: '100%', padding: '0.75rem', marginBottom: '1rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} 
@@ -53,9 +55,13 @@ const Login = () => {
                         <h2 style={{ marginBottom: '1.5rem', fontSize: '1.25rem', fontWeight: 'bold' }}>Verify OTP</h2>
                         <input 
                             type="text" 
+                            name="otp"
+                            value={otp} // Forces the box to be empty when step 2 starts
+                            maxLength="6" // Restricts input to exactly 6 characters
+                            autoComplete="one-time-code" // Tells the browser this is an OTP box
                             placeholder="Enter 6-digit OTP" 
                             onChange={(e) => setOtp(e.target.value)} 
-                            style={{ width: '100%', padding: '0.75rem', marginBottom: '1rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} 
+                            style={{ width: '100%', padding: '0.75rem', marginBottom: '1rem', border: '1px solid #d1d5db', borderRadius: '0.25rem', textAlign: 'center', letterSpacing: '0.25rem', fontSize: '1.25rem' }} 
                             required 
                         />
                         <button type="submit" style={{ width: '100%', padding: '0.75rem', backgroundColor: '#059669', color: 'white', border: 'none', borderRadius: '0.25rem', cursor: 'pointer' }}>
@@ -64,14 +70,12 @@ const Login = () => {
                     </form>
                 )}
 
-                {/* 🚨 ADDED THE REGISTER LINK HERE 🚨 */}
                 <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: '#4b5563' }}>
                     Don't have an account?{' '}
                     <Link to="/register" style={{ color: '#059669', textDecoration: 'none', fontWeight: 'bold' }}>
                         Register here
                     </Link>
                 </div>
-
             </div>
         </div>
     );
