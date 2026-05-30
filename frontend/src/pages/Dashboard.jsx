@@ -1,18 +1,45 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { AppContext } from '../context/AppContext';
 import api from '../utils/api';
 import PlotCard from '../components/PlotCard';
 import AddPlotModal from '../components/AddPlotModal';
 import DiagnoseModal from '../components/DiagnoseModal';
 import IrrigationModal from '../components/IrrigationModal';
-import WeatherWidget from '../components/WeatherWidget'; 
+import WeatherWidget from '../components/WeatherWidget';
 
 const Dashboard = () => {
+    // 1. Context for language
+    const { language } = useContext(AppContext);
+    
+    // 2. Translations mapping
+    const t = {
+        en: { 
+            title: "My Farm Plots", 
+            addPlot: "+ Add Plot", 
+            loading: "Loading your plots...", 
+            empty: "You haven't added any plots yet.",
+            confirmDelete: "Are you sure you want to delete this plot?",
+            failedDelete: "Failed to delete plot"
+        },
+        hi: { 
+            title: "मेरे खेत के प्लॉट", 
+            addPlot: "+ प्लॉट जोड़ें", 
+            loading: "आपके प्लॉट लोड हो रहे हैं...", 
+            empty: "आपने अभी तक कोई प्लॉट नहीं जोड़ा है।",
+            confirmDelete: "क्या आप वाकई इस प्लॉट को हटाना चाहते हैं?",
+            failedDelete: "प्लॉट हटाने में विफल"
+        }
+    };
+    const lang = t[language] || t.en;
+
+    // 3. Existing state
     const [plots, setPlots] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [selectedPlotForDiagnosis, setSelectedPlotForDiagnosis] = useState(null);
     const [selectedPlotForIrrigation, setSelectedPlotForIrrigation] = useState(null);
 
+    // 4. Existing operations
     useEffect(() => {
         const fetchPlots = async () => {
             try {
@@ -28,13 +55,13 @@ const Dashboard = () => {
     }, []);
 
     const handleDeletePlot = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this plot?')) return;
+        if (!window.confirm(lang.confirmDelete)) return;
         try {
             await api.delete(`/plots/${id}`);
             setPlots(plots.filter(plot => plot._id !== id));
         } catch (error) {
             console.error('Error deleting plot:', error);
-            alert('Failed to delete plot');
+            alert(lang.failedDelete);
         }
     };
 
@@ -43,24 +70,24 @@ const Dashboard = () => {
     };
 
     return (
-        <div style={{ width: '100%' }}>
+        <div style={{ width: '100%', padding: '2rem' }}>
             <WeatherWidget />
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', marginTop: '2rem' }}>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>My Farm Plots</h2>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{lang.title}</h2>
                 <button
                     onClick={() => setIsModalOpen(true)}
                     style={{ padding: '0.5rem 1rem', fontWeight: 'bold', color: 'white', backgroundColor: '#059669', borderRadius: '0.375rem', border: 'none', cursor: 'pointer' }}
                 >
-                    + Add Plot
+                    {lang.addPlot}
                 </button>
             </div>
 
             {loading ? (
-                <p>Loading your plots...</p>
+                <p>{lang.loading}</p>
             ) : plots.length === 0 ? (
                 <div style={{ padding: '2rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem', width: '100%', textAlign: 'center' }}>
-                    <p>You haven't added any plots yet.</p>
+                    <p>{lang.empty}</p>
                 </div>
             ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem', width: '100%' }}>
