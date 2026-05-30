@@ -74,7 +74,7 @@ export const registerUser = async (req, res) => {
 // --- LOGIN USER (Manual Login) ---
 export const loginUser = async (req, res) => {
     try {
-        const { email, password } = req.body; // 'email' field field handles both identifiers here
+        const { email, password } = req.body; // 'email' field handles both identifiers here
         const formattedIdentifier = formatIdentifier(email);
 
         const searchQuery = isEmail(formattedIdentifier) ? { email: formattedIdentifier } : { phone: formattedIdentifier };
@@ -112,30 +112,31 @@ export const requestOtp = async (req, res) => {
         otpStore.set(formattedIdentifier, { otp, expires: Date.now() + 300000 });
         
         if (isEmail(formattedIdentifier)) {
-            transporter.sendMail({
+            // Added 'await' so the server waits for Google to confirm the email was sent
+            await transporter.sendMail({
                 from: process.env.EMAIL_USER,
                 to: formattedIdentifier,
                 subject: "Your CropCure Login OTP",
                 text: `Your OTP for login is ${otp}. It expires in 5 minutes.`
-            }).catch(emailError => console.log("Email tracking blocked or failed, check log file."));
+            });
+            console.log(`✅ Email sent successfully to ${formattedIdentifier}`);
+            return res.status(200).json({ message: 'OTP sent successfully to your email!' });
+
         } else {
-            twilioClient.messages.create({
+            // Added 'await' so the server waits for Twilio to confirm the text was sent
+            await twilioClient.messages.create({
                 body: `Your CropCure OTP is ${otp}. It expires in 5 minutes.`,
                 from: process.env.TWILIO_PHONE_NUMBER,
                 to: formattedIdentifier
-            }).then(() => {
-                console.log(`✅ SMS successfully sent to phone: ${formattedIdentifier}`);
-            }).catch(smsError => {
-                console.log(`❌ Twilio Error: SMS execution failed for target ${formattedIdentifier}`);
-                console.error(smsError);
             });
+            console.log(`✅ SMS sent successfully to ${formattedIdentifier}`);
+            return res.status(200).json({ message: 'OTP sent successfully to your phone!' });
         }
         
-        res.status(200).json({ message: 'OTP processed successfully' });
-
     } catch (error) {
-        console.error("Fatal Server Error:", error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.error("Fatal OTP Error:", error);
+        // If Twilio blocks the unverified number, it jumps straight here and alerts the frontend
+        res.status(500).json({ message: 'Failed to send OTP. If using a phone number, it may not be verified in Twilio.', error: error.message });
     }
 };
 
