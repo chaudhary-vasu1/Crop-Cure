@@ -60,20 +60,19 @@ export const requestOtp = async (req, res) => {
         // Save OTP to memory
         otpStore.set(identifier, { otp, expires: Date.now() + 300000 });
         
-        // 🚨 THE FIX IS HERE 🚨
-        // Attempt to send email, but DO NOT crash if Render blocks it
-        try {
-            await transporter.sendMail({
-                from: process.env.EMAIL_USER,
-                to: identifier,
-                subject: "Your CropCure Login OTP",
-                text: `Your OTP for login is ${otp}. It expires in 5 minutes.`
-            });
-        } catch (emailError) {
+        // 🚨 THE FIX: "FIRE AND FORGET" 🚨
+        // Notice there is NO 'await' here. The server will start trying to send the email 
+        // in the background but will instantly move to the next line of code.
+        transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: identifier,
+            subject: "Your CropCure Login OTP",
+            text: `Your OTP for login is ${otp}. It expires in 5 minutes.`
+        }).catch(emailError => {
             console.log("Email blocked by Render Free Tier, but OTP is generated in logs.");
-        }
+        });
         
-        // ALWAYS return 200 OK so the frontend switches to the OTP input box!
+        // This line runs instantly now, unfreezing your frontend UI!
         res.status(200).json({ message: 'OTP processed successfully' });
 
     } catch (error) {
