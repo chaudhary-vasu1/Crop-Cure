@@ -1,7 +1,7 @@
 import User from '../models/User.js';
 import generateToken from '../utils/generateToken.js';
 import nodemailer from 'nodemailer';
-import twilio from 'twilio'; // <-- Added Twilio
+import twilio from 'twilio';
 
 const otpStore = new Map();
 
@@ -17,21 +17,39 @@ const transporter = nodemailer.createTransport({
 });
 
 // --- SETUP TWILIO (SMS) ---
-// It will look for your env variables automatically
 const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 // Helper function to detect Email vs Phone Number
 const isEmail = (identifier) => identifier.includes('@');
 
+// 🚨 UPDATED: Now handles both Email and Phone manual registration 🚨
 export const registerUser = async (req, res) => {
     try {
-        const { username, email, password } = req.body;
-        const userExists = await User.findOne({ email });
-        if (userExists) return res.status(400).json({ message: 'User already exists' });
+        // We now expect 'identifier' from the frontend instead of 'email'
+        const { username, identifier, password } = req.body;
+        
+        // Search by email OR phone depending on what they typed
+        const searchQuery = isEmail(identifier) ? { email: identifier } : { phone: identifier };
+        const userExists = await User.findOne(searchQuery);
+        
+        if (userExists) return res.status(400).json({ message: 'User already exists with this email or phone number' });
 
-        const user = await User.create({ username, email, password });
+        // Save to the correct column in MongoDB
+        const user = await User.create({ 
+            username, 
+            email: isEmail(identifier) ? identifier : undefined, 
+            phone: isEmail(identifier) ? undefined : identifier,
+            password 
+        });
+
         if (user) {
-            res.status(201).json({ _id: user._id, username: user.username, email: user.email, token: generateToken(user._id) });
+            res.status(201).json({ 
+                _id: user._id, 
+                username: user.username, 
+                email: user.email, 
+                phone: user.phone,
+                token: generateToken(user._id) 
+            });
         } else {
             res.status(400).json({ message: 'Invalid user data received' });
         }
@@ -68,7 +86,6 @@ export const requestOtp = async (req, res) => {
         otpStore.set(identifier, { otp, expires: Date.now() + 300000 });
         
         if (isEmail(identifier)) {
-            // --- SEND EMAIL ---
             transporter.sendMail({
                 from: process.env.EMAIL_USER,
                 to: identifier,
@@ -76,16 +93,14 @@ export const requestOtp = async (req, res) => {
                 text: `Your OTP for login is ${otp}. It expires in 5 minutes.`
             }).catch(emailError => console.log("Email blocked by Render Free Tier, but OTP is in logs."));
         } else {
-            // --- SEND REAL SMS ---
-            // Fire and forget, just like the email
             twilioClient.messages.create({
                 body: `Your CropCure OTP is ${otp}. It expires in 5 minutes.`,
                 from: process.env.TWILIO_PHONE_NUMBER,
-                to: identifier // WARNING: User must type their country code (e.g., +919876543210)
+                to: identifier
             }).then(() => {
                 console.log("✅ SMS successfully sent to phone!");
             }).catch(smsError => {
-                console.log("❌ Twilio Error: SMS failed. Did you include the +91 country code? Or are your API keys missing?");
+                console.log("❌ Twilio Error: SMS failed. Did you include the +91 country code?");
             });
         }
         

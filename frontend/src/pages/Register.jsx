@@ -1,122 +1,148 @@
-import { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-import api from '../utils/api';
+import User from '../models/User.js';
+import generateToken from '../utils/generateToken.js';
+import nodemailer from 'nodemailer';
+import twilio from 'twilio';
 
-const Register = () => {
-    const [formData, setFormData] = useState({ username: '', email: '', password: '' });
-    const [otp, setOtp] = useState('');
-    const [step, setStep] = useState(1); // 1: Enter Details, 2: Enter OTP
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
-    
-    const { login } = useContext(AuthContext);
-    const navigate = useNavigate();
+const otpStore = new Map();
 
-    // Step 1: Request OTP
-    const handleRequestOtp = async (e) => {
-        e.preventDefault();
-        setError(null);
-        setLoading(true);
-        try {
-            await api.post('/auth/request-otp', { identifier: formData.email });
-            setStep(2);
-        } catch (err) {
-            setError(err.response?.data?.message || 'Failed to send OTP');
-        } finally {
-            setLoading(false);
-        }
-    };
+// --- SETUP NODEMAILER (Email) ---
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, 
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
 
-    // Step 2: Verify OTP and Login
-    const handleVerifyAndRegister = async (e) => {
-        e.preventDefault();
-        setError(null);
-        setLoading(true);
-        try {
-            // Verify OTP and get user/token data from backend
-            const response = await api.post('/auth/verify-otp', { 
-                identifier: formData.email, 
-                otp 
+// --- SETUP TWILIO (SMS) ---
+const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
+// Helper function to detect Email vs Phone Number
+const isEmail = (identifier) => identifier.includes('@');
+
+// 🚨 UPDATED: Now handles both Email and Phone manual registration 🚨
+export const registerUser = async (req, res) => {
+    try {
+        // We now expect 'identifier' from the frontend instead of 'email'
+        const { username, identifier, password } = req.body;
+        
+        // Search by email OR phone depending on what they typed
+        const searchQuery = isEmail(identifier) ? { email: identifier } : { phone: identifier };
+        const userExists = await User.findOne(searchQuery);
+        
+        if (userExists) return res.status(400).json({ message: 'User already exists with this email or phone number' });
+
+        // Save to the correct column in MongoDB
+        const user = await User.create({ 
+            username, 
+            email: isEmail(identifier) ? identifier : undefined, 
+            phone: isEmail(identifier) ? undefined : identifier,
+            password 
+        });
+
+        if (user) {
+            res.status(201).json({ 
+                _id: user._id, 
+                username: user.username, 
+                email: user.email, 
+                phone: user.phone,
+                token: generateToken(user._id) 
             });
-            
-            // Log user in automatically using the response from verify-otp
-            login(response.data);
-            navigate('/'); 
-        } catch (err) {
-            setError(err.response?.data?.message || 'Verification failed. Please try again.');
-        } finally {
-            setLoading(false);
+        } else {
+            res.status(400).json({ message: 'Invalid user data received' });
         }
-    };
-
-    return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
-                <h2 className="text-2xl font-bold text-center text-green-700">
-                    {step === 1 ? 'Create Account' : 'Verify Email'}
-                </h2>
-                
-                {error && <div className="p-3 text-sm text-red-700 bg-red-100 rounded">{error}</div>}
-                
-                {step === 1 ? (
-                    <form onSubmit={handleRequestOtp} className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Username</label>
-                            <input 
-                                type="text" required 
-                                className="w-full px-3 py-2 mt-1 border rounded-md focus:outline-none focus:ring focus:ring-green-200"
-                                value={formData.username}
-                                onChange={(e) => setFormData({...formData, username: e.target.value})}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Email</label>
-                            <input 
-                                type="email" required 
-                                className="w-full px-3 py-2 mt-1 border rounded-md focus:outline-none focus:ring focus:ring-green-200"
-                                value={formData.email}
-                                onChange={(e) => setFormData({...formData, email: e.target.value})}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Password</label>
-                            <input 
-                                type="password" required 
-                                className="w-full px-3 py-2 mt-1 border rounded-md focus:outline-none focus:ring focus:ring-green-200"
-                                value={formData.password}
-                                onChange={(e) => setFormData({...formData, password: e.target.value})}
-                            />
-                        </div>
-                        <button type="submit" disabled={loading} className="w-full px-4 py-2 font-bold text-white bg-green-600 rounded hover:bg-green-700">
-                            {loading ? 'Sending...' : 'Send OTP'}
-                        </button>
-                    </form>
-                ) : (
-                    <form onSubmit={handleVerifyAndRegister} className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                                Enter 6-digit OTP sent to {formData.email}
-                            </label>
-                            <input 
-                                type="text" required maxLength="6"
-                                className="w-full px-3 py-2 mt-1 border rounded-md focus:outline-none focus:ring focus:ring-green-200 text-center text-xl tracking-widest"
-                                value={otp}
-                                onChange={(e) => setOtp(e.target.value)}
-                            />
-                        </div>
-                        <button type="submit" disabled={loading} className="w-full px-4 py-2 font-bold text-white bg-green-600 rounded hover:bg-green-700">
-                            {loading ? 'Verifying...' : 'Complete Registration'}
-                        </button>
-                    </form>
-                )}
-                
-                <p className="text-sm text-center text-gray-600">
-                    Already have an account? <Link to="/login" className="text-green-600 hover:underline">Login</Link>
-                </p>
-            </div>
-        </div>
-    );
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
 };
 
-export default Register;
+export const loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email }).select('+password');
+        if (user && (await user.matchPassword(password))) {
+            res.status(200).json({ _id: user._id, username: user.username, email: user.email, token: generateToken(user._id) });
+        } else {
+            res.status(401).json({ message: 'Invalid email or password' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+export const requestOtp = async (req, res) => {
+    try {
+        const { identifier } = req.body;
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        console.log(`\n--- OTP REQUESTED ---`);
+        console.log(`Target: ${identifier}`);
+        console.log(`Type: ${isEmail(identifier) ? 'Email' : 'Phone Number'}`);
+        console.log(`Generated OTP: ${otp}`); 
+        console.log(`---------------------\n`);
+
+        otpStore.set(identifier, { otp, expires: Date.now() + 300000 });
+        
+        if (isEmail(identifier)) {
+            transporter.sendMail({
+                from: process.env.EMAIL_USER,
+                to: identifier,
+                subject: "Your CropCure Login OTP",
+                text: `Your OTP for login is ${otp}. It expires in 5 minutes.`
+            }).catch(emailError => console.log("Email blocked by Render Free Tier, but OTP is in logs."));
+        } else {
+            twilioClient.messages.create({
+                body: `Your CropCure OTP is ${otp}. It expires in 5 minutes.`,
+                from: process.env.TWILIO_PHONE_NUMBER,
+                to: identifier
+            }).then(() => {
+                console.log("✅ SMS successfully sent to phone!");
+            }).catch(smsError => {
+                console.log("❌ Twilio Error: SMS failed. Did you include the +91 country code?");
+            });
+        }
+        
+        res.status(200).json({ message: 'OTP processed successfully' });
+
+    } catch (error) {
+        console.error("Fatal Server Error:", error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+export const verifyOtp = async (req, res) => {
+    try {
+        const { identifier, otp } = req.body;
+        const data = otpStore.get(identifier);
+        
+        if (!data || data.otp !== otp || Date.now() > data.expires) {
+            return res.status(400).json({ message: 'Invalid or expired OTP' });
+        }
+
+        const searchQuery = isEmail(identifier) ? { email: identifier } : { phone: identifier };
+        let user = await User.findOne(searchQuery);
+
+        if (!user) {
+            user = await User.create({ 
+                username: isEmail(identifier) ? identifier.split('@')[0] : `User_${identifier.slice(-4)}`, 
+                email: isEmail(identifier) ? identifier : undefined, 
+                phone: isEmail(identifier) ? undefined : identifier,
+                password: Math.random().toString(36).slice(-8) + 'A1!' 
+            });
+        }
+
+        otpStore.delete(identifier);
+        res.status(200).json({ 
+            _id: user._id, 
+            username: user.username, 
+            email: user.email, 
+            phone: user.phone,
+            token: generateToken(user._id) 
+        });
+    } catch (error) {
+        console.error("Verify Error:", error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
