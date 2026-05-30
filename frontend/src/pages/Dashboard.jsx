@@ -43,27 +43,27 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="w-full h-full">
+        <div style={{ width: '100%' }}>
             <WeatherWidget />
 
-            <div className="flex items-center justify-between mb-6 mt-8 w-full">
-                <h2 className="text-2xl font-bold text-gray-800">My Farm Plots</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', marginTop: '2rem' }}>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>My Farm Plots</h2>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="px-4 py-2 font-bold text-white bg-green-600 rounded shadow-sm hover:bg-green-700"
+                    style={{ padding: '0.5rem 1rem', fontWeight: 'bold', color: 'white', backgroundColor: '#059669', borderRadius: '0.375rem', border: 'none', cursor: 'pointer' }}
                 >
                     + Add Plot
                 </button>
             </div>
 
             {loading ? (
-                <p className="text-gray-600">Loading your plots...</p>
+                <p>Loading your plots...</p>
             ) : plots.length === 0 ? (
-                <div className="p-8 text-center bg-white border border-gray-200 rounded-lg w-full">
-                    <p className="text-gray-500">You haven't added any plots yet.</p>
+                <div style={{ padding: '2rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem', width: '100%', textAlign: 'center' }}>
+                    <p>You haven't added any plots yet.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 w-full">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem', width: '100%' }}>
                     {plots.map(plot => (
                         <PlotCard
                             key={plot._id}
