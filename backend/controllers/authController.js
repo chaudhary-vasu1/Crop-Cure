@@ -52,16 +52,14 @@ export const requestOtp = async (req, res) => {
         const { identifier } = req.body;
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         
-        // 2. Critical Debug Logs (View these in the Render Dashboard)
         console.log(`\n--- OTP REQUESTED ---`);
         console.log(`Target Email: ${identifier}`);
-        console.log(`Generated OTP: ${otp}`); // You can use this to bypass email failure
+        console.log(`Generated OTP: ${otp}`); 
         console.log(`Has EMAIL_PASS? : ${!!process.env.EMAIL_PASS}`);
         console.log(`---------------------\n`);
 
         otpStore.set(identifier, { otp, expires: Date.now() + 300000 });
         
-        // 3. Actually send the email (This was missing in your last version)
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: identifier,
@@ -79,11 +77,29 @@ export const requestOtp = async (req, res) => {
 export const verifyOtp = async (req, res) => {
     try {
         const { identifier, otp } = req.body;
-        const data = otpStore.get(identifier);
+        
+        // --- NEW DEBUG LOGS ---
+        console.log(`\n--- VERIFY ATTEMPT ---`);
+        console.log(`1. Email sent from frontend: "${identifier}"`);
+        console.log(`2. OTP entered by user: "${otp}"`);
 
-        if (!data || data.otp !== otp || Date.now() > data.expires) {
+        const data = otpStore.get(identifier);
+        console.log(`3. Data found in server memory:`, data);
+        
+        if (!data) {
+            console.log("❌ FAIL: No OTP found in memory for this email (Server restarted, or email is wrong).");
             return res.status(400).json({ message: 'Invalid or expired OTP' });
         }
+        if (data.otp !== otp) {
+            console.log(`❌ FAIL: OTP mismatch. Expected [${data.otp}], got [${otp}]`);
+            return res.status(400).json({ message: 'Invalid or expired OTP' });
+        }
+        if (Date.now() > data.expires) {
+            console.log("❌ FAIL: OTP expired.");
+            return res.status(400).json({ message: 'Invalid or expired OTP' });
+        }
+        console.log("✅ SUCCESS: OTP matches!");
+        // -----------------------
 
         let user = await User.findOne({ email: identifier });
         if (!user) {
@@ -102,6 +118,7 @@ export const verifyOtp = async (req, res) => {
             token: generateToken(user._id) 
         });
     } catch (error) {
+        console.error("Verify Error:", error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
