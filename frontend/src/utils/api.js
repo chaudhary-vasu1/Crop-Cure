@@ -1,16 +1,19 @@
 import axios from 'axios';
 
 const api = axios.create({
-    // Notice the /api added to the end!
-    baseURL: 'https://crop-cure-backend-f2zf.onrender.com/api',
+    // Make sure this points to your Render backend!
+    baseURL: 'https://crop-cure-backend-f2zf.onrender.com/api' 
 });
 
-// Request interceptor to add the JWT token to headers
+// 👇 ADD THIS INTERCEPTOR 👇
 api.interceptors.request.use(
     (config) => {
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (user && user.token) {
-            config.headers.Authorization = `Bearer ${user.token}`;
+        // Look in local storage for the token
+        const token = localStorage.getItem('token');
+        
+        // If we have a token, attach it to the Authorization header
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
     },
