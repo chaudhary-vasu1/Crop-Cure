@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; // <-- Added Link here
 import { AuthContext } from '../context/AuthContext';
 import api from '../utils/api';
 
@@ -13,7 +13,6 @@ const Login = () => {
     const handleRequestOtp = async (e) => {
         e.preventDefault();
         try {
-            // Using your existing api utility
             await api.post('/auth/request-otp', { identifier });
             setStep(2);
         } catch (err) {
@@ -24,10 +23,7 @@ const Login = () => {
     const handleVerifyOtp = async (e) => {
         e.preventDefault();
         try {
-            // This verifies the OTP and returns the same token structure as your old login
             const res = await api.post('/auth/verify-otp', { identifier, otp });
-            
-            // Reusing your existing login function from AuthContext keeps everything else working
             login(res.data);
             navigate('/');
         } catch (err) {
@@ -67,6 +63,15 @@ const Login = () => {
                         </button>
                     </form>
                 )}
+
+                {/* 🚨 ADDED THE REGISTER LINK HERE 🚨 */}
+                <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: '#4b5563' }}>
+                    Don't have an account?{' '}
+                    <Link to="/register" style={{ color: '#059669', textDecoration: 'none', fontWeight: 'bold' }}>
+                        Register here
+                    </Link>
+                </div>
+
             </div>
         </div>
     );
