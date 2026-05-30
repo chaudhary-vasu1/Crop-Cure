@@ -1,11 +1,11 @@
 import User from '../models/User.js';
 import generateToken from '../utils/generateToken.js';
 import nodemailer from 'nodemailer';
+import twilio from 'twilio'; // <-- Added Twilio
 
-// Temporary storage
 const otpStore = new Map();
 
-// Single, Production-Ready Transporter Configuration
+// --- SETUP NODEMAILER (Email) ---
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
@@ -15,6 +15,13 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS
     }
 });
+
+// --- SETUP TWILIO (SMS) ---
+// It will look for your env variables automatically
+const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
+// Helper function to detect Email vs Phone Number
+const isEmail = (identifier) => identifier.includes('@');
 
 export const registerUser = async (req, res) => {
     try {
@@ -53,26 +60,35 @@ export const requestOtp = async (req, res) => {
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         
         console.log(`\n--- OTP REQUESTED ---`);
-        console.log(`Target Email: ${identifier}`);
+        console.log(`Target: ${identifier}`);
+        console.log(`Type: ${isEmail(identifier) ? 'Email' : 'Phone Number'}`);
         console.log(`Generated OTP: ${otp}`); 
         console.log(`---------------------\n`);
 
-        // Save OTP to memory
         otpStore.set(identifier, { otp, expires: Date.now() + 300000 });
         
-        // 🚨 "FIRE AND FORGET" FIX 🚨
-        // No 'await' here. The server starts the email task but immediately 
-        // moves to the next line so your frontend doesn't freeze.
-        transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: identifier,
-            subject: "Your CropCure Login OTP",
-            text: `Your OTP for login is ${otp}. It expires in 5 minutes.`
-        }).catch(emailError => {
-            console.log("Email blocked by Render Free Tier, but OTP is generated in logs.");
-        });
+        if (isEmail(identifier)) {
+            // --- SEND EMAIL ---
+            transporter.sendMail({
+                from: process.env.EMAIL_USER,
+                to: identifier,
+                subject: "Your CropCure Login OTP",
+                text: `Your OTP for login is ${otp}. It expires in 5 minutes.`
+            }).catch(emailError => console.log("Email blocked by Render Free Tier, but OTP is in logs."));
+        } else {
+            // --- SEND REAL SMS ---
+            // Fire and forget, just like the email
+            twilioClient.messages.create({
+                body: `Your CropCure OTP is ${otp}. It expires in 5 minutes.`,
+                from: process.env.TWILIO_PHONE_NUMBER,
+                to: identifier // WARNING: User must type their country code (e.g., +919876543210)
+            }).then(() => {
+                console.log("✅ SMS successfully sent to phone!");
+            }).catch(smsError => {
+                console.log("❌ Twilio Error: SMS failed. Did you include the +91 country code? Or are your API keys missing?");
+            });
+        }
         
-        // This runs instantly, unfreezing your React UI!
         res.status(200).json({ message: 'OTP processed successfully' });
 
     } catch (error) {
@@ -84,33 +100,20 @@ export const requestOtp = async (req, res) => {
 export const verifyOtp = async (req, res) => {
     try {
         const { identifier, otp } = req.body;
-        
-        console.log(`\n--- VERIFY ATTEMPT ---`);
-        console.log(`1. Email: "${identifier}"`);
-        console.log(`2. OTP Entered: "${otp}"`);
-
         const data = otpStore.get(identifier);
         
-        if (!data) {
-            console.log("❌ FAIL: No OTP found in memory for this email.");
+        if (!data || data.otp !== otp || Date.now() > data.expires) {
             return res.status(400).json({ message: 'Invalid or expired OTP' });
         }
-        if (data.otp !== otp) {
-            console.log(`❌ FAIL: OTP mismatch. Expected [${data.otp}], got [${otp}]`);
-            return res.status(400).json({ message: 'Invalid or expired OTP' });
-        }
-        if (Date.now() > data.expires) {
-            console.log("❌ FAIL: OTP expired.");
-            return res.status(400).json({ message: 'Invalid or expired OTP' });
-        }
-        console.log("✅ SUCCESS: OTP matches!");
 
-        let user = await User.findOne({ email: identifier });
+        const searchQuery = isEmail(identifier) ? { email: identifier } : { phone: identifier };
+        let user = await User.findOne(searchQuery);
+
         if (!user) {
-            // Instantly register new users using passwordless auth
             user = await User.create({ 
-                username: identifier.split('@')[0], 
-                email: identifier, 
+                username: isEmail(identifier) ? identifier.split('@')[0] : `User_${identifier.slice(-4)}`, 
+                email: isEmail(identifier) ? identifier : undefined, 
+                phone: isEmail(identifier) ? undefined : identifier,
                 password: Math.random().toString(36).slice(-8) + 'A1!' 
             });
         }
@@ -120,6 +123,7 @@ export const verifyOtp = async (req, res) => {
             _id: user._id, 
             username: user.username, 
             email: user.email, 
+            phone: user.phone,
             token: generateToken(user._id) 
         });
     } catch (error) {
