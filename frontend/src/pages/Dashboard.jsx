@@ -21,6 +21,14 @@ const Dashboard = () => {
             confirmDelete: "Are you sure you want to delete this plot?",
             failedDelete: "Failed to delete plot"
         },
+        es: {
+            title: "Mis Parcelas de Campo",
+            addPlot: "+ Añadir Parcela",
+            loading: "Cargando sus parcelas...",
+            empty: "Aún no ha añadido ninguna parcela.",
+            confirmDelete: "¿Está seguro de que desea eliminar esta parcela?",
+            failedDelete: "Error al eliminar la parcela"
+        },
         hi: { 
             title: "मेरे खेत के प्लॉट", 
             addPlot: "+ प्लॉट जोड़ें", 

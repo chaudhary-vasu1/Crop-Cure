@@ -7,12 +7,40 @@ import { AppContext } from '../context/AppContext';
 const Sidebar = () => {
     const location = useLocation();
     const { logout } = useContext(AuthContext);
-    const { theme, toggleTheme } = useContext(AppContext); 
+    const { theme, toggleTheme, language } = useContext(AppContext); 
+
+    const t = {
+        en: {
+            dashboard: 'Dashboard',
+            crops: 'My Crops',
+            settings: 'Settings',
+            lightMode: 'Light Mode',
+            darkMode: 'Dark Mode',
+            logout: 'Logout'
+        },
+        es: {
+            dashboard: 'Panel',
+            crops: 'Mis Cultivos',
+            settings: 'Ajustes',
+            lightMode: 'Modo Claro',
+            darkMode: 'Modo Oscuro',
+            logout: 'Cerrar Sesión'
+        },
+        hi: {
+            dashboard: 'डैशबोर्ड',
+            crops: 'मेरी फसलें',
+            settings: 'सेटिंग्स',
+            lightMode: 'लाइट मोड',
+            darkMode: 'डार्क मोड',
+            logout: 'लॉगआउट'
+        }
+    };
+    const lang = t[language] || t.en;
 
     const menuItems = [
-        { name: 'Dashboard', path: '/', icon: Home },
-        { name: 'My Crops', path: '/crops', icon: Sprout },
-        { name: 'Settings', path: '/settings', icon: Settings },
+        { name: lang.dashboard, path: '/', icon: Home },
+        { name: lang.crops, path: '/crops', icon: Sprout },
+        { name: lang.settings, path: '/settings', icon: Settings },
     ];
 
     return (
@@ -32,7 +60,7 @@ const Sidebar = () => {
                     const isActive = location.pathname === item.path;
                     return (
                         <Link
-                            key={item.name}
+                            key={item.path}
                             to={item.path}
                             className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                                 isActive 
@@ -56,7 +84,7 @@ const Sidebar = () => {
                     className="flex items-center w-full gap-3 px-4 py-3 mb-2 transition-colors rounded-lg text-green-50 hover:bg-green-700 dark:text-gray-300 dark:hover:bg-gray-900"
                 >
                     {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-                    <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+                    <span>{theme === 'dark' ? lang.lightMode : lang.darkMode}</span>
                 </button>
 
                 {/* Logout Button */}
@@ -65,7 +93,7 @@ const Sidebar = () => {
                     className="flex items-center w-full gap-3 px-4 py-3 text-red-200 transition-colors rounded-lg hover:bg-red-500 hover:text-white dark:text-red-400 dark:hover:bg-red-900/50"
                 >
                     <LogOut size={20} />
-                    <span>Logout</span>
+                    <span>{lang.logout}</span>
                 </button>
             </div>
         </div>
