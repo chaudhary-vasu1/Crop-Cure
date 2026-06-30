@@ -9,6 +9,36 @@ const WeatherWidget = ({ defaultCity }) => {
     const [error, setError] = useState(null);
     const [searchCity, setSearchCity] = useState('');
     const [isEditing, setIsEditing] = useState(false);
+    const [gpsLoading, setGpsLoading] = useState(false);
+
+    const handleGpsWeather = () => {
+        if (!navigator.geolocation) {
+            alert("Geolocation is not supported by your browser");
+            return;
+        }
+        setGpsLoading(true);
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+                try {
+                    const response = await api.get(`/weather/reverse-geocode?lat=${latitude}&lng=${longitude}`);
+                    const resolvedName = response.data.location;
+                    await fetchWeather(resolvedName);
+                    setIsEditing(false);
+                } catch (err) {
+                    console.error("GPS weather error:", err);
+                    alert("Failed to auto-detect location weather. Please search manually.");
+                } finally {
+                    setGpsLoading(false);
+                }
+            },
+            (err) => {
+                console.error("GPS access error:", err);
+                alert("Geolocation access denied. Please search your location manually.");
+                setGpsLoading(false);
+            }
+        );
+    };
 
     const fetchWeather = async (targetCity) => {
         setLoading(true);
@@ -56,7 +86,7 @@ const WeatherWidget = ({ defaultCity }) => {
                 <p className="font-semibold text-red-600 dark:text-red-400">{error}</p>
                 <div className="flex gap-2 items-center w-full sm:w-auto">
                     {isEditing ? (
-                        <form onSubmit={handleSearchSubmit} className="flex gap-2 items-center w-full">
+                        <form onSubmit={handleSearchSubmit} className="flex gap-2 items-center w-full flex-wrap sm:flex-nowrap">
                             <input 
                                 type="text" 
                                 placeholder="Enter city..." 
@@ -68,14 +98,32 @@ const WeatherWidget = ({ defaultCity }) => {
                             <button type="submit" className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg border-none cursor-pointer font-bold text-xs">
                                 Go
                             </button>
+                            <button 
+                                type="button"
+                                disabled={gpsLoading}
+                                onClick={handleGpsWeather}
+                                className="px-3 py-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg border-none cursor-pointer font-bold text-xs flex items-center gap-1 transition"
+                            >
+                                📍 {gpsLoading ? "..." : "GPS"}
+                            </button>
                         </form>
                     ) : (
-                        <button 
-                            onClick={() => setIsEditing(true)} 
-                            className="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs border-none cursor-pointer"
-                        >
-                            Try Another City
-                        </button>
+                        <div className="flex gap-2 items-center">
+                            <button 
+                                onClick={() => setIsEditing(true)} 
+                                className="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs border-none cursor-pointer"
+                            >
+                                Try Another City
+                            </button>
+                            <button 
+                                type="button"
+                                disabled={gpsLoading}
+                                onClick={handleGpsWeather}
+                                className="px-4 py-1.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold rounded-xl text-xs border-none cursor-pointer flex items-center gap-1 transition"
+                            >
+                                📍 {gpsLoading ? "Detecting..." : "Detect GPS"}
+                            </button>
+                        </div>
                     )}
                 </div>
             </div>
@@ -89,7 +137,7 @@ const WeatherWidget = ({ defaultCity }) => {
             <div className="z-10 text-left">
                 <div className="flex items-center gap-2">
                     {isEditing ? (
-                        <form onSubmit={handleSearchSubmit} className="flex gap-2 items-center animate-fade-in">
+                        <form onSubmit={handleSearchSubmit} className="flex gap-2 items-center flex-wrap sm:flex-nowrap animate-fade-in">
                             <input 
                                 type="text" 
                                 placeholder="Change city..." 
@@ -100,6 +148,15 @@ const WeatherWidget = ({ defaultCity }) => {
                             />
                             <button type="submit" className="p-2 bg-white/25 hover:bg-white/40 text-white rounded-xl border-none cursor-pointer flex items-center justify-center">
                                 <Check size={14} />
+                            </button>
+                            <button 
+                                type="button"
+                                disabled={gpsLoading}
+                                onClick={handleGpsWeather}
+                                className="px-3 py-1.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold rounded-xl border-none cursor-pointer text-xs flex items-center gap-1 transition"
+                                title="Use current GPS location"
+                            >
+                                📍 {gpsLoading ? "..." : "GPS"}
                             </button>
                         </form>
                     ) : (
