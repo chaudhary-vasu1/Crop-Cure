@@ -2,7 +2,7 @@ import { Trash2, MapPin, Layers, Droplet } from 'lucide-react';
 
 const PlotCard = ({ plot, onDelete, onDiagnose, onIrrigation }) => {
     return (
-        <div className="flex flex-col h-full p-5 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-sm hover:shadow-md transition duration-300">
+        <div className="flex flex-col h-full p-5 bg-white dark:bg-gray-800 border border-gray-150 dark:border-gray-700 border-l-4 border-l-green-600 rounded-r-2xl rounded-l-md shadow-sm hover:shadow-md hover:-translate-y-1 transform hover:scale-[1.01] transition-all duration-300">
             
             {/* Header Section */}
             <div className="flex items-start justify-between mb-4">

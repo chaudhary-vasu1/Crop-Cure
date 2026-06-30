@@ -51,14 +51,14 @@ const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
                 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                     <div>
-                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Plot Name (e.g., North Field)</label>
+                        <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide text-left">Plot Name (e.g., North Field)</label>
                         <input 
                             type="text" required value={name} onChange={(e) => setName(e.target.value)}
                             className="w-full p-2 mt-1 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-green-500 outline-none"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Crop Type (e.g., Wheat, Corn)</label>
+                        <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide text-left">Crop Type (e.g., Wheat, Corn)</label>
                         <input 
                             type="text" required value={cropType} onChange={(e) => setCropType(e.target.value)}
                             className="w-full p-2 mt-1 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-green-500 outline-none"
@@ -66,14 +66,14 @@ const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Area (acres)</label>
+                            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide text-left">Area (acres)</label>
                             <input 
                                 type="number" required min="0.1" step="0.1" value={area} onChange={(e) => setArea(e.target.value)}
                                 className="w-full p-2 mt-1 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-green-500 outline-none"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Location/City</label>
+                            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide text-left">Location/City</label>
                             <input 
                                 type="text" required value={location} onChange={(e) => setLocation(e.target.value)}
                                 className="w-full p-2 mt-1 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-green-500 outline-none"
@@ -82,7 +82,7 @@ const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Soil Type</label>
+                            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide text-left">Soil Type</label>
                             <select 
                                 value={soilType} onChange={(e) => setSoilType(e.target.value)}
                                 className="w-full p-2 mt-1 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-green-500 outline-none cursor-pointer"
@@ -94,7 +94,7 @@ const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Irrigation Method</label>
+                            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide text-left">Irrigation Method</label>
                             <select 
                                 value={irrigationMethod} onChange={(e) => setIrrigationMethod(e.target.value)}
                                 className="w-full p-2 mt-1 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-green-500 outline-none cursor-pointer"
