@@ -67,3 +67,31 @@ export const getWeather = async (req, res) => {
         }
     }
 };
+
+// @desc    Reverse geocode coordinates using AI
+// @route   GET /api/weather/reverse-geocode
+// @access  Private
+export const reverseGeocode = async (req, res) => {
+    try {
+        const { lat, lng } = req.query;
+        if (!lat || !lng) {
+            return res.status(400).json({ message: 'Latitude and longitude are required' });
+        }
+        
+        console.log(`AI Reverse geocoding Lat: ${lat}, Lng: ${lng}...`);
+        const prompt = `You are a precise geocoder. Given the latitude: ${lat} and longitude: ${lng} in India, identify the nearest village, town, and district name. Return ONLY the resolved location name in English (e.g. "Sardhana, Meerut" or "Noida, Gautam Buddha Nagar"), with absolutely no extra sentences, punctuation, or bold tags.`;
+        
+        const aiResponse = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt
+        });
+        
+        const locationName = aiResponse.text.trim().replace(/[*"']/g, '');
+        console.log(`Resolved coordinate to location name: ${locationName}`);
+        
+        res.status(200).json({ location: locationName });
+    } catch (error) {
+        console.error("Reverse geocoding error:", error.message);
+        res.status(500).json({ message: "Failed to reverse geocode location" });
+    }
+};

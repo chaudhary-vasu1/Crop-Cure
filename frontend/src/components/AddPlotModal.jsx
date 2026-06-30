@@ -9,6 +9,34 @@ const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
     const [soilType, setSoilType] = useState('Loamy');
     const [irrigationMethod, setIrrigationMethod] = useState('Drip');
     const [loading, setLoading] = useState(false);
+    const [gpsLoading, setGpsLoading] = useState(false);
+
+    const handleGpsDetect = () => {
+        if (!navigator.geolocation) {
+            alert("Geolocation is not supported by your browser");
+            return;
+        }
+        setGpsLoading(true);
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+                try {
+                    const response = await api.get(`/weather/reverse-geocode?lat=${latitude}&lng=${longitude}`);
+                    setLocation(response.data.location);
+                } catch (err) {
+                    console.error("GPS resolve error:", err);
+                    alert("Failed to auto-detect location. Please enter it manually.");
+                } finally {
+                    setGpsLoading(false);
+                }
+            },
+            (err) => {
+                console.error("GPS permission error:", err);
+                alert("Geolocation access denied. Please type your location manually.");
+                setGpsLoading(false);
+            }
+        );
+    };
 
     if (!isOpen) return null;
 
@@ -76,8 +104,17 @@ const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
                             <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide text-left">Location/City</label>
                             <input 
                                 type="text" required value={location} onChange={(e) => setLocation(e.target.value)}
-                                className="w-full p-2 mt-1 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-green-500 outline-none"
+                                className="w-full p-2 mt-1 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-green-500 outline-none text-sm"
+                                placeholder="e.g. Meerut, Sardhana"
                             />
+                            <button
+                                type="button"
+                                disabled={gpsLoading}
+                                onClick={handleGpsDetect}
+                                className="mt-2 w-full py-1.5 px-3 text-[11px] font-bold text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/20 hover:bg-green-100 dark:hover:bg-green-950/40 rounded-lg cursor-pointer transition border border-dashed border-green-300 dark:border-green-800 text-center flex items-center justify-center gap-1"
+                            >
+                                📍 {gpsLoading ? "Detecting location..." : "Detect GPS Location"}
+                            </button>
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">

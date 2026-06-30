@@ -51,8 +51,8 @@ export const deletePlot = async (req, res) => {
             return res.status(404).json({ message: 'Plot not found' });
         }
 
-        // ✅ Safely converting both to strings to ensure a perfect match
-        if (plot.user.toString() !== req.user._id.toString()) {
+        // ✅ Safely check ownership if user field exists
+        if (plot.user && plot.user.toString() !== req.user._id.toString()) {
             return res.status(401).json({ message: 'User not authorized to delete this plot' });
         }
 
