@@ -69,9 +69,11 @@ const Dashboard = () => {
         setPlots([newPlot, ...plots]);
     };
 
+    const defaultCity = plots.length > 0 && plots[0].location ? plots[0].location.split(',')[0].trim() : undefined;
+
     return (
         <div className="w-full text-left">
-            <WeatherWidget />
+            <WeatherWidget defaultCity={defaultCity} />
 
             <div className="flex justify-between items-center mb-6 mt-8">
                 <h2 className="text-2xl font-extrabold text-gray-850 dark:text-white">{lang.title}</h2>
