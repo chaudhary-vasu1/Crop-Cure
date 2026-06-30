@@ -21,9 +21,11 @@ const app = express();
 // Connect Database
 connectDB();
 
-// =============================
-// Global Middleware
-// =============================
+// Request logging middleware
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} - Body:`, req.body);
+    next();
+});
 
 // Enable CORS for frontend requests
 app.use(cors());
