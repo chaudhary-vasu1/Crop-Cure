@@ -215,3 +215,44 @@ export const resetPassword = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+
+// --- UPDATE USER PROFILE ---
+export const updateProfile = async (req, res) => {
+    try {
+        const { username } = req.body;
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        user.username = username;
+        await user.save();
+        res.status(200).json({ 
+            message: 'Profile updated successfully', 
+            user: { id: user._id, username: user.username, email: user.email, phone: user.phone } 
+        });
+    } catch (error) {
+        console.error("Update Profile Error:", error);
+        res.status(500).json({ message: 'Server error updating profile' });
+    }
+};
+
+// --- UPDATE PASSWORD ---
+export const updatePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const user = await User.findById(req.user._id).select('+password');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const isMatch = await user.matchPassword(currentPassword);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Incorrect current password' });
+        }
+        user.password = newPassword;
+        await user.save();
+        res.status(200).json({ message: 'Password updated successfully' });
+    } catch (error) {
+        console.error("Update Password Error:", error);
+        res.status(500).json({ message: 'Server error updating password' });
+    }
+};

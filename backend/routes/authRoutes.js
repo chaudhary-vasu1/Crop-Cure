@@ -4,8 +4,11 @@ import {
     loginUser, 
     requestOtp, 
     verifyOtp, 
-    resetPassword 
+    resetPassword,
+    updateProfile,
+    updatePassword
 } from '../controllers/authController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -19,5 +22,9 @@ router.post('/verify-otp', verifyOtp);
 
 // Password Recovery Flow
 router.post('/reset-password', resetPassword);
+
+// Profile and Settings Management (Protected)
+router.put('/profile', protect, updateProfile);
+router.put('/change-password', protect, updatePassword);
 
 export default router;
