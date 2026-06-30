@@ -90,7 +90,7 @@ const Navbar = () => {
 
                     {/* User Profile display - Clickable Link to Settings */}
                     <Link 
-                        to="/settings" 
+                        to="/profile" 
                         className="hidden sm:flex items-center gap-2 px-3 py-1 bg-gray-50 dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800/80 transition-all border-none cursor-pointer text-current no-underline"
                     >
                         <User size={16} className="text-gray-400 dark:text-gray-500" />

@@ -11,6 +11,7 @@ import Dashboard from './pages/Dashboard';
 import Farms from './pages/Farms'; 
 import Crops from './pages/Crops';
 import Settings from './pages/Settings'; 
+import Profile from './pages/Profile'; 
 
 function App() {
     return (
@@ -36,6 +37,7 @@ function App() {
                             <Route path="farms" element={<Farms />} />
                             <Route path="crops" element={<Crops />} />
                             <Route path="settings" element={<Settings />} />
+                            <Route path="profile" element={<Profile />} />
                         </Route>
                     </Routes>
                 </Router>

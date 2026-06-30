@@ -141,6 +141,7 @@ const Dashboard = () => {
                     </p>
                     <div className="flex flex-wrap gap-3">
                         <button
+                            disabled={loading}
                             onClick={() => {
                                 if (plots.length > 0) {
                                     setSelectedPlotForDiagnosis(plots[0]);
@@ -148,7 +149,7 @@ const Dashboard = () => {
                                     setIsModalOpen(true);
                                 }
                             }}
-                            className="px-5 py-2.5 bg-white text-green-700 hover:bg-gray-100 font-bold rounded-xl shadow-md border-none cursor-pointer transition transform hover:scale-[1.03] text-sm"
+                            className="px-5 py-2.5 bg-white text-green-700 hover:bg-gray-100 disabled:bg-gray-200 disabled:text-gray-400 font-bold rounded-xl shadow-md border-none cursor-pointer transition transform hover:scale-[1.03] text-sm"
                         >
                             Diagnose Leaf 🩺
                         </button>
@@ -181,6 +182,7 @@ const Dashboard = () => {
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">{lang.diagDesc}</p>
                         </div>
                         <button 
+                            disabled={loading}
                             onClick={() => {
                                 console.log("AI Diagnose clicked. Plots:", plots);
                                 if (plots.length > 0) {
@@ -189,9 +191,9 @@ const Dashboard = () => {
                                     setIsModalOpen(true);
                                 }
                             }}
-                            className="w-full mt-6 py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-xs border-none cursor-pointer shadow-sm group-hover:scale-[1.02] transition"
+                            className="w-full mt-6 py-2 px-4 bg-green-600 hover:bg-green-700 disabled:bg-gray-200 dark:disabled:bg-gray-700 disabled:text-gray-400 dark:disabled:text-gray-500 font-bold rounded-xl text-xs border-none cursor-pointer shadow-sm group-hover:scale-[1.02] transition"
                         >
-                            {lang.diagBtn}
+                            {loading ? "Loading..." : lang.diagBtn}
                         </button>
                     </div>
 
@@ -203,6 +205,7 @@ const Dashboard = () => {
                             <p className="text-xs text-gray-505 dark:text-gray-400 mt-2 leading-relaxed">{lang.irrigDesc}</p>
                         </div>
                         <button 
+                            disabled={loading}
                             onClick={() => {
                                 console.log("Smart Irrigation clicked. Plots:", plots);
                                 if (plots.length > 0) {
@@ -211,9 +214,9 @@ const Dashboard = () => {
                                     setIsModalOpen(true);
                                 }
                             }}
-                            className="w-full mt-6 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs border-none cursor-pointer shadow-sm group-hover:scale-[1.02] transition"
+                            className="w-full mt-6 py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 dark:disabled:bg-gray-700 disabled:text-gray-400 dark:disabled:text-gray-500 font-bold rounded-xl text-xs border-none cursor-pointer shadow-sm group-hover:scale-[1.02] transition"
                         >
-                            {lang.irrigBtn}
+                            {loading ? "Loading..." : lang.irrigBtn}
                         </button>
                     </div>
 

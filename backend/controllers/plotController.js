@@ -56,7 +56,7 @@ export const deletePlot = async (req, res) => {
             return res.status(401).json({ message: 'User not authorized to delete this plot' });
         }
 
-        await plot.deleteOne();
+        await Plot.findByIdAndDelete(req.params.id);
         res.status(200).json({ id: req.params.id, message: 'Plot deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Failed to delete plot', error: error.message });
