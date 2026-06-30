@@ -103,7 +103,7 @@ const Navbar = () => {
                     {/* Logout */}
                     <button
                         onClick={logout}
-                        className="px-4 py-2 text-sm font-bold text-white bg-red-500 hover:bg-red-650 rounded-xl transition shadow-sm border-none cursor-pointer flex items-center gap-1.5"
+                        className="px-4 py-2 text-sm font-bold text-white bg-red-500 hover:bg-red-600 rounded-xl transition shadow-sm border-none cursor-pointer flex items-center gap-1.5"
                     >
                         <LogOut size={16} />
                         <span>{lang.logout}</span>

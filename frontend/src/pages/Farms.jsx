@@ -87,7 +87,7 @@ const Farms = () => {
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="px-5 py-2.5 font-bold text-white bg-green-605 hover:bg-green-700 transition rounded-xl shadow-md border-none cursor-pointer hover:shadow-lg text-sm"
+                    className="px-5 py-2.5 font-bold text-white bg-green-600 hover:bg-green-700 transition rounded-xl shadow-md border-none cursor-pointer hover:shadow-lg text-sm"
                 >
                     {lang.addPlot}
                 </button>

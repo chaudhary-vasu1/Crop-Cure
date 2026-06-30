@@ -53,7 +53,7 @@ const WeatherWidget = ({ defaultCity }) => {
     if (error) {
         return (
             <div className="p-6 mb-6 border border-red-200 dark:border-red-900/50 shadow-sm bg-red-50 dark:bg-red-950/20 rounded-2xl text-left flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <p className="font-semibold text-red-650 dark:text-red-400">{error}</p>
+                <p className="font-semibold text-red-600 dark:text-red-400">{error}</p>
                 <div className="flex gap-2 items-center w-full sm:w-auto">
                     {isEditing ? (
                         <form onSubmit={handleSearchSubmit} className="flex gap-2 items-center w-full">
@@ -65,14 +65,14 @@ const WeatherWidget = ({ defaultCity }) => {
                                 className="px-3 py-1 border rounded-lg focus:ring-1 focus:ring-red-500 text-sm outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                                 autoFocus
                             />
-                            <button type="submit" className="px-3 py-1 bg-red-650 hover:bg-red-750 text-white rounded-lg border-none cursor-pointer font-bold text-xs">
+                            <button type="submit" className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg border-none cursor-pointer font-bold text-xs">
                                 Go
                             </button>
                         </form>
                     ) : (
                         <button 
                             onClick={() => setIsEditing(true)} 
-                            className="px-4 py-1.5 bg-red-650 hover:bg-red-750 text-white font-bold rounded-xl text-xs border-none cursor-pointer"
+                            className="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs border-none cursor-pointer"
                         >
                             Try Another City
                         </button>

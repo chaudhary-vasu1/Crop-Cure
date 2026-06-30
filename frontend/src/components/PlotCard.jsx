@@ -16,7 +16,7 @@ const PlotCard = ({ plot, onDelete, onDiagnose, onIrrigation }) => {
                 </div>
                 <button 
                     onClick={() => onDelete(plot._id)} 
-                    className="text-gray-400 hover:text-red-650 transition p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 border-none cursor-pointer bg-transparent"
+                    className="text-gray-400 hover:text-red-600 transition p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 border-none cursor-pointer bg-transparent"
                     title="Delete Plot"
                 >
                     <Trash2 size={18} />

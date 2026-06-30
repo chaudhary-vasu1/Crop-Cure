@@ -131,7 +131,7 @@ const Dashboard = () => {
     return (
         <div className="w-full text-left">
             {/* Hero / Welcome section */}
-            <div className="relative p-8 mb-8 text-white rounded-3xl shadow-lg bg-gradient-to-r from-green-700 via-emerald-600 to-teal-650 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="relative p-8 mb-8 text-white rounded-3xl shadow-lg bg-gradient-to-r from-green-700 via-emerald-600 to-teal-600 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="z-10 text-left max-w-xl">
                     <h1 className="text-3xl sm:text-4xl font-black mb-3">
                         {lang.welcome} {user?.username || 'Farmer'}! 🌾👋

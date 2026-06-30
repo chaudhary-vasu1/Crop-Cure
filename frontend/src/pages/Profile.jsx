@@ -114,7 +114,7 @@ const Profile = () => {
                 <div className="z-10">
                     <button 
                         onClick={logout}
-                        className="px-5 py-2.5 bg-red-500 hover:bg-red-650 text-white font-bold rounded-xl shadow-md border-none cursor-pointer flex items-center gap-2 transition transform hover:scale-[1.03]"
+                        className="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl shadow-md border-none cursor-pointer flex items-center gap-2 transition transform hover:scale-[1.03]"
                     >
                         <LogOut size={16} />
                         <span>{lang.logoutBtn}</span>

@@ -59,7 +59,7 @@ const DiagnoseModal = ({ isOpen, onClose, plot }) => {
             <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-850 rounded-2xl shadow-2xl p-6 relative animate-scale-up">
                 
                 {/* Close Button */}
-                <button onClick={resetAndClose} className="absolute text-gray-400 top-4 right-4 hover:text-gray-650 transition border-none bg-transparent cursor-pointer text-lg font-bold">
+                <button onClick={resetAndClose} className="absolute text-gray-400 top-4 right-4 hover:text-gray-600 transition border-none bg-transparent cursor-pointer text-lg font-bold">
                     ✕
                 </button>
 
@@ -103,7 +103,7 @@ const DiagnoseModal = ({ isOpen, onClose, plot }) => {
                         <div className="p-4 bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/50 rounded-xl">
                             <h3 className="text-base font-bold text-blue-800 dark:text-blue-400">Diagnosis Results</h3>
                             <p className="text-2xl font-black text-gray-800 dark:text-white mt-1 capitalize">{diagnosis.diseaseName}</p>
-                            <p className="text-sm text-gray-650 dark:text-gray-400 mt-1">
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                 AI Confidence: <span className="font-bold text-green-600 dark:text-green-400">{(diagnosis.confidenceScore * 100).toFixed(0)}%</span>
                             </p>
                             
