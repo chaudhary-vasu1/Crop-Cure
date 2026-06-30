@@ -88,14 +88,17 @@ const Navbar = () => {
                         {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                     </button>
 
-                    {/* User Profile display */}
-                    <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-gray-50 dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-xl">
+                    {/* User Profile display - Clickable Link to Settings */}
+                    <Link 
+                        to="/settings" 
+                        className="hidden sm:flex items-center gap-2 px-3 py-1 bg-gray-50 dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800/80 transition-all border-none cursor-pointer text-current no-underline"
+                    >
                         <User size={16} className="text-gray-400 dark:text-gray-500" />
                         <div className="text-left leading-none">
                             <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">{lang.profile}</span>
                             <p className="text-xs font-bold text-gray-700 dark:text-gray-300">{user?.username || 'Farmer'}</p>
                         </div>
-                    </div>
+                    </Link>
 
                     {/* Logout */}
                     <button

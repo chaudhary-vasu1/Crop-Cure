@@ -182,13 +182,14 @@ const Dashboard = () => {
                         </div>
                         <button 
                             onClick={() => {
+                                console.log("AI Diagnose clicked. Plots:", plots);
                                 if (plots.length > 0) {
                                     setSelectedPlotForDiagnosis(plots[0]);
                                 } else {
                                     setIsModalOpen(true);
                                 }
                             }}
-                            className="w-full mt-6 py-2 px-4 bg-green-605 hover:bg-green-700 text-white font-bold rounded-xl text-xs border-none cursor-pointer shadow-sm group-hover:scale-[1.02] transition"
+                            className="w-full mt-6 py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-xs border-none cursor-pointer shadow-sm group-hover:scale-[1.02] transition"
                         >
                             {lang.diagBtn}
                         </button>
@@ -199,17 +200,18 @@ const Dashboard = () => {
                         <div>
                             <span className="text-4xl">💧</span>
                             <h3 className="text-lg font-bold text-gray-850 dark:text-white mt-4">{lang.irrigTitle}</h3>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">{lang.irrigDesc}</p>
+                            <p className="text-xs text-gray-505 dark:text-gray-400 mt-2 leading-relaxed">{lang.irrigDesc}</p>
                         </div>
                         <button 
                             onClick={() => {
+                                console.log("Smart Irrigation clicked. Plots:", plots);
                                 if (plots.length > 0) {
                                     setSelectedPlotForIrrigation(plots[0]);
                                 } else {
                                     setIsModalOpen(true);
                                 }
                             }}
-                            className="w-full mt-6 py-2 px-4 bg-blue-600 hover:bg-blue-750 text-white font-bold rounded-xl text-xs border-none cursor-pointer shadow-sm group-hover:scale-[1.02] transition"
+                            className="w-full mt-6 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs border-none cursor-pointer shadow-sm group-hover:scale-[1.02] transition"
                         >
                             {lang.irrigBtn}
                         </button>
@@ -220,7 +222,7 @@ const Dashboard = () => {
                         <div>
                             <span className="text-4xl">🌦️</span>
                             <h3 className="text-lg font-bold text-gray-850 dark:text-white mt-4">{lang.weatherTitle}</h3>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">{lang.weatherDesc}</p>
+                            <p className="text-xs text-gray-505 dark:text-gray-400 mt-2 leading-relaxed">{lang.weatherDesc}</p>
                         </div>
                         <button 
                             onClick={() => {
@@ -228,6 +230,12 @@ const Dashboard = () => {
                                 if (weatherWidget) {
                                     weatherWidget.scrollIntoView({ behavior: 'smooth' });
                                 }
+                                setTimeout(() => {
+                                    const changeCityBtn = document.getElementById('change-city-btn');
+                                    if (changeCityBtn) {
+                                        changeCityBtn.click();
+                                    }
+                                }, 350);
                             }}
                             className="w-full mt-6 py-2 px-4 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl text-xs border-none cursor-pointer shadow-sm group-hover:scale-[1.02] transition"
                         >
@@ -240,7 +248,7 @@ const Dashboard = () => {
                         <div>
                             <span className="text-4xl">📊</span>
                             <h3 className="text-lg font-bold text-gray-850 dark:text-white mt-4">{lang.analyticsTitle}</h3>
-                            <p className="text-xs text-gray-550 dark:text-gray-400 mt-2 leading-relaxed">{lang.analyticsDesc}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">{lang.analyticsDesc}</p>
                         </div>
                         <button 
                             onClick={() => navigate('/crops')}

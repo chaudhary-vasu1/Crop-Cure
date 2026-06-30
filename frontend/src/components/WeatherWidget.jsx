@@ -106,8 +106,9 @@ const WeatherWidget = ({ defaultCity }) => {
                         <>
                             <h3 className="text-2xl font-black">{weather.city} Forecast</h3>
                             <button 
+                                id="change-city-btn"
                                 onClick={() => setIsEditing(true)} 
-                                className="p-1 bg-white/10 hover:bg-white/25 text-white rounded-lg border-none cursor-pointer transition opacity-0 group-hover:opacity-100 focus:opacity-100 flex items-center justify-center"
+                                className="p-1 bg-white/10 hover:bg-white/25 text-white rounded-lg border-none cursor-pointer transition flex items-center justify-center"
                                 title="Change city"
                             >
                                 <Edit2 size={12} />
