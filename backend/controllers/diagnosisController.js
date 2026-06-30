@@ -105,3 +105,17 @@ export const getDiagnosesByPlot = async (req, res) => {
         res.status(500).json({ message: 'Failed to fetch diagnoses', error: error.message });
     }
 };
+
+// @desc    Get all diagnoses for the logged-in user across all plots
+// @route   GET /api/diagnostics
+// @access  Private
+export const getAllDiagnoses = async (req, res) => {
+    try {
+        const diagnoses = await Diagnosis.find({ user: req.user.id || req.user._id })
+            .populate('plot', 'name cropType location')
+            .sort({ createdAt: -1 });
+        res.status(200).json(diagnoses);
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to fetch diagnoses', error: error.message });
+    }
+};

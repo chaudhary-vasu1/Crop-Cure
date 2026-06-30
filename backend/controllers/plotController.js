@@ -18,7 +18,7 @@ export const getPlots = async (req, res) => {
 // @access  Private
 export const createPlot = async (req, res) => {
     try {
-        const { name, cropType, area } = req.body;
+        const { name, cropType, area, location, soilType, irrigationMethod } = req.body;
 
         if (!name || !cropType || !area) {
             return res.status(400).json({ message: 'Please provide name, crop type, and area' });
@@ -29,6 +29,9 @@ export const createPlot = async (req, res) => {
             name,
             cropType,
             area,
+            location: location || 'Meerut',
+            soilType: soilType || 'Loamy',
+            irrigationMethod: irrigationMethod || 'Drip'
         });
 
         res.status(201).json(plot);

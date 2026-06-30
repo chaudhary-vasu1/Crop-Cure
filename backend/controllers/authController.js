@@ -38,22 +38,31 @@ const formatIdentifier = (identifier) => {
 // --- REGISTER USER (Manual Registration) ---
 export const registerUser = async (req, res) => {
     try {
-        const { username, identifier, password } = req.body;
+        const { username, identifier, password, otp } = req.body;
         const formattedIdentifier = formatIdentifier(identifier);
         
-        // Search by email OR phone depending on what they typed
+        // 1. Verify OTP first
+        const data = otpStore.get(formattedIdentifier);
+        if (!data || data.otp !== otp || Date.now() > data.expires) {
+            return res.status(400).json({ message: 'Invalid or expired OTP' });
+        }
+
+        // 2. Search by email OR phone depending on what they typed
         const searchQuery = isEmail(formattedIdentifier) ? { email: formattedIdentifier } : { phone: formattedIdentifier };
         const userExists = await User.findOne(searchQuery);
         
         if (userExists) return res.status(400).json({ message: 'User already exists with this email or phone number' });
 
-        // Save to the correct column in MongoDB
+        // 3. Save to the correct column in MongoDB
         const user = await User.create({ 
             username, 
             email: isEmail(formattedIdentifier) ? formattedIdentifier : undefined, 
             phone: isEmail(formattedIdentifier) ? undefined : formattedIdentifier,
             password 
         });
+
+        // 4. Clean up OTP from store since it's successfully consumed
+        otpStore.delete(formattedIdentifier);
 
         if (user) {
             res.status(201).json({ 
@@ -112,30 +121,43 @@ export const requestOtp = async (req, res) => {
         otpStore.set(formattedIdentifier, { otp, expires: Date.now() + 300000 });
         
         if (isEmail(formattedIdentifier)) {
-            // Added 'await' so the server waits for Google to confirm the email was sent
-            await transporter.sendMail({
-                from: process.env.EMAIL_USER,
-                to: formattedIdentifier,
-                subject: "Your CropCure Login OTP",
-                text: `Your OTP for login is ${otp}. It expires in 5 minutes.`
-            });
-            console.log(`✅ Email sent successfully to ${formattedIdentifier}`);
+            try {
+                await transporter.sendMail({
+                    from: process.env.EMAIL_USER,
+                    to: formattedIdentifier,
+                    subject: "Your CropCure Login OTP",
+                    text: `Your OTP for login is ${otp}. It expires in 5 minutes.`
+                });
+                console.log(`✅ Email sent successfully to ${formattedIdentifier}`);
+            } catch (mailError) {
+                console.error(`⚠️ Email sending failed: ${mailError.message}`);
+                console.log(`💡 OTP is printed in the logs above. Proceeding in development mode.`);
+                if (process.env.NODE_ENV === 'production') {
+                    throw mailError; // Throw error to fail request in production
+                }
+            }
             return res.status(200).json({ message: 'OTP sent successfully to your email!' });
 
         } else {
-            // Added 'await' so the server waits for Twilio to confirm the text was sent
-            await twilioClient.messages.create({
-                body: `Your CropCure OTP is ${otp}. It expires in 5 minutes.`,
-                from: process.env.TWILIO_PHONE_NUMBER,
-                to: formattedIdentifier
-            });
-            console.log(`✅ SMS sent successfully to ${formattedIdentifier}`);
+            try {
+                await twilioClient.messages.create({
+                    body: `Your CropCure OTP is ${otp}. It expires in 5 minutes.`,
+                    from: process.env.TWILIO_PHONE_NUMBER,
+                    to: formattedIdentifier
+                });
+                console.log(`✅ SMS sent successfully to ${formattedIdentifier}`);
+            } catch (smsError) {
+                console.error(`⚠️ SMS sending failed: ${smsError.message}`);
+                console.log(`💡 OTP is printed in the logs above. Proceeding in development mode.`);
+                if (process.env.NODE_ENV === 'production') {
+                    throw smsError; // Throw error to fail request in production
+                }
+            }
             return res.status(200).json({ message: 'OTP sent successfully to your phone!' });
         }
         
     } catch (error) {
         console.error("Fatal OTP Error:", error);
-        // If Twilio blocks the unverified number, it jumps straight here and alerts the frontend
         res.status(500).json({ message: 'Failed to send OTP. If using a phone number, it may not be verified in Twilio.', error: error.message });
     }
 };
@@ -151,25 +173,8 @@ export const verifyOtp = async (req, res) => {
             return res.status(400).json({ message: 'Invalid or expired OTP' });
         }
 
-        const searchQuery = isEmail(formattedIdentifier) ? { email: formattedIdentifier } : { phone: formattedIdentifier };
-        let user = await User.findOne(searchQuery);
-
-        if (!user) {
-            user = await User.create({ 
-                username: isEmail(formattedIdentifier) ? formattedIdentifier.split('@')[0] : `User_${formattedIdentifier.slice(-4)}`, 
-                email: isEmail(formattedIdentifier) ? formattedIdentifier : undefined, 
-                phone: isEmail(formattedIdentifier) ? undefined : formattedIdentifier,
-                password: Math.random().toString(36).slice(-8) + 'A1!' 
-            });
-        }
-
-        otpStore.delete(formattedIdentifier);
         res.status(200).json({ 
-            _id: user._id, 
-            username: user.username, 
-            email: user.email, 
-            phone: user.phone,
-            token: generateToken(user._id) 
+            message: 'OTP verified successfully!' 
         });
     } catch (error) {
         console.error("Verify Error:", error);

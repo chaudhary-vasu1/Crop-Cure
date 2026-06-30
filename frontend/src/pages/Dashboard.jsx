@@ -70,27 +70,29 @@ const Dashboard = () => {
     };
 
     return (
-        <div style={{ width: '100%', padding: '2rem' }}>
+        <div className="w-full text-left">
             <WeatherWidget />
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', marginTop: '2rem' }}>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{lang.title}</h2>
+            <div className="flex justify-between items-center mb-6 mt-8">
+                <h2 className="text-2xl font-extrabold text-gray-850 dark:text-white">{lang.title}</h2>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    style={{ padding: '0.5rem 1rem', fontWeight: 'bold', color: 'white', backgroundColor: '#059669', borderRadius: '0.375rem', border: 'none', cursor: 'pointer' }}
+                    className="px-5 py-2.5 font-bold text-white bg-green-600 hover:bg-green-700 transition rounded-xl shadow-md border-none cursor-pointer"
                 >
                     {lang.addPlot}
                 </button>
             </div>
 
             {loading ? (
-                <p>{lang.loading}</p>
+                <div className="flex justify-center items-center py-12">
+                    <p className="text-gray-500 dark:text-gray-400 font-semibold animate-pulse">{lang.loading}</p>
+                </div>
             ) : plots.length === 0 ? (
-                <div style={{ padding: '2rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem', width: '100%', textAlign: 'center' }}>
-                    <p>{lang.empty}</p>
+                <div className="p-12 border border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-2xl w-full text-center shadow-sm">
+                    <p className="text-gray-500 dark:text-gray-400 font-medium">{lang.empty}</p>
                 </div>
             ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem', width: '100%' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
                     {plots.map(plot => (
                         <PlotCard
                             key={plot._id}

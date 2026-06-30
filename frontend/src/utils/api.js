@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-    // Ensure this matches your live backend URL
-    baseURL: 'https://crop-cure-backend-f2zf.onrender.com/api' 
+    // Use environment variable or default to local backend URL
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api' 
 });
 
 // Interceptor to attach the token to every request automatically

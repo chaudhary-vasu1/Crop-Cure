@@ -19,12 +19,13 @@ export const getIrrigationAdvice = async (req, res) => {
         }
 
         // 2. Fetch real-time weather using the plot's location
-        // Note: For production, you'd want to handle location parsing robustly (e.g., splitting "City, State")
-        const city = plot.location.split(',')[0].trim();
+        const city = (plot.location && typeof plot.location === 'string' && plot.location.trim().length > 0)
+            ? plot.location.split(',')[0].trim()
+            : 'Meerut';
         const weatherData = await getLocalWeather(city);
 
         // 3. Calculate the irrigation recommendation
-        const advice = calculateIrrigationNeeds(weatherData, plot.soilType);
+        const advice = calculateIrrigationNeeds(weatherData, plot.soilType || 'Loamy');
 
         // 4. Send the combined dashboard data back to the frontend
         res.status(200).json({

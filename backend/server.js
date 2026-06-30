@@ -1,8 +1,9 @@
-import weatherRoutes from './routes/weatherRoutes.js';
-import express from 'express';
 import dotenv from 'dotenv';
-import cors from 'cors';
+// Load environment variables FIRST
+dotenv.config();
 
+import express from 'express';
+import cors from 'cors';
 import connectDB from './config/db.js';
 
 // =============================
@@ -12,9 +13,7 @@ import authRoutes from './routes/authRoutes.js';
 import plotRoutes from './routes/plotRoutes.js';
 import diagnosisRoutes from './routes/diagnosisRoutes.js';
 import irrigationRoutes from './routes/irrigationRoutes.js';
-
-// Load environment variables FIRST
-dotenv.config();
+import weatherRoutes from './routes/weatherRoutes.js';
 
 // Initialize Express app
 const app = express();

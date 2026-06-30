@@ -60,24 +60,19 @@ const Register = () => {
         const formattedId = getFormattedIdentifier();
 
         try {
-            // First: Verify the OTP code
-            await api.post('/auth/verify-otp', { 
-                identifier: formattedId, 
-                otp 
-            });
-
-            // Second: If OTP is valid, proceed with creating the permanent user account
+            // Call register directly with OTP. The backend will verify OTP and create the user atomically.
             const res = await api.post('/auth/register', { 
                 username, 
                 identifier: formattedId, 
-                password 
+                password, 
+                otp
             });
             
             // Automatically log them in after successful registration
             login(res.data);
             navigate('/');
         } catch (err) {
-            alert(err.response?.data?.message || 'Verification or Registration failed. Please check your OTP.');
+            alert(err.response?.data?.message || 'Registration failed. Please check your OTP.');
         } finally {
             setLoading(false);
         }
