@@ -112,7 +112,6 @@ const Dashboard = () => {
     }, []);
 
     const handleDeletePlot = async (id) => {
-        if (!window.confirm(lang.confirmDelete)) return;
         try {
             await api.delete(`/plots/${id}`);
             setPlots(plots.filter(plot => plot._id !== id));
