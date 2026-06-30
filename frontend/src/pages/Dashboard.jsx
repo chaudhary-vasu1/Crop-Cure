@@ -257,39 +257,7 @@ const Dashboard = () => {
                 <WeatherWidget defaultCity={defaultCity} />
             </div>
 
-            {/* Plot Listings Header */}
-            <div className="flex justify-between items-center mb-6 mt-10">
-                <h2 className="text-2xl font-black text-gray-850 dark:text-white">{lang.title}</h2>
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="px-5 py-2.5 font-bold text-white bg-green-600 hover:bg-green-700 transition rounded-xl shadow-md border-none cursor-pointer hover:shadow-lg text-sm"
-                >
-                    {lang.addPlot}
-                </button>
-            </div>
 
-            {/* Plots Listing Grid */}
-            {loading ? (
-                <div className="flex justify-center items-center py-12">
-                    <p className="text-gray-500 dark:text-gray-400 font-semibold animate-pulse">{lang.loading}</p>
-                </div>
-            ) : plots.length === 0 ? (
-                <div className="p-12 border border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-2xl w-full text-center shadow-sm">
-                    <p className="text-gray-500 dark:text-gray-400 font-medium">{lang.empty}</p>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-                    {plots.map(plot => (
-                        <PlotCard
-                            key={plot._id}
-                            plot={plot}
-                            onDelete={handleDeletePlot}
-                            onDiagnose={setSelectedPlotForDiagnosis}
-                            onIrrigation={setSelectedPlotForIrrigation}
-                        />
-                    ))}
-                </div>
-            )}
 
             <AddPlotModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onPlotAdded={handlePlotAdded} />
             <DiagnoseModal isOpen={!!selectedPlotForDiagnosis} onClose={() => setSelectedPlotForDiagnosis(null)} plot={selectedPlotForDiagnosis} />

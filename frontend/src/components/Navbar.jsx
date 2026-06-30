@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Sprout, Settings, LogOut, Moon, Sun, User } from 'lucide-react';
+import { Home, Sprout, Settings, LogOut, Moon, Sun, User, Layers } from 'lucide-react';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { AppContext } from '../context/AppContext';
@@ -12,6 +12,7 @@ const Navbar = () => {
     const t = {
         en: {
             dashboard: 'Dashboard',
+            farms: 'My Farms',
             crops: 'My Crops',
             settings: 'Settings',
             logout: 'Logout',
@@ -19,6 +20,7 @@ const Navbar = () => {
         },
         es: {
             dashboard: 'Panel',
+            farms: 'Mis Parcelas',
             crops: 'Mis Cultivos',
             settings: 'Ajustes',
             logout: 'Cerrar Sesión',
@@ -26,6 +28,7 @@ const Navbar = () => {
         },
         hi: {
             dashboard: 'डैशबोर्ड',
+            farms: 'मेरे खेत',
             crops: 'मेरी फसलें',
             settings: 'सेटिंग्स',
             logout: 'लॉगआउट',
@@ -36,6 +39,7 @@ const Navbar = () => {
 
     const navItems = [
         { name: lang.dashboard, path: '/', icon: Home },
+        { name: lang.farms, path: '/farms', icon: Layers },
         { name: lang.crops, path: '/crops', icon: Sprout },
         { name: lang.settings, path: '/settings', icon: Settings },
     ];

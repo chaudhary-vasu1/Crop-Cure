@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Layout from './components/Layout'; 
 import Dashboard from './pages/Dashboard'; 
+import Farms from './pages/Farms'; 
 import Crops from './pages/Crops';
 import Settings from './pages/Settings'; 
 
@@ -32,6 +33,7 @@ function App() {
                             } 
                         >
                             <Route index element={<Dashboard />} />
+                            <Route path="farms" element={<Farms />} />
                             <Route path="crops" element={<Crops />} />
                             <Route path="settings" element={<Settings />} />
                         </Route>
