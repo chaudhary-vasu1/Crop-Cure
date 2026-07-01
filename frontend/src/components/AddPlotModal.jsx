@@ -162,8 +162,8 @@ const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/75 backdrop-blur-md animate-fade-in">
-            <div className="w-full max-w-md max-h-[90vh] overflow-y-auto scrollbar-thin p-8 bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/50 rounded-3xl shadow-2xl animate-scale-in text-left">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 dark:bg-black/75 backdrop-blur-md animate-fade-in">
+            <div className="w-full max-w-md max-h-[85vh] sm:max-h-[90vh] overflow-y-auto scrollbar-thin p-6 sm:p-8 bg-white dark:bg-gray-900 border-t sm:border border-slate-200/50 dark:border-gray-800/50 rounded-t-[2rem] sm:rounded-3xl shadow-2xl animate-slide-up sm:animate-scale-in text-left">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-black text-slate-800 dark:text-white tracking-tight flex items-center gap-1.5">
                         {lang.title}
