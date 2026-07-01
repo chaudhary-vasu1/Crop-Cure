@@ -21,6 +21,7 @@ import marketplaceRoutes from './routes/marketplaceRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import forumRoutes from './routes/forumRoutes.js';
 import subscriptionRoutes from './routes/subscriptionRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
 
 import path from 'path';
 
@@ -63,6 +64,7 @@ app.use('/api/marketplace', marketplaceRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/forum', forumRoutes);
 app.use('/api/subscription', subscriptionRoutes);
+app.use('/api/chat', chatRoutes);
 
 // =============================
 // Health Check Route

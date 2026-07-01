@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
+import ChatBot from './ChatBot';
 
 const Layout = () => {
     return (
@@ -16,6 +17,9 @@ const Layout = () => {
                     <Outlet />
                 </div>
             </main>
+
+            {/* Floating AI Chatbot */}
+            <ChatBot />
         </div>
     );
 };
