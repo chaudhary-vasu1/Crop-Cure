@@ -59,7 +59,7 @@ const Profile = () => {
 
     const t = {
         en: {
-            editProfile: "Edit Profile",
+            editProfile: "Edit Profile Info",
             fullName: "Full Name / Username",
             contactInfo: "Contact Info (Read Only)",
             saveBtn: "Save Profile",
@@ -95,28 +95,29 @@ const Profile = () => {
     const lang = t[language] || t.en;
 
     return (
-        <div className="max-w-4xl mx-auto mt-6 text-left">
-            {/* SymptoGenie-style Purple Header Profile Banner */}
-            <div className="relative p-6 sm:p-8 mb-8 text-white rounded-3xl shadow-lg bg-gradient-to-r from-violet-600 via-indigo-600 to-blue-600 overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div className="max-w-4xl mx-auto mt-6 text-left animate-slide-up">
+            {/* Header Profile Banner */}
+            <div className="relative p-8 mb-8 text-white rounded-3xl shadow-lg bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
                 <div className="flex flex-col sm:flex-row items-center gap-6 z-10 w-full sm:w-auto">
-                    <div className="w-24 h-24 rounded-full bg-white/20 border-4 border-white flex items-center justify-center text-4xl font-extrabold select-none shadow-md">
+                    <div className="w-20 h-20 rounded-full bg-white/20 border-4 border-white/60 flex items-center justify-center text-3xl font-extrabold select-none shadow-md">
                         {userInitial}
                     </div>
                     <div className="text-center sm:text-left">
-                        <h2 className="text-3xl font-black mb-1 tracking-tight">
+                        <h2 className="text-2xl font-black mb-1 tracking-tight text-white">
                             {user?.username || 'Farmer'}
                         </h2>
-                        <p className="text-sm font-semibold opacity-85 uppercase tracking-wider">
+                        <p className="text-xs font-bold text-emerald-100/90 uppercase tracking-widest">
                             {userContact}
                         </p>
                     </div>
                 </div>
-                <div className="z-10">
+                <div className="z-10 shrink-0">
                     <button 
                         onClick={logout}
-                        className="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl shadow-md border-none cursor-pointer flex items-center gap-2 transition transform hover:scale-[1.03]"
+                        className="px-5 py-2.5 bg-red-500 hover:bg-red-650 text-white font-bold rounded-xl shadow-md border-none cursor-pointer flex items-center gap-2 transition active:scale-95 text-xs"
                     >
-                        <LogOut size={16} />
+                        <LogOut size={14} />
                         <span>{lang.logoutBtn}</span>
                     </button>
                 </div>
@@ -124,23 +125,23 @@ const Profile = () => {
             </div>
 
             {/* Profile Navigation Tabs */}
-            <div className="flex border-b border-gray-200 dark:border-gray-800 mb-6 font-semibold overflow-x-auto text-sm">
+            <div className="flex border-b border-slate-200 dark:border-gray-800 mb-6 font-semibold overflow-x-auto text-xs">
                 <button
                     onClick={() => setActiveTab('profile')}
-                    className={`pb-3.5 px-5 border-b-2 transition-all cursor-pointer bg-transparent whitespace-nowrap ${
+                    className={`pb-3 px-5 border-b-2 transition-all cursor-pointer bg-transparent border-none font-bold whitespace-nowrap ${
                         activeTab === 'profile' 
-                            ? 'border-blue-600 text-blue-600 dark:text-blue-400 font-extrabold' 
-                            : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                            ? 'border-b-emerald-500 text-emerald-600 dark:text-emerald-400 font-extrabold' 
+                            : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
                     }`}
                 >
                     Profile Settings
                 </button>
                 <button
                     onClick={() => setActiveTab('security')}
-                    className={`pb-3.5 px-5 border-b-2 transition-all cursor-pointer bg-transparent whitespace-nowrap ${
+                    className={`pb-3 px-5 border-b-2 transition-all cursor-pointer bg-transparent border-none font-bold whitespace-nowrap ${
                         activeTab === 'security' 
-                            ? 'border-blue-600 text-blue-600 dark:text-blue-400 font-extrabold' 
-                            : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                            ? 'border-b-emerald-500 text-emerald-600 dark:text-emerald-400 font-extrabold' 
+                            : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
                     }`}
                 >
                     Security & Password
@@ -148,24 +149,26 @@ const Profile = () => {
             </div>
 
             {/* Form Panels */}
-            <div className="p-6 sm:p-8 bg-white border border-gray-200 rounded-2xl shadow-sm dark:bg-gray-800 dark:border-gray-700 transition duration-300">
+            <div className="p-6 sm:p-8 bg-white border border-slate-200/50 dark:border-gray-800/50 rounded-3xl shadow-sm dark:bg-gray-900 transition duration-300">
                 {activeTab === 'profile' && (
                     <div className="animate-fade-in">
-                        <h3 className="text-xl font-bold text-gray-850 dark:text-white mb-6">
+                        <h3 className="text-base font-extrabold text-slate-850 dark:text-white mb-6">
                             {lang.editProfile}
                         </h3>
 
                         {saveStatus && (
-                            <div className={`p-4 mb-6 rounded-xl text-sm font-semibold ${
-                                saveStatus.type === 'success' ? 'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400' : 'bg-red-50 text-red-750 dark:bg-red-950/20 dark:text-red-400'
+                            <div className={`p-4 mb-6 rounded-xl text-xs font-semibold ${
+                                saveStatus.type === 'success' 
+                                    ? 'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400 border border-green-200/20' 
+                                    : 'bg-red-50 text-red-750 dark:bg-red-950/20 dark:text-red-400 border border-red-200/20'
                             }`}>
                                 {saveStatus.message}
                             </div>
                         )}
 
-                        <form onSubmit={handleSaveProfile} className="flex flex-col gap-6 max-w-xl">
+                        <form onSubmit={handleSaveProfile} className="flex flex-col gap-5 max-w-xl">
                             <div>
-                                <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 mb-2 uppercase tracking-wider">
+                                <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-wider">
                                     {lang.fullName}
                                 </label>
                                 <input 
@@ -173,19 +176,19 @@ const Profile = () => {
                                     required 
                                     value={username} 
                                     onChange={(e) => setUsername(e.target.value)}
-                                    className="w-full p-3 border rounded-xl bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm font-semibold text-slate-800 dark:text-white transition"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 mb-2 uppercase tracking-wider">
+                                <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-wider">
                                     {lang.contactInfo}
                                 </label>
                                 <input 
                                     type="text" 
                                     disabled 
                                     value={userContact}
-                                    className="w-full p-3 border rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 outline-none cursor-not-allowed select-none"
+                                    className="w-full px-4 py-2.5 bg-slate-100 dark:bg-gray-950/50 text-slate-500 dark:text-slate-400 border border-slate-200/40 dark:border-gray-805 outline-none cursor-not-allowed select-none text-sm font-medium rounded-xl"
                                 />
                             </div>
 
@@ -193,9 +196,9 @@ const Profile = () => {
                                 <button
                                     type="submit"
                                     disabled={saving}
-                                    className="px-6 py-3 font-bold text-white bg-blue-600 hover:bg-blue-700 transition rounded-xl border-none cursor-pointer shadow-md flex items-center gap-2"
+                                    className="px-5 py-2.5 font-bold text-white bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-400 transition rounded-xl border-none cursor-pointer shadow-md flex items-center gap-1.5 active:scale-95 text-xs"
                                 >
-                                    <Save size={16} />
+                                    <Save size={14} />
                                     <span>{saving ? 'Saving...' : lang.saveBtn}</span>
                                 </button>
                             </div>
@@ -205,21 +208,23 @@ const Profile = () => {
 
                 {activeTab === 'security' && (
                     <div className="animate-fade-in">
-                        <h3 className="text-xl font-bold text-gray-850 dark:text-white mb-6">
+                        <h3 className="text-base font-extrabold text-slate-850 dark:text-white mb-6">
                             {lang.security}
                         </h3>
 
                         {passwordStatus && (
-                            <div className={`p-4 mb-6 rounded-xl text-sm font-semibold ${
-                                passwordStatus.type === 'success' ? 'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400' : 'bg-red-50 text-red-750 dark:bg-red-950/20 dark:text-red-400'
+                            <div className={`p-4 mb-6 rounded-xl text-xs font-semibold ${
+                                passwordStatus.type === 'success' 
+                                    ? 'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400 border border-green-200/20' 
+                                    : 'bg-red-50 text-red-750 dark:bg-red-950/20 dark:text-red-400 border border-red-200/20'
                             }`}>
                                 {passwordStatus.message}
                             </div>
                         )}
 
-                        <form onSubmit={handleChangePassword} className="flex flex-col gap-6 max-w-xl">
+                        <form onSubmit={handleChangePassword} className="flex flex-col gap-5 max-w-xl">
                             <div>
-                                <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 mb-2 uppercase tracking-wider">
+                                <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-wider">
                                     {lang.currentPass}
                                 </label>
                                 <input 
@@ -227,12 +232,12 @@ const Profile = () => {
                                     required 
                                     value={currentPassword} 
                                     onChange={(e) => setCurrentPassword(e.target.value)}
-                                    className="w-full p-3 border rounded-xl bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm font-semibold text-slate-800 dark:text-white transition"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 mb-2 uppercase tracking-wider">
+                                <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-wider">
                                     {lang.newPass}
                                 </label>
                                 <input 
@@ -240,7 +245,7 @@ const Profile = () => {
                                     required 
                                     value={newPassword} 
                                     onChange={(e) => setNewPassword(e.target.value)}
-                                    className="w-full p-3 border rounded-xl bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm font-semibold text-slate-800 dark:text-white transition"
                                 />
                             </div>
 
@@ -248,9 +253,9 @@ const Profile = () => {
                                 <button
                                     type="submit"
                                     disabled={passwordSaving}
-                                    className="px-6 py-3 font-bold text-white bg-blue-600 hover:bg-blue-700 transition rounded-xl border-none cursor-pointer shadow-md flex items-center gap-2"
+                                    className="px-5 py-2.5 font-bold text-white bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-400 transition rounded-xl border-none cursor-pointer shadow-md flex items-center gap-1.5 active:scale-95 text-xs"
                                 >
-                                    <Shield size={16} />
+                                    <Shield size={14} />
                                     <span>{passwordSaving ? 'Updating...' : lang.updatePassBtn}</span>
                                 </button>
                             </div>

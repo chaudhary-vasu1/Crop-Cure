@@ -3,10 +3,10 @@ import { AppContext } from '../context/AppContext';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
-import PlotCard from '../components/PlotCard';
 import AddPlotModal from '../components/AddPlotModal';
 import DiagnoseModal from '../components/DiagnoseModal';
 import IrrigationModal from '../components/IrrigationModal';
+import { Sparkles, Calendar, Plus, HeartPulse, Droplets, Sun, LineChart, HelpCircle } from 'lucide-react';
 
 const Dashboard = () => {
     const { language } = useContext(AppContext);
@@ -130,7 +130,7 @@ const Dashboard = () => {
             dailyTips: "दैनिक कृषि सुझाव",
             tipsDesc: "खेत की उत्पादकता बढ़ाने और फसलों को स्वस्थ रखने के लिए व्यावहारिक दैनिक सुझाव।",
             tip1Title: "💧 पानी देने का सही समय",
-            tip1Desc: "फसलों को सुबह जल्दी या शाम को पानी दें। इससे पानी का वाष्पीकरण कम होता है और जड़ें नम रहती हैं।",
+            tip1Desc: "फसलों को सुबह जल्दी या शाम को पानी दें। इससे पानी का वाष्गीकरण कम होता है और जड़ें नम रहती हैं।",
             tip2Title: "🌱 जैविक कीट नियंत्रण",
             tip2Desc: "नीम के तेल और गुनगुने पानी का मिश्रण एफिड्स और स्पाइडर माइट्स के खिलाफ एक प्रभावी प्राकृतिक सुरक्षा है।",
             tip3Title: "🍃 वेंटिलेशन और दूरी",
@@ -161,31 +161,24 @@ const Dashboard = () => {
         fetchPlots();
     }, []);
 
-    const handleDeletePlot = async (id) => {
-        try {
-            await api.delete(`/plots/${id}`);
-            setPlots(plots.filter(plot => plot._id !== id));
-        } catch (error) {
-            console.error('Error deleting plot:', error);
-            alert(lang.failedDelete);
-        }
-    };
-
     const handlePlotAdded = (newPlot) => {
         setPlots([newPlot, ...plots]);
     };
 
-    const defaultCity = plots.length > 0 && plots[0].location ? plots[0].location.split(',')[0].trim() : undefined;
-
     return (
-        <div className="w-full text-left">
+        <div className="w-full text-left animate-slide-up">
             {/* Hero / Welcome section */}
-            <div className="relative p-8 mb-8 text-white rounded-3xl shadow-lg bg-gradient-to-r from-green-700 via-emerald-600 to-teal-600 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="z-10 text-left max-w-xl">
-                    <h1 className="text-3xl sm:text-4xl font-black mb-3">
+            <div className="relative p-8 mb-10 text-white rounded-3xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 shadow-lg shadow-emerald-700/10">
+                <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
+                <div className="z-10 text-left max-w-2xl">
+                    <div className="flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-bold w-fit mb-4">
+                        <Sparkles size={12} className="text-emerald-350" />
+                        <span>Agricultural Intelligence Active</span>
+                    </div>
+                    <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-3 tracking-tight">
                         {lang.welcome} {user?.username || 'Farmer'}! 🌾👋
                     </h1>
-                    <p className="text-sm sm:text-base font-medium opacity-90 leading-relaxed mb-6">
+                    <p className="text-sm sm:text-base font-medium text-emerald-100/90 leading-relaxed mb-8">
                         {lang.subtitle}
                     </p>
                     <div className="flex flex-wrap gap-3">
@@ -198,102 +191,110 @@ const Dashboard = () => {
                                     setIsModalOpen(true);
                                 }
                             }}
-                            className="px-5 py-2.5 bg-white text-green-700 hover:bg-gray-100 disabled:bg-gray-200 disabled:text-gray-400 font-bold rounded-xl shadow-md border-none cursor-pointer transition transform hover:scale-[1.03] text-sm"
+                            className="px-5 py-3 bg-white hover:bg-emerald-50 text-emerald-700 disabled:bg-gray-100 disabled:text-gray-400 font-extrabold rounded-xl shadow-md border-none cursor-pointer transition-all active:scale-[0.98] text-sm"
                         >
                             Diagnose Leaf 🩺
                         </button>
                         <button
                             onClick={() => setIsModalOpen(true)}
-                            className="px-5 py-2.5 bg-transparent text-white border-2 border-white/80 font-bold rounded-xl cursor-pointer hover:bg-white/10 transition transform hover:scale-[1.03] text-sm"
+                            className="px-5 py-3 bg-transparent text-white border border-white/40 font-extrabold rounded-xl cursor-pointer hover:bg-white/10 transition-all active:scale-[0.98] text-sm"
                         >
                             {lang.addPlot} 🚜
                         </button>
                     </div>
                 </div>
-                <div className="hidden md:flex flex-col items-center gap-1 z-10 select-none">
-                    <span className="text-8xl filter drop-shadow-md">🚜</span>
-                    <span className="text-xs uppercase tracking-widest font-black opacity-75">CropCure AI Assistant</span>
+                <div className="hidden md:flex flex-col items-center gap-1.5 z-10 select-none bg-white/5 backdrop-blur-sm p-6 rounded-2xl border border-white/10 shrink-0">
+                    <span className="text-7xl filter drop-shadow-md">🚜</span>
+                    <span className="text-[10px] uppercase tracking-widest font-black text-emerald-250">CropCure OS</span>
                 </div>
                 <div className="absolute right-[-40px] top-[-40px] w-64 h-64 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
             </div>
 
             {/* Core Farming Tools Section */}
-            <div className="mb-10 text-left">
-                <h2 className="text-2xl font-black text-gray-850 dark:text-white">{lang.coreTools}</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{lang.coreSubtitle}</p>
+            <div className="mb-14 text-left">
+                <div className="mb-6">
+                    <h2 className="text-2xl font-black text-slate-850 dark:text-slate-100 tracking-tight">{lang.coreTools}</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{lang.coreSubtitle}</p>
+                </div>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {/* Diagnose Tool (Green) */}
-                    <div className="flex flex-col justify-between p-6 bg-white dark:bg-gray-800 border border-green-100 dark:border-green-950/40 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 hover:border-green-400 dark:hover:border-green-700 transition duration-300 group">
-                        <div>
-                            <span className="text-4xl">🩺</span>
-                            <h3 className="text-lg font-bold text-gray-850 dark:text-white mt-4">{lang.diagTitle}</h3>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">{lang.diagDesc}</p>
+                    <div className="flex flex-col justify-between p-6 bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/50 hover:border-emerald-400 dark:hover:border-emerald-700 rounded-2xl shadow-sm hover:shadow-md hover:shadow-emerald-500/5 hover:-translate-y-0.5 transition-all duration-300 group">
+                        <div className="text-left">
+                            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/20 text-2xl rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                                🩺
+                            </div>
+                            <h3 className="text-base font-extrabold text-slate-800 dark:text-slate-200 mt-4">{lang.diagTitle}</h3>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed font-medium">{lang.diagDesc}</p>
                         </div>
                         <button 
                             disabled={loading}
                             onClick={() => {
-                                console.log("AI Diagnose clicked. Plots:", plots);
                                 if (plots.length > 0) {
                                     setSelectedPlotForDiagnosis(plots[0]);
                                 } else {
                                     setIsModalOpen(true);
                                 }
                             }}
-                            className="w-full mt-6 py-2 px-4 bg-green-600 hover:bg-green-700 disabled:bg-gray-200 dark:disabled:bg-gray-700 disabled:text-gray-400 dark:disabled:text-gray-500 font-bold rounded-xl text-xs border-none cursor-pointer shadow-sm group-hover:scale-[1.02] transition"
+                            className="w-full mt-6 py-2.5 px-4 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-200 text-white font-extrabold rounded-xl text-xs border-none cursor-pointer shadow-sm active:scale-[0.98] transition-all"
                         >
                             {loading ? "Loading..." : lang.diagBtn}
                         </button>
                     </div>
 
                     {/* Irrigation Advice Tool (Blue) */}
-                    <div className="flex flex-col justify-between p-6 bg-white dark:bg-gray-800 border border-blue-100 dark:border-blue-950/40 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 hover:border-blue-400 dark:hover:border-blue-700 transition duration-300 group">
-                        <div>
-                            <span className="text-4xl">💧</span>
-                            <h3 className="text-lg font-bold text-gray-850 dark:text-white mt-4">{lang.irrigTitle}</h3>
-                            <p className="text-xs text-gray-505 dark:text-gray-400 mt-2 leading-relaxed">{lang.irrigDesc}</p>
+                    <div className="flex flex-col justify-between p-6 bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/50 hover:border-blue-400 dark:hover:border-blue-700 rounded-2xl shadow-sm hover:shadow-md hover:shadow-blue-500/5 hover:-translate-y-0.5 transition-all duration-300 group">
+                        <div className="text-left">
+                            <div className="w-12 h-12 bg-blue-50 dark:bg-blue-950/20 text-2xl rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                                💧
+                            </div>
+                            <h3 className="text-base font-extrabold text-slate-800 dark:text-slate-200 mt-4">{lang.irrigTitle}</h3>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed font-medium">{lang.irrigDesc}</p>
                         </div>
                         <button 
                             disabled={loading}
                             onClick={() => {
-                                console.log("Smart Irrigation clicked. Plots:", plots);
                                 if (plots.length > 0) {
                                     setSelectedPlotForIrrigation(plots[0]);
                                 } else {
                                     setIsModalOpen(true);
                                 }
                             }}
-                            className="w-full mt-6 py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 dark:disabled:bg-gray-700 disabled:text-gray-400 dark:disabled:text-gray-500 font-bold rounded-xl text-xs border-none cursor-pointer shadow-sm group-hover:scale-[1.02] transition"
+                            className="w-full mt-6 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 text-white font-extrabold rounded-xl text-xs border-none cursor-pointer shadow-sm active:scale-[0.98] transition-all"
                         >
                             {loading ? "Loading..." : lang.irrigBtn}
                         </button>
                     </div>
 
                     {/* Weather Tool (Teal) */}
-                    <div className="flex flex-col justify-between p-6 bg-white dark:bg-gray-800 border border-cyan-100 dark:border-cyan-950/40 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 hover:border-cyan-400 dark:hover:border-cyan-700 transition duration-300 group">
-                        <div>
-                            <span className="text-4xl">🌦️</span>
-                            <h3 className="text-lg font-bold text-gray-850 dark:text-white mt-4">{lang.weatherTitle}</h3>
-                            <p className="text-xs text-gray-505 dark:text-gray-400 mt-2 leading-relaxed">{lang.weatherDesc}</p>
+                    <div className="flex flex-col justify-between p-6 bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/50 hover:border-cyan-400 dark:hover:border-cyan-700 rounded-2xl shadow-sm hover:shadow-md hover:shadow-cyan-500/5 hover:-translate-y-0.5 transition-all duration-300 group">
+                        <div className="text-left">
+                            <div className="w-12 h-12 bg-cyan-50 dark:bg-cyan-950/20 text-2xl rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                                🌦️
+                            </div>
+                            <h3 className="text-base font-extrabold text-slate-800 dark:text-slate-200 mt-4">{lang.weatherTitle}</h3>
+                            <p className="text-xs text-gray-505 dark:text-gray-400 mt-2 leading-relaxed font-medium">{lang.weatherDesc}</p>
                         </div>
                         <button 
                             onClick={() => navigate('/weather')}
-                            className="w-full mt-6 py-2 px-4 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl text-xs border-none cursor-pointer shadow-sm group-hover:scale-[1.02] transition"
+                            className="w-full mt-6 py-2.5 px-4 bg-cyan-600 hover:bg-cyan-700 text-white font-extrabold rounded-xl text-xs border-none cursor-pointer shadow-sm active:scale-[0.98] transition-all"
                         >
                             {lang.weatherBtn}
                         </button>
                     </div>
 
                     {/* Analytics Timeline Tool (Purple) */}
-                    <div className="flex flex-col justify-between p-6 bg-white dark:bg-gray-800 border border-purple-100 dark:border-purple-950/40 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 hover:border-purple-400 dark:hover:border-purple-700 transition duration-300 group">
-                        <div>
-                            <span className="text-4xl">📊</span>
-                            <h3 className="text-lg font-bold text-gray-850 dark:text-white mt-4">{lang.analyticsTitle}</h3>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">{lang.analyticsDesc}</p>
+                    <div className="flex flex-col justify-between p-6 bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/50 hover:border-purple-400 dark:hover:border-purple-700 rounded-2xl shadow-sm hover:shadow-md hover:shadow-purple-500/5 hover:-translate-y-0.5 transition-all duration-300 group">
+                        <div className="text-left">
+                            <div className="w-12 h-12 bg-purple-50 dark:bg-purple-950/20 text-2xl rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                                📊
+                            </div>
+                            <h3 className="text-base font-extrabold text-slate-800 dark:text-slate-200 mt-4">{lang.analyticsTitle}</h3>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed font-medium">{lang.analyticsDesc}</p>
                         </div>
                         <button 
                             onClick={() => navigate('/crops')}
-                            className="w-full mt-6 py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs border-none cursor-pointer shadow-sm group-hover:scale-[1.02] transition"
+                            className="w-full mt-6 py-2.5 px-4 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl text-xs border-none cursor-pointer shadow-sm active:scale-[0.98] transition-all"
                         >
                             {lang.analyticsBtn}
                         </button>
@@ -303,35 +304,37 @@ const Dashboard = () => {
 
             {/* How It Works Section */}
             <div className="mt-14 text-left">
-                <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
-                    🛠️ {lang.howItWorks}
-                </h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    Follow these simple steps to analyze crop health and save water
-                </p>
+                <div className="mb-6">
+                    <h2 className="text-2xl font-black text-slate-850 dark:text-white tracking-tight flex items-center gap-2">
+                        🛠️ {lang.howItWorks}
+                    </h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        Follow these simple steps to analyze crop health and save water
+                    </p>
+                </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                    <div className="p-6 bg-white dark:bg-gray-800 border border-l-4 border-l-green-600 border-gray-150 dark:border-gray-700 rounded-r-2xl rounded-l-md shadow-sm">
-                        <h4 className="font-black text-green-700 dark:text-green-500 text-sm">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="p-6 bg-white dark:bg-gray-900 border border-l-4 border-l-emerald-500 border-slate-200/50 dark:border-gray-800/50 rounded-r-2xl rounded-l-md shadow-sm">
+                        <h4 className="font-extrabold text-slate-800 dark:text-slate-100 text-sm">
                             {lang.howStep1Title}
                         </h4>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2.5 leading-relaxed">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-2.5 leading-relaxed font-medium">
                             {lang.howStep1Desc}
                         </p>
                     </div>
-                    <div className="p-6 bg-white dark:bg-gray-800 border border-l-4 border-l-blue-600 border-gray-150 dark:border-gray-700 rounded-r-2xl rounded-l-md shadow-sm">
-                        <h4 className="font-black text-blue-700 dark:text-blue-500 text-sm">
+                    <div className="p-6 bg-white dark:bg-gray-900 border border-l-4 border-l-blue-500 border-slate-200/50 dark:border-gray-800/50 rounded-r-2xl rounded-l-md shadow-sm">
+                        <h4 className="font-extrabold text-slate-800 dark:text-slate-100 text-sm">
                             {lang.howStep2Title}
                         </h4>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2.5 leading-relaxed">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-2.5 leading-relaxed font-medium">
                             {lang.howStep2Desc}
                         </p>
                     </div>
-                    <div className="p-6 bg-white dark:bg-gray-800 border border-l-4 border-l-teal-600 border-gray-150 dark:border-gray-700 rounded-r-2xl rounded-l-md shadow-sm">
-                        <h4 className="font-black text-teal-700 dark:text-teal-500 text-sm">
+                    <div className="p-6 bg-white dark:bg-gray-900 border border-l-4 border-l-teal-500 border-slate-200/50 dark:border-gray-800/50 rounded-r-2xl rounded-l-md shadow-sm">
+                        <h4 className="font-extrabold text-slate-800 dark:text-slate-100 text-sm">
                             {lang.howStep3Title}
                         </h4>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2.5 leading-relaxed">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-2.5 leading-relaxed font-medium">
                             {lang.howStep3Desc}
                         </p>
                     </div>
@@ -340,35 +343,37 @@ const Dashboard = () => {
 
             {/* Daily Tips Section */}
             <div className="mt-14 text-left">
-                <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
-                    💡 {lang.dailyTips}
-                </h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    {lang.tipsDesc}
-                </p>
+                <div className="mb-6">
+                    <h2 className="text-2xl font-black text-slate-850 dark:text-white tracking-tight flex items-center gap-2">
+                        💡 {lang.dailyTips}
+                    </h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        {lang.tipsDesc}
+                    </p>
+                </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                    <div className="p-6 bg-white dark:bg-gray-800 border border-gray-150 dark:border-gray-700 rounded-2xl shadow-sm hover:shadow-md transition">
-                        <h4 className="font-extrabold text-gray-900 dark:text-white text-base flex items-center gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="p-6 bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/50 rounded-2xl shadow-sm hover:shadow-md transition-all">
+                        <h4 className="font-extrabold text-slate-800 dark:text-slate-200 text-base flex items-center gap-2">
                             {lang.tip1Title}
                         </h4>
-                        <p className="text-xs text-gray-505 dark:text-gray-400 leading-relaxed mt-2.5">
+                        <p className="text-xs text-slate-505 dark:text-gray-400 leading-relaxed mt-3 font-medium">
                             {lang.tip1Desc}
                         </p>
                     </div>
-                    <div className="p-6 bg-white dark:bg-gray-800 border border-gray-150 dark:border-gray-700 rounded-2xl shadow-sm hover:shadow-md transition">
-                        <h4 className="font-extrabold text-gray-900 dark:text-white text-base flex items-center gap-2">
+                    <div className="p-6 bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/50 rounded-2xl shadow-sm hover:shadow-md transition-all">
+                        <h4 className="font-extrabold text-slate-800 dark:text-slate-200 text-base flex items-center gap-2">
                             {lang.tip2Title}
                         </h4>
-                        <p className="text-xs text-gray-505 dark:text-gray-400 leading-relaxed mt-2.5">
+                        <p className="text-xs text-slate-505 dark:text-gray-400 leading-relaxed mt-3 font-medium">
                             {lang.tip2Desc}
                         </p>
                     </div>
-                    <div className="p-6 bg-white dark:bg-gray-800 border border-gray-150 dark:border-gray-700 rounded-2xl shadow-sm hover:shadow-md transition">
-                        <h4 className="font-extrabold text-gray-900 dark:text-white text-base flex items-center gap-2">
+                    <div className="p-6 bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/50 rounded-2xl shadow-sm hover:shadow-md transition-all">
+                        <h4 className="font-extrabold text-slate-800 dark:text-slate-200 text-base flex items-center gap-2">
                             {lang.tip3Title}
                         </h4>
-                        <p className="text-xs text-gray-505 dark:text-gray-400 leading-relaxed mt-2.5">
+                        <p className="text-xs text-slate-505 dark:text-gray-400 leading-relaxed mt-3 font-medium">
                             {lang.tip3Desc}
                         </p>
                     </div>
@@ -376,16 +381,14 @@ const Dashboard = () => {
             </div>
 
             {/* Disclaimer Panel */}
-            <div className="mt-16 mb-6 p-6 border border-red-150 dark:border-red-950/40 bg-red-50/20 dark:bg-red-950/10 rounded-2xl text-left">
+            <div className="mt-16 mb-6 p-6 border border-red-200/60 dark:border-red-950/40 bg-red-50/20 dark:bg-red-950/10 rounded-2xl text-left">
                 <h4 className="text-sm font-extrabold text-red-700 dark:text-red-400 flex items-center gap-1.5 uppercase tracking-wider">
                     ⚠️ {lang.disclaimerTitle}
                 </h4>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2.5 leading-relaxed">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2.5 leading-relaxed font-medium">
                     {lang.disclaimerText}
                 </p>
             </div>
-
-
 
             <AddPlotModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onPlotAdded={handlePlotAdded} />
             <DiagnoseModal isOpen={!!selectedPlotForDiagnosis} onClose={() => setSelectedPlotForDiagnosis(null)} plot={selectedPlotForDiagnosis} />

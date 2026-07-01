@@ -1,95 +1,104 @@
 import { useState } from 'react';
-import { Trash2, MapPin, Layers, Droplet, AlertTriangle, Check, X } from 'lucide-react';
+import { Trash2, MapPin, Layers, Droplet, AlertTriangle, Check, X, ShieldAlert } from 'lucide-react';
 
 const PlotCard = ({ plot, onDelete, onDiagnose, onIrrigation }) => {
     const [isConfirming, setIsConfirming] = useState(false);
 
     return (
-        <div className="relative flex flex-col h-full p-5 bg-white dark:bg-gray-800 border border-gray-150 dark:border-gray-700 border-l-4 border-l-green-600 rounded-r-2xl rounded-l-md shadow-sm hover:shadow-md hover:-translate-y-1 transform hover:scale-[1.01] transition-all duration-300 overflow-hidden">
+        <div className="relative flex flex-col h-full p-6 bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/50 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 overflow-hidden group">
             
             {/* Inline Deletion Confirm Overlay */}
-            {isConfirming ? (
-                <div className="absolute inset-0 bg-red-50/95 dark:bg-red-950/90 z-20 flex flex-col justify-center items-center p-6 text-center animate-fade-in">
-                    <AlertTriangle size={36} className="text-red-500 mb-3 animate-pulse" />
-                    <h4 className="text-lg font-black text-red-700 dark:text-red-300">Delete Plot?</h4>
-                    <p className="text-xs text-red-600 dark:text-red-400 mt-1 max-w-[200px] leading-relaxed">
-                        Are you sure you want to remove <strong>{plot.name}</strong>? This cannot be undone.
+            {isConfirming && (
+                <div className="absolute inset-0 bg-red-500/95 dark:bg-red-950/95 z-20 flex flex-col justify-center items-center p-6 text-center animate-scale-in">
+                    <ShieldAlert size={36} className="text-white dark:text-red-400 mb-3 animate-pulse" />
+                    <h4 className="text-lg font-black text-white dark:text-red-300">Delete Plot?</h4>
+                    <p className="text-xs text-white/90 dark:text-red-300/80 mt-1 max-w-[200px] leading-relaxed">
+                        Are you sure you want to remove <strong>{plot.name}</strong>? This action cannot be undone.
                     </p>
-                    <div className="flex gap-3 mt-5 w-full max-w-[220px]">
+                    <div className="flex gap-2.5 mt-6 w-full max-w-[220px]">
                         <button
                             onClick={() => setIsConfirming(false)}
-                            className="flex-1 py-2 px-4 bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded-xl text-xs border-none cursor-pointer flex items-center justify-center gap-1 transition"
+                            className="flex-1 py-2 px-3 bg-white/20 hover:bg-white/30 text-white font-bold rounded-xl text-xs border-none cursor-pointer flex items-center justify-center gap-1 transition"
                         >
                             <X size={12} />
                             <span>Cancel</span>
                         </button>
                         <button
                             onClick={() => onDelete(plot._id)}
-                            className="flex-1 py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs border-none cursor-pointer flex items-center justify-center gap-1 transition shadow-md"
+                            className="flex-1 py-2 px-3 bg-white hover:bg-red-50 text-red-700 dark:text-red-400 font-black rounded-xl text-xs border-none cursor-pointer flex items-center justify-center gap-1 transition shadow-md"
                         >
                             <Check size={12} />
                             <span>Delete</span>
                         </button>
                     </div>
                 </div>
-            ) : null}
+            )}
 
             {/* Header Section */}
             <div className="flex items-start justify-between mb-4">
                 <div className="text-left">
-                    <h3 className="text-xl font-bold text-green-700 dark:text-green-500 leading-tight">
+                    <h3 className="text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight leading-snug">
                         {plot.name || 'Unnamed Plot'}
                     </h3>
-                    <p className="text-xs font-semibold text-gray-400 mt-0.5 uppercase tracking-wide">
+                    <span className="inline-block px-2.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-extrabold rounded-full uppercase tracking-wider mt-1.5 border border-emerald-100/20">
                         {plot.cropType || 'Crop not specified'}
-                    </p>
+                    </span>
                 </div>
                 <button 
                     onClick={() => setIsConfirming(true)} 
-                    className="text-gray-400 hover:text-red-600 transition p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 border-none cursor-pointer bg-transparent"
+                    className="text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 p-2 rounded-xl border-none cursor-pointer bg-transparent transition duration-200"
                     title="Delete Plot"
                 >
-                    <Trash2 size={18} />
+                    <Trash2 size={16} />
                 </button>
             </div>
 
             {/* Plot Details Grid */}
-            <div className="grid grid-cols-2 gap-3 text-left mb-6 mt-1 text-sm text-gray-600 dark:text-gray-300">
-                <div className="flex items-center gap-1.5">
-                    <span className="font-semibold text-gray-400">Area:</span>
-                    <span className="font-medium">{plot.area || 0} acres</span>
+            <div className="grid grid-cols-2 gap-4 text-left my-5 text-xs text-slate-500 dark:text-slate-400 border-t border-b border-slate-100 dark:border-gray-800/80 py-4">
+                <div className="flex flex-col gap-1">
+                    <span className="font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide text-[9px]">Plot Area</span>
+                    <span className="font-extrabold text-slate-700 dark:text-slate-350">{plot.area || 0} acres</span>
                 </div>
-                {plot.location && (
-                    <div className="flex items-center gap-1.5 truncate">
-                        <MapPin size={14} className="text-gray-400 shrink-0" />
-                        <span className="font-medium truncate">{plot.location}</span>
-                    </div>
-                )}
                 {plot.soilType && (
-                    <div className="flex items-center gap-1.5">
-                        <Layers size={14} className="text-gray-400 shrink-0" />
-                        <span className="font-medium">{plot.soilType} Soil</span>
+                    <div className="flex flex-col gap-1">
+                        <span className="font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide text-[9px]">Soil Profile</span>
+                        <span className="font-extrabold text-slate-700 dark:text-slate-350 flex items-center gap-1">
+                            <Layers size={12} className="text-slate-400 shrink-0" />
+                            {plot.soilType}
+                        </span>
                     </div>
                 )}
                 {plot.irrigationMethod && (
-                    <div className="flex items-center gap-1.5">
-                        <Droplet size={14} className="text-gray-400 shrink-0" />
-                        <span className="font-medium">{plot.irrigationMethod}</span>
+                    <div className="flex flex-col gap-1">
+                        <span className="font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide text-[9px]">Watering Mode</span>
+                        <span className="font-extrabold text-slate-700 dark:text-slate-350 flex items-center gap-1">
+                            <Droplet size={12} className="text-slate-400 shrink-0" />
+                            {plot.irrigationMethod}
+                        </span>
+                    </div>
+                )}
+                {plot.location && (
+                    <div className="flex flex-col gap-1 truncate">
+                        <span className="font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide text-[9px]">District</span>
+                        <span className="font-extrabold text-slate-700 dark:text-slate-350 flex items-center gap-1 truncate" title={plot.location}>
+                            <MapPin size={12} className="text-slate-400 shrink-0" />
+                            <span className="truncate">{plot.location}</span>
+                        </span>
                     </div>
                 )}
             </div>
 
             {/* Action Buttons (Pushed to the bottom) */}
-            <div className="flex gap-2 pt-4 mt-auto border-t border-gray-100 dark:border-gray-700">
+            <div className="flex gap-2.5 mt-auto">
                 <button
                     onClick={() => onDiagnose(plot)}
-                    className="flex-1 py-2.5 font-bold text-blue-700 dark:text-blue-400 transition bg-blue-50 dark:bg-blue-950/30 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-950/60 border-none cursor-pointer"
+                    className="flex-1 py-2.5 px-3 font-bold text-blue-600 dark:text-blue-400 hover:text-white dark:hover:text-white bg-blue-50 hover:bg-blue-600 dark:bg-blue-950/20 dark:hover:bg-blue-600 rounded-xl transition-all border-none cursor-pointer text-xs"
                 >
                     🩺 Diagnose
                 </button>
                 <button
                     onClick={() => onIrrigation(plot)}
-                    className="flex-1 py-2.5 font-bold text-white transition bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm border-none cursor-pointer"
+                    className="flex-1 py-2.5 px-3 font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-xl shadow-sm border-none cursor-pointer transition-all active:scale-95 text-xs"
                 >
                     💧 Irrigate
                 </button>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
+import { X, Droplets, Loader2, CloudRain, ShieldAlert, Sparkles } from 'lucide-react';
 
 const IrrigationModal = ({ isOpen, onClose, plot }) => {
     const [loading, setLoading] = useState(true);
@@ -62,30 +63,37 @@ const IrrigationModal = ({ isOpen, onClose, plot }) => {
     if (!isOpen || !plot) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm animate-fade-in">
-            <div className="w-full max-w-md bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-2xl overflow-hidden relative animate-scale-up">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/75 backdrop-blur-md animate-fade-in">
+            <div className="w-full max-w-md bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/50 rounded-3xl shadow-2xl overflow-hidden relative animate-scale-in text-left">
                 
                 {/* Header */}
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white text-center relative">
-                    <button onClick={onClose} className="absolute text-blue-200 top-4 right-4 hover:text-white font-bold text-lg">
-                        ✕
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-white text-center relative">
+                    <button 
+                        onClick={onClose} 
+                        className="absolute p-1.5 text-blue-200 top-4 right-4 hover:text-white hover:bg-white/10 rounded-xl transition border-none cursor-pointer bg-transparent"
+                    >
+                        <X size={16} />
                     </button>
-                    <h2 className="text-2xl font-bold flex justify-center items-center gap-2">
+                    <h2 className="text-xl font-black flex justify-center items-center gap-1.5 text-white">
                         💧 Smart Irrigation
                     </h2>
-                    <p className="opacity-90 mt-1 font-medium">{plot.name} ({plot.area} Acres of {plot.cropType})</p>
+                    <p className="opacity-90 mt-1.5 text-xs font-semibold">{plot.name} ({plot.area} Acres of {plot.cropType})</p>
                 </div>
 
                 <div className="p-6">
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                            <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-                            <p className="text-blue-600 dark:text-blue-400 font-semibold animate-pulse">Fetching live weather & crop needs...</p>
+                        <div className="flex flex-col justify-center items-center py-16 gap-3 text-slate-450 dark:text-slate-500">
+                            <Loader2 size={32} className="animate-spin text-blue-500" />
+                            <p className="text-xs font-bold animate-pulse">Calculating crop water needs...</p>
                         </div>
                     ) : error ? (
-                        <div className="text-center py-8">
-                            <p className="text-red-500 font-bold mb-4">{error}</p>
-                            <button onClick={onClose} className="px-6 py-2 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700">
+                        <div className="text-center py-8 flex flex-col items-center gap-4">
+                            <ShieldAlert size={36} className="text-red-500" />
+                            <p className="text-xs font-bold text-red-500">{error}</p>
+                            <button 
+                                onClick={onClose} 
+                                className="px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs border-none cursor-pointer transition"
+                            >
                                 Close
                             </button>
                         </div>
@@ -94,30 +102,30 @@ const IrrigationModal = ({ isOpen, onClose, plot }) => {
                             
                             {/* Weather Card */}
                             {adviceData.currentWeather && (
-                                <div className="flex items-center justify-between p-3 bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/50 rounded-xl">
+                                <div className="flex items-center justify-between p-3.5 bg-blue-50/20 dark:bg-blue-950/10 border border-blue-100 dark:border-blue-950 rounded-xl text-xs">
                                     <div>
-                                        <p className="text-xs text-gray-500 font-semibold uppercase">Local Weather</p>
-                                        <p className="text-sm font-bold text-gray-800 dark:text-gray-200 capitalize">
+                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Local Temperature</p>
+                                        <p className="text-sm font-extrabold text-slate-800 dark:text-slate-200 capitalize mt-0.5">
                                             {adviceData.currentWeather.temp}°C, {adviceData.currentWeather.description}
                                         </p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-xs text-gray-500 font-semibold uppercase">Humidity</p>
-                                        <p className="text-sm font-bold text-gray-800 dark:text-gray-200">{adviceData.currentWeather.humidity}%</p>
+                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Humidity</p>
+                                        <p className="text-sm font-extrabold text-slate-800 dark:text-slate-200 mt-0.5">{adviceData.currentWeather.humidity}%</p>
                                     </div>
                                 </div>
                             )}
 
                             {/* Recommendation Summary */}
-                            <div className="p-4 rounded-xl border text-center bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800">
-                                <span className={`inline-block px-3 py-1 text-xs font-extrabold rounded-full mb-2 uppercase ${
+                            <div className="p-5 rounded-2xl border text-center bg-slate-50 dark:bg-gray-950 border-slate-200/50 dark:border-gray-800/50">
+                                <span className={`inline-block px-3 py-0.5 text-[9px] font-black rounded-full mb-2.5 uppercase tracking-wider ${
                                     adviceData.recommendation.action === 'Pause Irrigation' 
-                                        ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' 
-                                        : 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'
+                                        ? 'bg-yellow-50 text-yellow-700 dark:bg-yellow-950/20 dark:text-yellow-400 border border-yellow-250/20' 
+                                        : 'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400 border border-green-250/20'
                                 }`}>
                                     {adviceData.recommendation.action}
                                 </span>
-                                <h3 className="text-base font-bold text-gray-800 dark:text-gray-100 px-2">
+                                <h3 className="text-sm font-extrabold text-slate-850 dark:text-slate-100 px-2 leading-relaxed">
                                     {adviceData.recommendation.reason}
                                 </h3>
                             </div>
@@ -125,38 +133,40 @@ const IrrigationModal = ({ isOpen, onClose, plot }) => {
                             {/* Water Volume Cards */}
                             {adviceData.recommendation.action !== 'Pause Irrigation' && (
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-blue-50/30 dark:bg-blue-950/10 border border-blue-100 dark:border-blue-950 p-4 rounded-xl text-center animate-pulse-slow">
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase">Volume Needed</p>
-                                        <p className="text-xl font-extrabold text-blue-600 dark:text-blue-400 mt-1">{volumes.liters} L</p>
+                                    <div className="bg-blue-50/20 dark:bg-blue-950/10 border border-blue-100/50 dark:border-blue-950 p-4 rounded-xl text-center">
+                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Volume Needed</p>
+                                        <p className="text-lg font-black text-blue-600 dark:text-blue-400 mt-1">{volumes.liters} L</p>
                                     </div>
-                                    <div className="bg-blue-50/30 dark:bg-blue-950/10 border border-blue-100 dark:border-blue-950 p-4 rounded-xl text-center">
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase">In Gallons</p>
-                                        <p className="text-xl font-extrabold text-blue-600 dark:text-blue-400 mt-1">{volumes.gallons} G</p>
+                                    <div className="bg-blue-50/20 dark:bg-blue-950/10 border border-blue-100/50 dark:border-blue-950 p-4 rounded-xl text-center">
+                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">In Gallons</p>
+                                        <p className="text-lg font-black text-blue-600 dark:text-blue-400 mt-1">{volumes.gallons} G</p>
                                     </div>
                                 </div>
                             )}
 
                             {/* Schedule Details */}
-                            <div className="space-y-2 pt-2 border-t border-gray-100 dark:border-gray-800">
-                                <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800/30 p-3 rounded-lg text-sm">
-                                    <span className="text-gray-600 dark:text-gray-400 font-semibold">⏱️ Frequency:</span>
-                                    <span className="font-bold text-gray-800 dark:text-gray-200">{adviceData.recommendation.frequency}</span>
+                            <div className="space-y-2 pt-2 border-t border-slate-150 dark:border-gray-800">
+                                <div className="flex justify-between items-center bg-slate-50 dark:bg-gray-950/50 p-3 rounded-xl text-xs font-semibold">
+                                    <span className="text-slate-500 dark:text-slate-400">⏱️ Frequency:</span>
+                                    <span className="font-extrabold text-slate-800 dark:text-slate-200">{adviceData.recommendation.frequency}</span>
                                 </div>
-                                <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800/30 p-3 rounded-lg text-sm">
-                                    <span className="text-gray-600 dark:text-gray-400 font-semibold">🚰 Flow Rate:</span>
-                                    <span className="font-bold text-gray-800 dark:text-gray-200">{adviceData.recommendation.waterVolume}</span>
+                                <div className="flex justify-between items-center bg-slate-50 dark:bg-gray-950/50 p-3 rounded-xl text-xs font-semibold">
+                                    <span className="text-slate-500 dark:text-slate-400">🚰 Water Level:</span>
+                                    <span className="font-extrabold text-slate-800 dark:text-slate-200">{adviceData.recommendation.waterVolume}</span>
                                 </div>
-                                <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800/30 p-3 rounded-lg text-sm">
-                                    <span className="text-gray-600 dark:text-gray-400 font-semibold">⚠️ Urgency:</span>
-                                    <span className={`font-bold capitalize ${
-                                        adviceData.recommendation.urgency === 'High' ? 'text-red-500' : 'text-gray-800 dark:text-gray-200'
+                                <div className="flex justify-between items-center bg-slate-50 dark:bg-gray-950/50 p-3 rounded-xl text-xs font-semibold">
+                                    <span className="text-slate-500 dark:text-slate-400">⚠️ Urgency:</span>
+                                    <span className={`font-extrabold uppercase tracking-wide text-[10px] px-2 py-0.5 rounded ${
+                                        adviceData.recommendation.urgency === 'High' 
+                                            ? 'bg-red-50 text-red-700 dark:bg-red-950/20 dark:text-red-400 border border-red-200/20' 
+                                            : 'text-slate-800 dark:text-slate-200'
                                     }`}>{adviceData.recommendation.urgency}</span>
                                 </div>
                             </div>
 
                             <button 
                                 onClick={onClose}
-                                className="w-full py-3 font-bold text-white bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 rounded-xl transition shadow-md"
+                                className="w-full py-3 font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition shadow-md border-none cursor-pointer text-xs active:scale-95 mt-4"
                             >
                                 Acknowledge Schedule
                             </button>

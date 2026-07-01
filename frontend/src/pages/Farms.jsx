@@ -5,6 +5,7 @@ import PlotCard from '../components/PlotCard';
 import AddPlotModal from '../components/AddPlotModal';
 import DiagnoseModal from '../components/DiagnoseModal';
 import IrrigationModal from '../components/IrrigationModal';
+import { Plus, Info, LayoutGrid, Loader2 } from 'lucide-react';
 
 const Farms = () => {
     const { language } = useContext(AppContext);
@@ -14,7 +15,7 @@ const Farms = () => {
         en: { 
             title: "My Farm Plots", 
             addPlot: "+ Add Plot", 
-            loading: "Loading your plots...", 
+            loading: "Retrieving farm registry...", 
             empty: "You haven't added any plots yet.",
             confirmDelete: "Are you sure you want to delete this plot?",
             failedDelete: "Failed to delete plot"
@@ -73,36 +74,44 @@ const Farms = () => {
     };
 
     return (
-        <div className="w-full text-left">
+        <div className="w-full text-left animate-slide-up">
             {/* Plot Listings Header */}
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl font-extrabold text-gray-800 dark:text-white">
+                    <h1 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">
                         {lang.title}
                     </h1>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5 font-medium">
                         Manage your crops, physical plots, and watering methods.
                     </p>
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="px-5 py-2.5 font-bold text-white bg-green-600 hover:bg-green-700 transition rounded-xl shadow-md border-none cursor-pointer hover:shadow-lg text-sm"
+                    className="px-5 py-3 font-extrabold text-white bg-emerald-500 hover:bg-emerald-600 rounded-xl shadow-md shadow-emerald-500/10 border-none cursor-pointer transition-all active:scale-[0.98] text-sm flex items-center gap-1.5 shrink-0"
                 >
-                    {lang.addPlot}
+                    <Plus size={16} />
+                    <span>{lang.addPlot}</span>
                 </button>
             </div>
 
             {/* Plots Listing Grid */}
             {loading ? (
-                <div className="flex justify-center items-center py-12">
-                    <p className="text-gray-500 dark:text-gray-400 font-semibold animate-pulse">{lang.loading}</p>
+                <div className="flex flex-col justify-center items-center py-24 gap-3 text-slate-400 dark:text-slate-500">
+                    <Loader2 size={36} className="animate-spin text-emerald-500" />
+                    <p className="text-sm font-bold animate-pulse">{lang.loading}</p>
                 </div>
             ) : plots.length === 0 ? (
-                <div className="p-12 border border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-2xl w-full text-center shadow-sm">
-                    <p className="text-gray-500 dark:text-gray-400 font-medium">{lang.empty}</p>
+                <div className="p-12 border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 rounded-3xl w-full text-center shadow-lg shadow-slate-200/30 dark:shadow-black/40 flex flex-col items-center justify-center gap-5">
+                    <div className="w-16 h-16 bg-slate-50 dark:bg-gray-950 rounded-2xl flex items-center justify-center text-3xl shadow-inner select-none">
+                        🚜
+                    </div>
+                    <div className="max-w-xs">
+                        <h4 className="text-base font-extrabold text-slate-800 dark:text-slate-200">No plots registered</h4>
+                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 font-medium leading-relaxed">{lang.empty}</p>
+                    </div>
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="mt-4 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xs font-bold border-none cursor-pointer transition shadow-sm"
+                        className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold border-none cursor-pointer transition shadow-sm active:scale-95"
                     >
                         Create Your First Plot
                     </button>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import api from '../utils/api'; // Your custom axios setup!
+import api from '../utils/api'; 
+import { MapPin, Sparkles, X, Layers, Droplet } from 'lucide-react';
 
 const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
     const [name, setName] = useState('');
@@ -44,7 +45,6 @@ const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            // This sends the new plot to your Render backend
             const response = await api.post('/plots', { 
                 name, 
                 cropType, 
@@ -54,7 +54,7 @@ const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
                 irrigationMethod
             });
             
-            onPlotAdded(response.data); // Updates the UI instantly!
+            onPlotAdded(response.data); 
             
             // Reset form and close
             setName(''); 
@@ -73,56 +73,72 @@ const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm animate-fade-in">
-            <div className="w-full max-w-md p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-2xl transition-all duration-300">
-                <h2 className="mb-4 text-2xl font-bold text-green-700 dark:text-green-500">Add New Plot</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/75 backdrop-blur-md animate-fade-in">
+            <div className="w-full max-w-md p-8 bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/50 rounded-3xl shadow-2xl animate-scale-in text-left">
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-black text-slate-800 dark:text-white tracking-tight flex items-center gap-1.5">
+                        🚜 Add New Plot
+                    </h2>
+                    <button 
+                        onClick={onClose} 
+                        className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-gray-850 rounded-xl transition border-none cursor-pointer bg-transparent"
+                    >
+                        <X size={16} />
+                    </button>
+                </div>
                 
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide text-left">Plot Name (e.g., North Field)</label>
+                        <label className="block text-[10px] font-black text-slate-450 dark:text-slate-500 uppercase tracking-wider mb-2">Plot Name</label>
                         <input 
                             type="text" required value={name} onChange={(e) => setName(e.target.value)}
-                            className="w-full p-2 mt-1 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-green-500 outline-none"
+                            className="w-full px-4 py-2.5 bg-slate-50/50 dark:bg-gray-950/50 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm font-semibold text-slate-800 dark:text-white"
+                            placeholder="e.g. North Field"
                         />
                     </div>
+                    
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide text-left">Crop Type (e.g., Wheat, Corn)</label>
+                        <label className="block text-[10px] font-black text-slate-450 dark:text-slate-500 uppercase tracking-wider mb-2">Crop Type</label>
                         <input 
                             type="text" required value={cropType} onChange={(e) => setCropType(e.target.value)}
-                            className="w-full p-2 mt-1 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-green-500 outline-none"
+                            className="w-full px-4 py-2.5 bg-slate-50/50 dark:bg-gray-950/50 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm font-semibold text-slate-800 dark:text-white"
+                            placeholder="e.g. Wheat, Corn, Cotton"
                         />
                     </div>
+
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide text-left">Area (acres)</label>
+                            <label className="block text-[10px] font-black text-slate-450 dark:text-slate-500 uppercase tracking-wider mb-2">Area (acres)</label>
                             <input 
                                 type="number" required min="0.1" step="0.1" value={area} onChange={(e) => setArea(e.target.value)}
-                                className="w-full p-2 mt-1 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-green-500 outline-none"
+                                className="w-full px-4 py-2.5 bg-slate-50/50 dark:bg-gray-950/50 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm font-semibold text-slate-800 dark:text-white"
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide text-left">Location/City</label>
+                            <label className="block text-[10px] font-black text-slate-450 dark:text-slate-500 uppercase tracking-wider mb-2">Location/City</label>
                             <input 
                                 type="text" required value={location} onChange={(e) => setLocation(e.target.value)}
-                                className="w-full p-2 mt-1 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-green-500 outline-none text-sm"
-                                placeholder="e.g. Meerut, Sardhana"
+                                className="w-full px-4 py-2.5 bg-slate-50/50 dark:bg-gray-950/50 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-xs font-semibold text-slate-800 dark:text-white"
+                                placeholder="e.g. Meerut, Delhi"
                             />
                             <button
                                 type="button"
                                 disabled={gpsLoading}
                                 onClick={handleGpsDetect}
-                                className="mt-2 w-full py-1.5 px-3 text-[11px] font-bold text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/20 hover:bg-green-100 dark:hover:bg-green-950/40 rounded-lg cursor-pointer transition border border-dashed border-green-300 dark:border-green-800 text-center flex items-center justify-center gap-1"
+                                className="mt-2 w-full py-2 px-3 text-[10px] font-extrabold text-emerald-600 dark:text-emerald-450 bg-emerald-50/60 dark:bg-emerald-950/20 hover:bg-emerald-100/50 dark:hover:bg-emerald-950/40 rounded-xl cursor-pointer transition border border-dashed border-emerald-300/40 dark:border-emerald-800/40 text-center flex items-center justify-center gap-1.5 active:scale-95"
                             >
-                                📍 {gpsLoading ? "Detecting location..." : "Detect GPS Location"}
+                                <MapPin size={12} className={gpsLoading ? "animate-pulse" : ""} />
+                                <span>{gpsLoading ? "Detecting..." : "Detect GPS"}</span>
                             </button>
                         </div>
                     </div>
+
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide text-left">Soil Type</label>
+                            <label className="block text-[10px] font-black text-slate-450 dark:text-slate-500 uppercase tracking-wider mb-2">Soil Type</label>
                             <select 
                                 value={soilType} onChange={(e) => setSoilType(e.target.value)}
-                                className="w-full p-2 mt-1 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-green-500 outline-none cursor-pointer"
+                                className="w-full px-4 py-2.5 bg-slate-50/50 dark:bg-gray-950/50 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-xs font-semibold text-slate-800 dark:text-white cursor-pointer"
                             >
                                 <option value="Loamy">Loamy</option>
                                 <option value="Clay">Clay</option>
@@ -131,10 +147,10 @@ const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide text-left">Irrigation Method</label>
+                            <label className="block text-[10px] font-black text-slate-450 dark:text-slate-500 uppercase tracking-wider mb-2">Irrigation Method</label>
                             <select 
                                 value={irrigationMethod} onChange={(e) => setIrrigationMethod(e.target.value)}
-                                className="w-full p-2 mt-1 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-green-500 outline-none cursor-pointer"
+                                className="w-full px-4 py-2.5 bg-slate-50/50 dark:bg-gray-950/50 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-xs font-semibold text-slate-800 dark:text-white cursor-pointer"
                             >
                                 <option value="Drip">Drip</option>
                                 <option value="Sprinkler">Sprinkler</option>
@@ -143,11 +159,19 @@ const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
                         </div>
                     </div>
 
-                    <div className="flex justify-end gap-2 mt-4">
-                        <button type="button" onClick={onClose} className="px-4 py-2 text-gray-600 dark:text-gray-400 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg transition">
+                    <div className="flex justify-end gap-2.5 mt-6 border-t border-slate-100 dark:border-gray-800 pt-5">
+                        <button 
+                            type="button" 
+                            onClick={onClose} 
+                            className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-gray-850 dark:hover:bg-gray-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs border-none cursor-pointer transition active:scale-95"
+                        >
                             Cancel
                         </button>
-                        <button type="submit" disabled={loading} className="px-4 py-2 font-bold text-white bg-green-600 hover:bg-green-700 rounded-lg transition shadow-md">
+                        <button 
+                            type="submit" 
+                            disabled={loading} 
+                            className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-400 text-white font-bold rounded-xl text-xs border-none cursor-pointer transition shadow-md active:scale-95"
+                        >
                             {loading ? 'Saving...' : 'Save Plot'}
                         </button>
                     </div>

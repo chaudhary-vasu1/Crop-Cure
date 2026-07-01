@@ -48,19 +48,29 @@ const Navbar = () => {
         { name: lang.settings, path: '/settings', icon: Settings },
     ];
 
+    // Helper to get user initial
+    const getUserInitial = () => {
+        if (user && user.username) {
+            return user.username.charAt(0).toUpperCase();
+        }
+        return 'F';
+    };
+
     return (
-        <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm dark:bg-gray-950 dark:border-gray-800 transition-colors duration-200">
+        <header className="sticky top-0 z-50 w-full glass-panel shadow-sm transition-all duration-300">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 {/* Logo */}
-                <Link to="/" className="flex items-center gap-2 hover:opacity-90 transition border-none bg-transparent">
-                    <span className="text-2xl select-none">🌾</span>
-                    <span className="text-xl font-extrabold tracking-wider text-green-700 dark:text-green-500">
-                        CropCure
+                <Link to="/" className="flex items-center gap-2.5 hover:opacity-90 transition border-none bg-transparent group">
+                    <div className="w-9 h-9 bg-emerald-500 dark:bg-emerald-600 rounded-xl flex items-center justify-center shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-200">
+                        <span className="text-xl select-none text-white font-bold">🌾</span>
+                    </div>
+                    <span className="text-lg font-black tracking-tight text-slate-800 dark:text-slate-100">
+                        Crop<span className="text-emerald-500">Cure</span>
                     </span>
                 </Link>
 
                 {/* Desktop Navigation Links */}
-                <nav className="hidden md:flex items-center gap-2">
+                <nav className="hidden md:flex items-center gap-1 bg-slate-100/60 dark:bg-gray-900/60 p-1.5 rounded-2xl border border-slate-200/40 dark:border-gray-800/40">
                     {navItems.map((item) => {
                         const Icon = item.icon;
                         const isActive = location.pathname === item.path;
@@ -68,13 +78,13 @@ const Navbar = () => {
                             <Link
                                 key={item.path}
                                 to={item.path}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 border-none ${
+                                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 border-none ${
                                     isActive
-                                    ? 'bg-green-50 text-green-700 shadow-sm dark:bg-green-950/45 dark:text-green-400'
-                                    : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-900/60 dark:hover:text-gray-200'
+                                    ? 'bg-white dark:bg-gray-800 text-emerald-600 dark:text-emerald-400 shadow-sm'
+                                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-white/45 dark:hover:bg-gray-800/45'
                                 }`}
                             >
-                                <Icon size={16} />
+                                <Icon size={14} />
                                 <span>{item.name}</span>
                             </Link>
                         );
@@ -86,31 +96,37 @@ const Navbar = () => {
                     {/* Theme Toggle */}
                     <button
                         onClick={toggleTheme}
-                        className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-900 border-none cursor-pointer transition"
+                        className="p-2 text-slate-500 hover:text-slate-850 dark:text-slate-400 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-900 border-none cursor-pointer transition-all active:scale-95 duration-200"
                         title={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
                     >
-                        {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                        {theme === 'dark' ? (
+                            <Sun size={18} className="animate-spin-slow" />
+                        ) : (
+                            <Moon size={18} />
+                        )}
                     </button>
 
                     {/* User Profile display - Clickable Link to Settings */}
                     <Link 
                         to="/profile" 
-                        className="hidden sm:flex items-center gap-2 px-3 py-1 bg-gray-50 dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800/80 transition-all border-none cursor-pointer text-current no-underline"
+                        className="flex items-center gap-2.5 p-1 pr-3 bg-slate-100/70 hover:bg-slate-150/70 dark:bg-gray-900/75 dark:hover:bg-gray-800/80 border border-slate-200/40 dark:border-gray-800/40 rounded-full transition-all border-none cursor-pointer text-current no-underline group shadow-sm"
                     >
-                        <User size={16} className="text-gray-400 dark:text-gray-500" />
-                        <div className="text-left leading-none">
-                            <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">{lang.profile}</span>
-                            <p className="text-xs font-bold text-gray-700 dark:text-gray-300">{user?.username || 'Farmer'}</p>
+                        <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-emerald-500 to-green-400 text-white font-extrabold flex items-center justify-center text-xs shadow-inner group-hover:scale-105 transition-transform duration-200">
+                            {getUserInitial()}
+                        </div>
+                        <div className="hidden sm:block text-left leading-none">
+                            <span className="text-[8px] text-gray-400 font-black uppercase tracking-wider">{lang.profile}</span>
+                            <p className="text-xs font-extrabold text-slate-700 dark:text-slate-300 mt-0.5">{user?.username || 'Farmer'}</p>
                         </div>
                     </Link>
 
                     {/* Logout */}
                     <button
                         onClick={logout}
-                        className="px-4 py-2 text-sm font-bold text-white bg-red-500 hover:bg-red-600 rounded-xl transition shadow-sm border-none cursor-pointer flex items-center gap-1.5"
+                        className="px-3 py-2 text-xs font-bold text-red-600 hover:text-white border border-red-200 hover:bg-red-500 dark:border-red-950/40 dark:hover:bg-red-650 rounded-xl transition-all shadow-sm border-none cursor-pointer flex items-center gap-1.5 active:scale-95 bg-transparent"
                     >
-                        <LogOut size={16} />
-                        <span>{lang.logout}</span>
+                        <LogOut size={13} />
+                        <span className="hidden sm:inline">{lang.logout}</span>
                     </button>
                 </div>
             </div>

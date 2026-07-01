@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from '../utils/api';
+import { Shield, Sparkles, Navigation, ChevronRight, CornerDownLeft } from 'lucide-react';
 
 const Login = () => {
     // Shared State
@@ -87,111 +88,246 @@ const Login = () => {
     };
 
     return (
-        <div style={{ padding: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
-            <div style={{ width: '100%', maxWidth: '400px', padding: '2rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem', backgroundColor: 'white' }}>
+        <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 dark:bg-gray-950 transition-colors duration-300 relative overflow-hidden">
+            {/* Left Decorative Split Panel */}
+            <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 flex-col justify-between p-12 text-white relative">
+                <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
                 
-                {/* --- STANDARD LOGIN VIEW --- */}
-                {view === 'login' && (
-                    <>
-                        <h2 style={{ marginBottom: '1.5rem', fontSize: '1.25rem', fontWeight: 'bold' }}>Welcome Back</h2>
-                        <form onSubmit={handleLogin}>
-                            <input 
-                                type="text" 
-                                placeholder="Email or Phone Number" 
-                                value={identifier}
-                                onChange={(e) => setIdentifier(e.target.value)} 
-                                style={{ width: '100%', padding: '0.75rem', marginBottom: '1rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} 
-                                required 
-                            />
-                            <input 
-                                type="password" 
-                                placeholder="Password" 
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)} 
-                                style={{ width: '100%', padding: '0.75rem', marginBottom: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} 
-                                required 
-                            />
-                            
-                            <div style={{ textAlign: 'right', marginBottom: '1.5rem' }}>
-                                <button type="button" onClick={() => setView('forgot-request')} style={{ background: 'none', border: 'none', color: '#059669', fontSize: '0.875rem', cursor: 'pointer', padding: 0 }}>
-                                    Forgot Password?
-                                </button>
+                {/* Header Logo */}
+                <div className="flex items-center gap-2.5 z-10">
+                    <div className="w-9 h-9 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center shadow-lg">
+                        <span className="text-xl select-none">🌾</span>
+                    </div>
+                    <span className="text-xl font-black tracking-tight">CropCure</span>
+                </div>
+
+                {/* Promotional content block */}
+                <div className="my-auto z-10 max-w-md text-left flex flex-col gap-6">
+                    <h1 className="text-4xl font-extrabold text-white leading-tight tracking-tight">
+                        Optimize Field Yields and Prevent Fungal Infections.
+                    </h1>
+                    <p className="text-sm text-emerald-100 leading-relaxed font-medium">
+                        CropCure leverages advanced machine learning to detect plant leaf anomalies, coordinates-based reverse geocoding to predict localized downpours, and weather-adjusted soil hydration advice.
+                    </p>
+                    <div className="flex flex-col gap-3 mt-4">
+                        <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/10">
+                            <span className="text-2xl">🩺</span>
+                            <div className="text-left">
+                                <h4 className="text-sm font-bold">State-of-the-Art AI Diagnosis</h4>
+                                <p className="text-xs text-emerald-200 mt-0.5">Upload diseased leaves to receive chemical & organic plans</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/10">
+                            <span className="text-2xl">💧</span>
+                            <div className="text-left">
+                                <h4 className="text-sm font-bold">Soil Water Adjustments</h4>
+                                <p className="text-xs text-emerald-200 mt-0.5">Schedule watering tailored to weather, acreage, and methods</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Footer copyright */}
+                <div className="z-10 text-xs text-emerald-200/70">
+                    © 2026 CropCure Agricultural Technologies Inc.
+                </div>
+            </div>
+
+            {/* Right Form split panel */}
+            <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-6 sm:p-12 z-10 relative">
+                
+                {/* Decorative mesh circle on right background */}
+                <div className="absolute right-[-100px] top-[-100px] w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div className="w-full max-w-md bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/50 rounded-3xl p-8 sm:p-10 shadow-xl shadow-slate-200/40 dark:shadow-black/45 animate-scale-in text-left">
+                    
+                    {/* Brand banner visible only on mobile */}
+                    <div className="flex items-center gap-2 mb-8 md:hidden justify-center">
+                        <span className="text-2xl">🌾</span>
+                        <span className="text-lg font-black tracking-tight text-slate-800 dark:text-slate-100">
+                            Crop<span className="text-emerald-500">Cure</span>
+                        </span>
+                    </div>
+
+                    {/* --- STANDARD LOGIN VIEW --- */}
+                    {view === 'login' && (
+                        <>
+                            <div className="mb-8">
+                                <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                                    Welcome Back
+                                </h2>
+                                <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-1">
+                                    Please enter your farmer credentials to access your registry
+                                </p>
                             </div>
 
-                            <button type="submit" disabled={loading} style={{ width: '100%', padding: '0.75rem', backgroundColor: '#059669', color: 'white', border: 'none', borderRadius: '0.25rem', cursor: loading ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}>
-                                {loading ? 'Logging in...' : 'Login'}
-                            </button>
-                        </form>
-                    </>
-                )}
+                            <form onSubmit={handleLogin} className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+                                        Email or Phone
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        placeholder="farmer@example.com or 10-digit phone" 
+                                        value={identifier}
+                                        onChange={(e) => setIdentifier(e.target.value)} 
+                                        className="w-full px-4 py-3 bg-slate-50/50 dark:bg-gray-950/50 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white dark:focus:bg-gray-900 transition-all text-sm font-medium text-slate-800 dark:text-white"
+                                        required 
+                                    />
+                                </div>
 
-                {/* --- FORGOT PASSWORD: ASK FOR EMAIL/PHONE --- */}
-                {view === 'forgot-request' && (
-                    <div style={{ animation: 'fadeIn 0.3s ease-in-out' }}>
-                        <h2 style={{ marginBottom: '0.5rem', fontSize: '1.25rem', fontWeight: 'bold' }}>Reset Password</h2>
-                        <p style={{ fontSize: '0.875rem', color: '#4b5563', marginBottom: '1.5rem' }}>Enter your email or phone number to receive a recovery code.</p>
-                        
-                        <form onSubmit={handleSendResetOtp}>
-                            <input 
-                                type="text" 
-                                placeholder="Email or Phone Number" 
-                                value={identifier}
-                                onChange={(e) => setIdentifier(e.target.value)} 
-                                style={{ width: '100%', padding: '0.75rem', marginBottom: '1.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} 
-                                required 
-                            />
-                            <button type="submit" disabled={loading} style={{ width: '100%', padding: '0.75rem', backgroundColor: '#059669', color: 'white', border: 'none', borderRadius: '0.25rem', cursor: loading ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}>
-                                {loading ? 'Sending...' : 'Send Recovery OTP'}
-                            </button>
-                        </form>
-                        <button onClick={() => setView('login')} style={{ width: '100%', marginTop: '1rem', background: 'none', border: 'none', color: '#4b5563', cursor: 'pointer', textDecoration: 'underline' }}>Back to Login</button>
-                    </div>
-                )}
+                                <div>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <label className="block text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                            Password
+                                        </label>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => setView('forgot-request')} 
+                                            className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-transparent border-none cursor-pointer hover:underline p-0"
+                                        >
+                                            Forgot Password?
+                                        </button>
+                                    </div>
+                                    <input 
+                                        type="password" 
+                                        placeholder="••••••••" 
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)} 
+                                        className="w-full px-4 py-3 bg-slate-50/50 dark:bg-gray-950/50 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white dark:focus:bg-gray-900 transition-all text-sm font-medium text-slate-800 dark:text-white"
+                                        required 
+                                    />
+                                </div>
 
-                {/* --- FORGOT PASSWORD: ENTER OTP & NEW PASSWORD --- */}
-                {view === 'forgot-reset' && (
-                    <div style={{ animation: 'fadeIn 0.3s ease-in-out' }}>
-                        <h2 style={{ marginBottom: '1.5rem', fontSize: '1.25rem', fontWeight: 'bold' }}>Create New Password</h2>
-                        
-                        <form onSubmit={handleResetPassword}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: '600', color: '#374151' }}>Enter the 6-Digit Code:</label>
-                            <input 
-                                type="text" 
-                                placeholder="123456" 
-                                value={otp}
-                                maxLength={6}
-                                onChange={(e) => setOtp(e.target.value)} 
-                                style={{ width: '100%', padding: '0.75rem', marginBottom: '1rem', border: '2px solid #059669', borderRadius: '0.25rem', letterSpacing: '2px', textAlign: 'center', fontSize: '1.125rem', fontWeight: 'bold' }} 
-                                required 
-                            />
+                                <button 
+                                    type="submit" 
+                                    disabled={loading} 
+                                    className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-450 text-white font-bold rounded-xl text-sm border-none cursor-pointer transition-all shadow-md shadow-emerald-500/10 active:scale-[0.98] mt-6 flex items-center justify-center gap-2"
+                                >
+                                    {loading ? 'Logging in...' : 'Sign In'}
+                                    <ChevronRight size={16} />
+                                </button>
+                            </form>
+                        </>
+                    )}
+
+                    {/* --- FORGOT PASSWORD: ASK FOR EMAIL/PHONE --- */}
+                    {view === 'forgot-request' && (
+                        <div className="animate-fade-in">
+                            <div className="mb-6">
+                                <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                                    Recover Password
+                                </h2>
+                                <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-1">
+                                    Enter your credentials to receive a 6-digit verification code
+                                </p>
+                            </div>
                             
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: '600', color: '#374151' }}>New Password:</label>
-                            <input 
-                                type="password" 
-                                placeholder="Create a new password" 
-                                value={newPassword}
-                                onChange={(e) => setNewPassword(e.target.value)} 
-                                style={{ width: '100%', padding: '0.75rem', marginBottom: '1.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} 
-                                required 
-                            />
+                            <form onSubmit={handleSendResetOtp} className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+                                        Email or Phone
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        placeholder="farmer@example.com or 10-digit phone" 
+                                        value={identifier}
+                                        onChange={(e) => setIdentifier(e.target.value)} 
+                                        className="w-full px-4 py-3 bg-slate-50/50 dark:bg-gray-950/50 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white dark:focus:bg-gray-900 transition-all text-sm font-medium text-slate-800 dark:text-white"
+                                        required 
+                                    />
+                                </div>
 
-                            <button type="submit" disabled={loading} style={{ width: '100%', padding: '0.75rem', backgroundColor: '#059669', color: 'white', border: 'none', borderRadius: '0.25rem', cursor: loading ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}>
-                                {loading ? 'Updating...' : 'Reset Password'}
+                                <button 
+                                    type="submit" 
+                                    disabled={loading} 
+                                    className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-450 text-white font-bold rounded-xl text-sm border-none cursor-pointer transition-all shadow-md active:scale-[0.98] mt-6 flex items-center justify-center gap-1.5"
+                                >
+                                    {loading ? 'Sending...' : 'Send Recovery OTP'}
+                                </button>
+                            </form>
+
+                            <button 
+                                onClick={() => setView('login')} 
+                                className="w-full mt-4 bg-transparent border-none text-xs font-bold text-slate-500 dark:text-slate-400 cursor-pointer hover:underline flex items-center justify-center gap-1.5"
+                            >
+                                <CornerDownLeft size={14} />
+                                <span>Back to Login</span>
                             </button>
-                        </form>
-                        <button onClick={() => setView('forgot-request')} style={{ width: '100%', marginTop: '1rem', background: 'none', border: 'none', color: '#4b5563', cursor: 'pointer', textDecoration: 'underline' }}>Change Phone/Email</button>
-                    </div>
-                )}
+                        </div>
+                    )}
 
-                {/* Register Link (Only shows on main login view) */}
-                {view === 'login' && (
-                    <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: '#4b5563' }}>
-                        Don't have an account?{' '}
-                        <Link to="/register" style={{ color: '#059669', textDecoration: 'none', fontWeight: 'bold' }}>
-                            Register here
-                        </Link>
-                    </div>
-                )}
+                    {/* --- FORGOT PASSWORD: ENTER OTP & NEW PASSWORD --- */}
+                    {view === 'forgot-reset' && (
+                        <div className="animate-fade-in">
+                            <div className="mb-6">
+                                <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                                    Choose New Password
+                                </h2>
+                                <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-1">
+                                    Enter the OTP sent to your recovery channel to reset credentials
+                                </p>
+                            </div>
+                            
+                            <form onSubmit={handleResetPassword} className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+                                        6-Digit Verification Code
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        placeholder="123456" 
+                                        value={otp}
+                                        maxLength={6}
+                                        onChange={(e) => setOtp(e.target.value)} 
+                                        className="w-full px-4 py-3 bg-emerald-50/50 dark:bg-emerald-950/20 border-2 border-emerald-500 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 text-center text-lg font-black tracking-widest text-emerald-700 dark:text-emerald-400"
+                                        required 
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+                                        New Password
+                                    </label>
+                                    <input 
+                                        type="password" 
+                                        placeholder="Create a strong password" 
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)} 
+                                        className="w-full px-4 py-3 bg-slate-50/50 dark:bg-gray-950/50 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white dark:focus:bg-gray-900 transition-all text-sm font-medium text-slate-800 dark:text-white"
+                                        required 
+                                    />
+                                </div>
+
+                                <button 
+                                    type="submit" 
+                                    disabled={loading} 
+                                    className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-450 text-white font-bold rounded-xl text-sm border-none cursor-pointer transition-all shadow-md active:scale-[0.98] mt-6 flex items-center justify-center gap-1.5"
+                                >
+                                    {loading ? 'Updating...' : 'Reset Password'}
+                                </button>
+                            </form>
+                            
+                            <button 
+                                onClick={() => setView('forgot-request')} 
+                                className="w-full mt-4 bg-transparent border-none text-xs font-bold text-slate-500 dark:text-slate-400 cursor-pointer hover:underline flex items-center justify-center gap-1.5"
+                            >
+                                <CornerDownLeft size={14} />
+                                <span>Change Phone/Email</span>
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Register Link (Only shows on main login view) */}
+                    {view === 'login' && (
+                        <div className="mt-8 pt-6 border-t border-slate-100 dark:border-gray-800 text-center text-xs text-slate-500 dark:text-slate-400">
+                            Don't have an account?{' '}
+                            <Link to="/register" className="text-emerald-650 hover:text-emerald-700 dark:text-emerald-400 font-extrabold hover:underline no-underline transition">
+                                Register here
+                            </Link>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
