@@ -130,13 +130,20 @@ const Login = () => {
     };
     const lang = t[language] || t.en;
 
-    // Helper to format 10-digit phone numbers automatically
+    // Helper to format phone numbers automatically (normalizes to 10 digits)
     const getFormattedIdentifier = () => {
         let finalIdentifier = identifier.trim();
-        if (!finalIdentifier.includes('@') && !finalIdentifier.startsWith('+') && finalIdentifier.length === 10) {
-            return `+91${finalIdentifier}`;
+        if (finalIdentifier.includes('@')) {
+            return finalIdentifier.toLowerCase();
         }
-        return finalIdentifier;
+        let clean = finalIdentifier.replace(/[\s-()+]/g, '');
+        if (clean.startsWith('91') && clean.length === 12) {
+            clean = clean.slice(2);
+        }
+        if (clean.startsWith('0')) {
+            clean = clean.slice(1);
+        }
+        return clean;
     };
 
     // --- NORMAL LOGIN ---
@@ -144,7 +151,7 @@ const Login = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const cleanIdentifier = identifier.trim();
+            const cleanIdentifier = getFormattedIdentifier();
             const cleanPassword = password.trim();
             const res = await api.post('/auth/login', { email: cleanIdentifier, password: cleanPassword });
             login(res.data);

@@ -22,17 +22,29 @@ const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_A
 // Helper function to detect Email vs Phone Number
 const isEmail = (identifier) => identifier.includes('@');
 
-// Helper function to automatically format 10-digit Indian numbers to E.164 standard
+// Helper function to automatically format 10-digit Indian numbers (strips leading 0 and +91 prefixes)
 const formatIdentifier = (identifier) => {
-    if (!isEmail(identifier)) {
-        let clean = identifier.trim();
-        // If it's a 10-digit number, prepend +91
-        if (!clean.startsWith('+') && clean.length === 10) {
-            return `+91${clean}`;
-        }
-        return clean;
+    if (!identifier) return '';
+    const clean = identifier.trim();
+    if (isEmail(clean)) {
+        return clean.toLowerCase();
     }
-    return identifier.trim().toLowerCase();
+    
+    // Normalize phone number to exactly 10 digits
+    // 1. Remove all spaces, dashes, hyphens, parentheses, and leading plus sign
+    let cleanPhone = clean.replace(/[\s-()+]/g, '');
+    
+    // 2. If it starts with '91' and is 12 digits (like '919876543210'), strip '91'
+    if (cleanPhone.startsWith('91') && cleanPhone.length === 12) {
+        cleanPhone = cleanPhone.slice(2);
+    }
+    
+    // 3. If it starts with '0' (like '09876543210'), strip leading '0'
+    if (cleanPhone.startsWith('0')) {
+        cleanPhone = cleanPhone.slice(1);
+    }
+    
+    return cleanPhone;
 };
 
 export const registerUser = async (req, res) => {
@@ -91,6 +103,10 @@ export const loginUser = async (req, res) => {
                 { username: { $regex: new RegExp(`^${email.trim().replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}$`, 'i') } }
             ]
         };
+
+        // Log the exact searched query string in the database
+        console.log(`[Auth Login] Searching database with identifier: "${formattedIdentifier}" (original input: "${email}")`);
+
         const user = await User.findOne(searchQuery).select('+password');
 
         if (user && (await user.matchPassword(password))) {
