@@ -148,32 +148,37 @@ const Navbar = () => {
                         onMouseEnter={() => setActiveDropdown('farming')}
                         onMouseLeave={() => setActiveDropdown(null)}
                     >
-                        <button className={`flex items-center gap-1 px-3.5 py-2 rounded-xl text-xs font-black bg-transparent border-none cursor-pointer transition ${
-                            activeDropdown === 'farming' || ['/farms', '/crops', '/health-tracking', '/weather'].includes(location.pathname)
-                                ? 'text-emerald-600 dark:text-emerald-450'
-                                : 'text-slate-655 dark:text-slate-400'
-                        }`}>
+                        <button 
+                            onClick={() => setActiveDropdown(activeDropdown === 'farming' ? null : 'farming')}
+                            className={`flex items-center gap-1 px-3.5 py-2 rounded-xl text-xs font-black bg-transparent border-none cursor-pointer transition ${
+                                activeDropdown === 'farming' || ['/farms', '/crops', '/health-tracking', '/weather'].includes(location.pathname)
+                                    ? 'text-emerald-600 dark:text-emerald-450'
+                                    : 'text-slate-655 dark:text-slate-400'
+                            }`}
+                        >
                             <span>{lang.menuFarming}</span>
                             <ChevronDown size={12} className={`transition-transform duration-200 ${activeDropdown === 'farming' ? 'rotate-180' : ''}`} />
                         </button>
 
                         {activeDropdown === 'farming' && (
-                            <div className="absolute left-0 mt-1 w-64 bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/80 rounded-3xl shadow-xl z-50 p-2.5 animate-scale-in grid grid-cols-1 gap-1">
-                                {dropdownItems.farming.map((item) => (
-                                    <Link
-                                        key={item.path}
-                                        to={item.path}
-                                        className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-slate-50 dark:hover:bg-gray-850 transition duration-200 text-left cursor-pointer border-none no-underline text-current group"
-                                    >
-                                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${item.color}`}>
-                                            <item.icon size={15} />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-black text-slate-800 dark:text-slate-105 group-hover:text-emerald-500 transition-colors">{item.name}</p>
-                                            <p className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold mt-0.5 leading-snug">{item.desc}</p>
-                                        </div>
-                                    </Link>
-                                ))}
+                            <div className="absolute left-0 top-full pt-1.5 w-64 z-50 animate-scale-in">
+                                <div className="bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/80 rounded-3xl shadow-xl p-2.5 grid grid-cols-1 gap-1">
+                                    {dropdownItems.farming.map((item) => (
+                                        <Link
+                                            key={item.path}
+                                            to={item.path}
+                                            className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-slate-50 dark:hover:bg-gray-850 transition duration-200 text-left cursor-pointer border-none no-underline text-current group"
+                                        >
+                                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${item.color}`}>
+                                                <item.icon size={15} />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-black text-slate-800 dark:text-slate-105 group-hover:text-emerald-500 transition-colors">{item.name}</p>
+                                                <p className="text-[9px] text-slate-400 dark:text-slate-505 mt-0.5 leading-snug font-semibold">{item.desc}</p>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </div>
@@ -184,32 +189,37 @@ const Navbar = () => {
                         onMouseEnter={() => setActiveDropdown('services')}
                         onMouseLeave={() => setActiveDropdown(null)}
                     >
-                        <button className={`flex items-center gap-1 px-3.5 py-2 rounded-xl text-xs font-black bg-transparent border-none cursor-pointer transition ${
-                            activeDropdown === 'services' || ['/marketplace', '/forum', '/knowledge-base'].includes(location.pathname)
-                                ? 'text-emerald-600 dark:text-emerald-450'
-                                : 'text-slate-655 dark:text-slate-400'
-                        }`}>
+                        <button 
+                            onClick={() => setActiveDropdown(activeDropdown === 'services' ? null : 'services')}
+                            className={`flex items-center gap-1 px-3.5 py-2 rounded-xl text-xs font-black bg-transparent border-none cursor-pointer transition ${
+                                activeDropdown === 'services' || ['/marketplace', '/forum', '/knowledge-base'].includes(location.pathname)
+                                    ? 'text-emerald-600 dark:text-emerald-450'
+                                    : 'text-slate-655 dark:text-slate-400'
+                            }`}
+                        >
                             <span>{lang.menuServices}</span>
                             <ChevronDown size={12} className={`transition-transform duration-200 ${activeDropdown === 'services' ? 'rotate-180' : ''}`} />
                         </button>
 
                         {activeDropdown === 'services' && (
-                            <div className="absolute left-0 mt-1 w-64 bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/80 rounded-3xl shadow-xl z-50 p-2.5 animate-scale-in grid grid-cols-1 gap-1">
-                                {dropdownItems.services.map((item) => (
-                                    <Link
-                                        key={item.path}
-                                        to={item.path}
-                                        className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-slate-50 dark:hover:bg-gray-850 transition duration-200 text-left cursor-pointer border-none no-underline text-current group"
-                                    >
-                                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${item.color}`}>
-                                            <item.icon size={15} />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-black text-slate-800 dark:text-slate-105 group-hover:text-emerald-500 transition-colors">{item.name}</p>
-                                            <p className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold mt-0.5 leading-snug">{item.desc}</p>
-                                        </div>
-                                    </Link>
-                                ))}
+                            <div className="absolute left-0 top-full pt-1.5 w-64 z-50 animate-scale-in">
+                                <div className="bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/80 rounded-3xl shadow-xl p-2.5 grid grid-cols-1 gap-1">
+                                    {dropdownItems.services.map((item) => (
+                                        <Link
+                                            key={item.path}
+                                            to={item.path}
+                                            className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-slate-50 dark:hover:bg-gray-850 transition duration-200 text-left cursor-pointer border-none no-underline text-current group"
+                                        >
+                                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${item.color}`}>
+                                                <item.icon size={15} />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-black text-slate-800 dark:text-slate-105 group-hover:text-emerald-500 transition-colors">{item.name}</p>
+                                                <p className="text-[9px] text-slate-400 dark:text-slate-505 mt-0.5 leading-snug font-semibold">{item.desc}</p>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </div>
@@ -220,32 +230,37 @@ const Navbar = () => {
                         onMouseEnter={() => setActiveDropdown('account')}
                         onMouseLeave={() => setActiveDropdown(null)}
                     >
-                        <button className={`flex items-center gap-1 px-3.5 py-2 rounded-xl text-xs font-black bg-transparent border-none cursor-pointer transition ${
-                            activeDropdown === 'account' || ['/settings', '/pricing', '/usage'].includes(location.pathname)
-                                ? 'text-emerald-600 dark:text-emerald-450'
-                                : 'text-slate-655 dark:text-slate-400'
-                        }`}>
+                        <button 
+                            onClick={() => setActiveDropdown(activeDropdown === 'account' ? null : 'account')}
+                            className={`flex items-center gap-1 px-3.5 py-2 rounded-xl text-xs font-black bg-transparent border-none cursor-pointer transition ${
+                                activeDropdown === 'account' || ['/settings', '/pricing', '/usage'].includes(location.pathname)
+                                    ? 'text-emerald-600 dark:text-emerald-450'
+                                    : 'text-slate-655 dark:text-slate-400'
+                            }`}
+                        >
                             <span>{lang.menuAccount}</span>
                             <ChevronDown size={12} className={`transition-transform duration-200 ${activeDropdown === 'account' ? 'rotate-180' : ''}`} />
                         </button>
 
                         {activeDropdown === 'account' && (
-                            <div className="absolute right-0 mt-1 w-64 bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/80 rounded-3xl shadow-xl z-50 p-2.5 animate-scale-in grid grid-cols-1 gap-1">
-                                {dropdownItems.account.map((item) => (
-                                    <Link
-                                        key={item.path}
-                                        to={item.path}
-                                        className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-slate-50 dark:hover:bg-gray-850 transition duration-200 text-left cursor-pointer border-none no-underline text-current group"
-                                    >
-                                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${item.color}`}>
-                                            <item.icon size={15} />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-black text-slate-800 dark:text-slate-105 group-hover:text-emerald-500 transition-colors">{item.name}</p>
-                                            <p className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold mt-0.5 leading-snug">{item.desc}</p>
-                                        </div>
-                                    </Link>
-                                ))}
+                            <div className="absolute right-0 top-full pt-1.5 w-64 z-50 animate-scale-in">
+                                <div className="bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/80 rounded-3xl shadow-xl p-2.5 grid grid-cols-1 gap-1">
+                                    {dropdownItems.account.map((item) => (
+                                        <Link
+                                            key={item.path}
+                                            to={item.path}
+                                            className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-slate-50 dark:hover:bg-gray-850 transition duration-200 text-left cursor-pointer border-none no-underline text-current group"
+                                        >
+                                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${item.color}`}>
+                                                <item.icon size={15} />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-black text-slate-800 dark:text-slate-105 group-hover:text-emerald-500 transition-colors">{item.name}</p>
+                                                <p className="text-[9px] text-slate-400 dark:text-slate-505 mt-0.5 leading-snug font-semibold">{item.desc}</p>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </div>
