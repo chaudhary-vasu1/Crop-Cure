@@ -55,12 +55,9 @@ const Navbar = () => {
     const navItems = [
         { name: lang.dashboard, path: '/', icon: Home },
         { name: lang.farms, path: '/farms', icon: Layers },
-        { name: lang.crops, path: '/crops', icon: Sprout },
-        { name: lang.weather, path: '/weather', icon: Sun },
-        { name: lang.health, path: '/health-tracking', icon: Activity },
         { name: lang.marketplace, path: '/marketplace', icon: ShoppingBag },
         { name: lang.forum, path: '/forum', icon: MessageSquare },
-        { name: lang.pricing, path: '/pricing', icon: Award },
+        { name: lang.settings, path: '/settings', icon: Settings },
     ];
 
     // Helper to get user initial
