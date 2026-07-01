@@ -188,7 +188,7 @@ const IrrigationModal = ({ isOpen, onClose, plot }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/75 backdrop-blur-md animate-fade-in">
-            <div className="w-full max-w-md bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/50 rounded-3xl shadow-2xl overflow-hidden relative animate-scale-in text-left">
+            <div className="w-full max-w-md max-h-[90vh] overflow-y-auto scrollbar-thin bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/50 rounded-3xl shadow-2xl relative animate-scale-in text-left">
                 
                 {/* Header */}
                 <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white text-center relative">
