@@ -89,8 +89,24 @@ export const getPestForecast = async (req, res) => {
 
         const { farmId } = req.params;
         let farm = null;
-        let crops = ['wheat']; // default crop
         let location = 'Meerut'; // default location
+
+        // Determine currently grown crops based on Indian agricultural season
+        const getSeasonalCrops = () => {
+            const month = new Date().getMonth(); // 0-indexed (0=Jan, 6=Jul, 11=Dec)
+            // Kharif (Monsoon): June–October → rice, corn, cotton, sugarcane, soybean
+            if (month >= 5 && month <= 9) {
+                return ['rice', 'corn', 'cotton', 'sugarcane'];
+            }
+            // Rabi (Winter): November–March → wheat, mustard, barley, chickpea
+            if (month >= 10 || month <= 2) {
+                return ['wheat', 'corn'];
+            }
+            // Zaid (Summer): April–May → moong, watermelon, cucumber, sunflower
+            return ['sugarcane', 'corn', 'cotton'];
+        };
+
+        let crops = getSeasonalCrops();
 
         if (farmId && farmId !== 'all') {
             farm = await Farm.findById(farmId);
