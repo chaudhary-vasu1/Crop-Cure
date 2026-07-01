@@ -250,7 +250,7 @@ const IrrigationModal = ({ isOpen, onClose, plot }) => {
                 )}
 
                 <div className="p-6">
-                    {loading ? (
+                    {loading || (!adviceData && !isManualMode && !error) ? (
                         <div className="flex flex-col justify-center items-center py-16 gap-3 text-slate-450 dark:text-slate-500">
                             <Loader2 size={32} className="animate-spin text-blue-500" />
                             <p className="text-xs font-bold animate-pulse">{lang.calculating}</p>
