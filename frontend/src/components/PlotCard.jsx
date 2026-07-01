@@ -22,7 +22,28 @@ const PlotCard = ({ plot, onDelete, onDiagnose, onIrrigation }) => {
             labelDistrict: "District",
             acres: "acres",
             btnDiagnose: "Diagnose",
-            btnIrrigate: "Irrigate"
+            btnIrrigate: "Irrigate",
+            // Soil types
+            valLoamy: "Loamy",
+            valClay: "Clay",
+            valSandy: "Sandy",
+            valSilt: "Silt",
+            // Irrigation methods
+            valDrip: "Drip",
+            valSprinkler: "Sprinkler",
+            valManual: "Manual",
+            // Crops
+            valWheat: "Wheat",
+            valCorn: "Corn",
+            valSugarcane: "Sugarcane",
+            valRice: "Rice",
+            valCotton: "Cotton",
+            // Districts
+            valMeerut: "Meerut",
+            valSardhana: "Sardhana",
+            valDelhi: "Delhi",
+            valBhoopkheri: "Bhoopkheri",
+            valBaghpat: "Baghpat"
         },
         es: {
             deleteTitle: "¿Eliminar Parcela?",
@@ -38,7 +59,28 @@ const PlotCard = ({ plot, onDelete, onDiagnose, onIrrigation }) => {
             labelDistrict: "Distrito",
             acres: "acres",
             btnDiagnose: "Diagnosticar",
-            btnIrrigate: "Regar"
+            btnIrrigate: "Regar",
+            // Soil types
+            valLoamy: "Franco",
+            valClay: "Arcillosa",
+            valSandy: "Arenosa",
+            valSilt: "Limo",
+            // Irrigation methods
+            valDrip: "Riego por goteo",
+            valSprinkler: "Aspersión",
+            valManual: "Manual",
+            // Crops
+            valWheat: "Trigo",
+            valCorn: "Maíz",
+            valSugarcane: "Caña de azúcar",
+            valRice: "Arroz",
+            valCotton: "Algodón",
+            // Districts
+            valMeerut: "Meerut",
+            valSardhana: "Sardhana",
+            valDelhi: "Delhi",
+            valBhoopkheri: "Bhoopkheri",
+            valBaghpat: "Baghpat"
         },
         hi: {
             deleteTitle: "प्लॉट हटाएं?",
@@ -54,10 +96,40 @@ const PlotCard = ({ plot, onDelete, onDiagnose, onIrrigation }) => {
             labelDistrict: "ज़िला (District)",
             acres: "एकड़",
             btnDiagnose: "निदान",
-            btnIrrigate: "सिंचाई"
+            btnIrrigate: "सिंचाई",
+            // Soil types
+            valLoamy: "लोमी (दोमट)",
+            valClay: "चिकनी मिट्टी",
+            valSandy: "बलुई मिट्टी",
+            valSilt: "गाद मिट्टी",
+            // Irrigation methods
+            valDrip: "टपक सिंचाई (ड्रिप)",
+            valSprinkler: "फव्वारा सिंचाई (स्प्रिंकलर)",
+            valManual: "मैनुअल (हाथ से)",
+            // Crops
+            valWheat: "गेहूं",
+            valCorn: "मक्का",
+            valSugarcane: "गन्ना",
+            valRice: "चावल",
+            valCotton: "कपास",
+            // Districts
+            valMeerut: "मेरठ",
+            valSardhana: "सरधना",
+            valDelhi: "दिल्ली",
+            valBhoopkheri: "भूपखेड़ी",
+            valBaghpat: "बागपत"
         }
     };
     const lang = t[language] || t.en;
+
+    // Translation lookup helper for input values
+    const localize = (val) => {
+        if (!val) return val;
+        // Construct camel-case key e.g. "Loamy" -> "valLoamy"
+        const cleanVal = val.trim();
+        const key = 'val' + cleanVal.charAt(0).toUpperCase() + cleanVal.slice(1);
+        return lang[key] || cleanVal;
+    };
 
     return (
         <div className="relative flex flex-col h-full p-6 bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/50 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 overflow-hidden group text-left">
@@ -96,7 +168,7 @@ const PlotCard = ({ plot, onDelete, onDiagnose, onIrrigation }) => {
                         {plot.name || lang.unnamed}
                     </h3>
                     <span className="inline-block px-2.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-extrabold rounded-full uppercase tracking-wider mt-1.5 border border-emerald-100/20">
-                        {plot.cropType || lang.cropUnspecified}
+                        {localize(plot.cropType) || lang.cropUnspecified}
                     </span>
                 </div>
                 <button 
@@ -119,7 +191,7 @@ const PlotCard = ({ plot, onDelete, onDiagnose, onIrrigation }) => {
                         <span className="font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide text-[9px]">{lang.labelSoil}</span>
                         <span className="font-extrabold text-slate-700 dark:text-slate-350 flex items-center gap-1">
                             <Layers size={12} className="text-slate-400 shrink-0" />
-                            {plot.soilType}
+                            {localize(plot.soilType)}
                         </span>
                     </div>
                 )}
@@ -128,7 +200,7 @@ const PlotCard = ({ plot, onDelete, onDiagnose, onIrrigation }) => {
                         <span className="font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide text-[9px]">{lang.labelWatering}</span>
                         <span className="font-extrabold text-slate-700 dark:text-slate-350 flex items-center gap-1">
                             <Droplet size={12} className="text-slate-400 shrink-0" />
-                            {plot.irrigationMethod}
+                            {localize(plot.irrigationMethod)}
                         </span>
                     </div>
                 )}
@@ -137,7 +209,7 @@ const PlotCard = ({ plot, onDelete, onDiagnose, onIrrigation }) => {
                         <span className="font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide text-[9px]">{lang.labelDistrict}</span>
                         <span className="font-extrabold text-slate-700 dark:text-slate-350 flex items-center gap-1 truncate" title={plot.location}>
                             <MapPin size={12} className="text-slate-400 shrink-0" />
-                            <span className="truncate">{plot.location}</span>
+                            <span className="truncate">{localize(plot.location)}</span>
                         </span>
                     </div>
                 )}

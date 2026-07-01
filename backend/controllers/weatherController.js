@@ -156,15 +156,20 @@ const groupForecastByDay = (list) => {
 };
 
 // Helper to generate AI agricultural advisory
-const getAiAdvisory = async (city, current, forecast) => {
+const getAiAdvisory = async (city, current, forecast, lang = 'en') => {
     try {
         const forecastSummary = forecast.map(f => `${f.date}: ${f.condition}, Temp: ${f.minTemp}-${f.maxTemp}°C, Rain: ${f.rainChance}%`).join('; ');
+        
+        let targetLanguage = 'English';
+        if (lang === 'hi') targetLanguage = 'Hindi (हिंदी)';
+        else if (lang === 'es') targetLanguage = 'Spanish (Español)';
+
         const prompt = `You are a professional agricultural advisor. Based on this weather data for the city/village "${city}":
 Current Weather: Temp ${current.temp}°C, Humidity ${current.humidity}%, Condition ${current.description}, Wind ${current.windSpeed} m/s.
 5-Day Forecast: ${forecastSummary}
 
 Provide a practical agricultural advisory for farmers in 3-4 clear, bulleted recommendations. Focus on irrigation schedule, pesticide/fertilizer application safety, and crop protection actions based on these specific conditions.
-Keep the recommendations concise and return them as a bulleted text list in English. Do not add markdown bolding or code blocks.`;
+Keep the recommendations concise and return them as a bulleted text list in ${targetLanguage}. Do not add markdown bolding or code blocks.`;
 
         const aiResponse = await getAi().models.generateContent({
             model: 'gemini-2.5-flash',
@@ -173,6 +178,11 @@ Keep the recommendations concise and return them as a bulleted text list in Engl
         return aiResponse.text.trim();
     } catch (err) {
         console.error("AI Advisory Error:", err);
+        if (lang === 'hi') {
+            return "• सिंचाई करने से पहले स्थानीय मिट्टी की नमी की जांच करें।\n• दोपहर की अत्यधिक गर्मी से युवा पौधों की रक्षा करें।\n• सामान्य कृषि प्रक्रियाएं लागू होती हैं।";
+        } else if (lang === 'es') {
+            return "• Verifique la humedad del suelo local antes de regar.\n• Proteja las plántulas jóvenes del calor extremo del mediodía.\n• Se aplican los procedimientos agrícolas estándar.";
+        }
         return "• Check local soil moisture before watering.\n• Protect young seedlings from extreme midday heat.\n• Standard farming procedures apply.";
     }
 };
@@ -182,7 +192,8 @@ Keep the recommendations concise and return them as a bulleted text list in Engl
 // @access  Private
 export const getWeatherDetails = async (req, res) => {
     const apiKey = process.env.WEATHER_API_KEY;
-    const { city, lat, lng } = req.query;
+    const { city, lat, lng, lang } = req.query;
+    const langCode = lang || 'en';
     
     let resolvedCity = city || 'Meerut';
 
@@ -234,7 +245,7 @@ export const getWeatherDetails = async (req, res) => {
         };
 
         const forecastData = groupForecastByDay(forecastRes.data.list);
-        const advisory = await getAiAdvisory(currentData.city, currentData, forecastData);
+        const advisory = await getAiAdvisory(currentData.city, currentData, forecastData, langCode);
 
         return res.status(200).json({
             current: currentData,
@@ -271,7 +282,7 @@ export const getWeatherDetails = async (req, res) => {
             };
 
             const forecastData = groupForecastByDay(forecastRes.data.list);
-            const advisory = await getAiAdvisory("Meerut", currentData, forecastData);
+            const advisory = await getAiAdvisory("Meerut", currentData, forecastData, langCode);
 
             return res.status(200).json({
                 current: currentData,

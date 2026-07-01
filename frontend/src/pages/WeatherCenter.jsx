@@ -102,7 +102,7 @@ const WeatherCenter = () => {
                 queryString = `?city=${encodeURIComponent(targetCity)}`;
             }
 
-            const response = await api.get(`/weather/details${queryString}`);
+            const response = await api.get(`/weather/details${queryString}&lang=${language}`);
             setWeatherData(response.data);
             setCity(response.data.current.city);
         } catch (err) {
@@ -113,10 +113,10 @@ const WeatherCenter = () => {
         }
     };
 
-    // Auto-load weather on mount
+    // Auto-load weather on mount and when language changes
     useEffect(() => {
         fetchWeatherDetails();
-    }, []);
+    }, [language]);
 
     // Manual search query
     const handleSearch = (e) => {

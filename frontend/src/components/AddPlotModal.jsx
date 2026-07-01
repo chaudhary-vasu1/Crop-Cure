@@ -208,10 +208,10 @@ const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
                                 value={soilType} onChange={(e) => setSoilType(e.target.value)}
                                 className="w-full px-4 py-2.5 bg-slate-50/50 dark:bg-gray-950/50 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-xs font-semibold text-slate-800 dark:text-white cursor-pointer"
                             >
-                                <option value="Loamy">Loamy</option>
-                                <option value="Clay">Clay</option>
-                                <option value="Sandy">Sandy</option>
-                                <option value="Silt">Silt</option>
+                                <option value="Loamy">{lang.valLoamy}</option>
+                                <option value="Clay">{lang.valClay}</option>
+                                <option value="Sandy">{lang.valSandy}</option>
+                                <option value="Silt">{lang.valSilt}</option>
                             </select>
                         </div>
                         <div>
@@ -220,9 +220,9 @@ const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
                                 value={irrigationMethod} onChange={(e) => setIrrigationMethod(e.target.value)}
                                 className="w-full px-4 py-2.5 bg-slate-50/50 dark:bg-gray-950/50 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-xs font-semibold text-slate-800 dark:text-white cursor-pointer"
                             >
-                                <option value="Drip">Drip</option>
-                                <option value="Sprinkler">Sprinkler</option>
-                                <option value="Manual">Manual</option>
+                                <option value="Drip">{lang.valDrip}</option>
+                                <option value="Sprinkler">{lang.valSprinkler}</option>
+                                <option value="Manual">{lang.valManual}</option>
                             </select>
                         </div>
                     </div>
