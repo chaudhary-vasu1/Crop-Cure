@@ -93,7 +93,7 @@ const DiagnoseModal = ({ isOpen, onClose, plot }) => {
         formData.append('image', file); 
 
         try {
-            const response = await api.post(`/diagnostics/${plot._id}`, formData, {
+            const response = await api.post(`/diagnostics/${plot._id}?lang=${language}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             setDiagnosis(response.data); 

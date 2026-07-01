@@ -17,6 +17,11 @@ const getAi = () => {
 export const analyzeCrop = async (req, res) => {
     try {
         const { plotId } = req.params;
+        const { lang } = req.query;
+
+        let targetLanguage = 'English';
+        if (lang === 'hi') targetLanguage = 'Hindi (हिंदी)';
+        else if (lang === 'es') targetLanguage = 'Spanish (Español)';
 
         // 1. Validate the file exists
         if (!req.file) {
@@ -45,14 +50,16 @@ export const analyzeCrop = async (req, res) => {
             You are an expert agricultural AI. Analyze this image of a crop leaf.
             Identify any diseases or nutrient deficiencies.
             
+            Please translate all user-facing description text fields (diseaseName, organic treatment, and chemical treatment) into ${targetLanguage}.
+            
             You MUST return your response as a raw, valid JSON object without any markdown wrapping or code blocks.
             Use this exact schema:
             {
-                "diseaseName": "Name of the disease or 'Healthy'",
+                "diseaseName": "Name of the disease in ${targetLanguage} or 'Healthy' or 'स्वस्थ' / 'Saludable'",
                 "confidenceScore": 0.00 to 1.00,
                 "treatmentPlan": {
-                    "organic": "Specific organic treatment instructions",
-                    "chemical": "Specific chemical treatment instructions"
+                    "organic": "Specific organic treatment instructions written in ${targetLanguage}",
+                    "chemical": "Specific chemical treatment instructions written in ${targetLanguage}"
                 },
                 "isContagious": true or false
             }
