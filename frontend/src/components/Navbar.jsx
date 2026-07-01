@@ -13,6 +13,13 @@ const Navbar = () => {
     const { logout, user } = useContext(AuthContext);
     const { theme, toggleTheme, language } = useContext(AppContext);
 
+    const handleLogout = () => {
+        const confirmMsg = lang.confirmLogout || "Are you sure you want to log out?";
+        if (window.confirm(confirmMsg)) {
+            logout();
+        }
+    };
+
     // Dropdown open states for desktop hover/clicks
     const [activeDropdown, setActiveDropdown] = useState(null); // 'farming', 'services', 'account' or null
     
@@ -43,7 +50,8 @@ const Navbar = () => {
             menuFarming: 'My Farm',
             menuServices: 'Services',
             menuAccount: 'Account',
-            more: 'More Menu'
+            more: 'More Menu',
+            confirmLogout: 'Are you sure you want to log out?'
         },
         es: {
             dashboard: 'Inicio',
@@ -62,7 +70,8 @@ const Navbar = () => {
             menuFarming: 'Mi Campo',
             menuServices: 'Servicios',
             menuAccount: 'Cuenta',
-            more: 'Más'
+            more: 'Más',
+            confirmLogout: '¿Está seguro de que desea cerrar la sesión?'
         },
         hi: {
             dashboard: 'होम',
@@ -81,7 +90,8 @@ const Navbar = () => {
             menuFarming: 'मेरा खेत',
             menuServices: 'सेवाएं',
             menuAccount: 'खाता',
-            more: 'अधिक'
+            more: 'अधिक',
+            confirmLogout: 'क्या आप वाकई लॉगआउट करना चाहते हैं?'
         }
     };
     const lang = t[language] || t.en;
@@ -292,7 +302,7 @@ const Navbar = () => {
 
                     {/* Log out */}
                     <button
-                        onClick={logout}
+                        onClick={handleLogout}
                         className="hidden sm:flex px-3 py-2 text-xs font-bold text-red-650 hover:text-white border border-red-200 hover:bg-red-500 dark:border-red-950/40 dark:hover:bg-red-650 rounded-xl transition shadow-sm border-none cursor-pointer items-center gap-1 bg-transparent"
                     >
                         <LogOut size={13} />
@@ -372,7 +382,7 @@ const Navbar = () => {
                         {/* Mobile Logout Button */}
                         <div className="pt-5">
                             <button
-                                onClick={logout}
+                                onClick={handleLogout}
                                 className="w-full py-3 bg-red-50 text-red-650 hover:bg-red-500 hover:text-white dark:bg-red-950/20 dark:hover:bg-red-650 border border-red-200/20 dark:border-red-900/30 rounded-2xl text-xs font-black cursor-pointer transition flex items-center justify-center gap-1.5 shadow-sm"
                             >
                                 <LogOut size={14} />
