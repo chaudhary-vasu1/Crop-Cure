@@ -13,6 +13,16 @@ import Crops from './pages/Crops';
 import Settings from './pages/Settings'; 
 import Profile from './pages/Profile'; 
 import WeatherCenter from './pages/WeatherCenter';
+import HealthTrackingDashboard from './pages/HealthTrackingDashboard';
+import Marketplace from './pages/Marketplace';
+import Cart from './pages/Cart';
+import OrderHistory from './pages/OrderHistory';
+import SupplierDetail from './pages/SupplierDetail';
+import CommunityForum from './pages/CommunityForum';
+import PostDetail from './pages/PostDetail';
+import KnowledgeBase from './pages/KnowledgeBase';
+import PricingPage from './pages/PricingPage';
+import UsagePage from './pages/UsagePage';
 
 function App() {
     return (
@@ -40,6 +50,16 @@ function App() {
                             <Route path="settings" element={<Settings />} />
                             <Route path="profile" element={<Profile />} />
                             <Route path="weather" element={<WeatherCenter />} />
+                            <Route path="health-tracking" element={<HealthTrackingDashboard />} />
+                            <Route path="marketplace" element={<Marketplace />} />
+                            <Route path="marketplace/cart" element={<Cart />} />
+                            <Route path="marketplace/orders" element={<OrderHistory />} />
+                            <Route path="marketplace/supplier/:supplierId" element={<SupplierDetail />} />
+                            <Route path="forum" element={<CommunityForum />} />
+                            <Route path="forum/post/:postId" element={<PostDetail />} />
+                            <Route path="knowledge-base" element={<KnowledgeBase />} />
+                            <Route path="pricing" element={<PricingPage />} />
+                            <Route path="usage" element={<UsagePage />} />
                         </Route>
                     </Routes>
                 </Router>

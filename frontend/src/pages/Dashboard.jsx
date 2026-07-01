@@ -6,12 +6,14 @@ import api from '../utils/api';
 import AddPlotModal from '../components/AddPlotModal';
 import DiagnoseModal from '../components/DiagnoseModal';
 import IrrigationModal from '../components/IrrigationModal';
+import PestPredictionCard from '../components/PestPredictionCard';
 import { Sparkles, Calendar, Plus, HeartPulse, Droplets, Sun, LineChart, HelpCircle } from 'lucide-react';
 
 const Dashboard = () => {
     const { language } = useContext(AppContext);
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
+    const [showOnboarding, setShowOnboarding] = useState(!localStorage.getItem('hasSeenOnboarding'));
     
     // Translations mapping
     const t = {
@@ -210,6 +212,55 @@ const Dashboard = () => {
                 <div className="absolute right-[-40px] top-[-40px] w-64 h-64 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
             </div>
 
+            {showOnboarding && (
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-650 p-6 rounded-3xl text-white mb-10 text-left relative shadow-lg animate-scale-in">
+                    <button 
+                        onClick={() => {
+                            localStorage.setItem('hasSeenOnboarding', 'true');
+                            setShowOnboarding(false);
+                        }}
+                        className="absolute top-4 right-4 bg-transparent border-none text-blue-200 hover:text-white cursor-pointer text-xs"
+                    >
+                        ✕
+                    </button>
+                    <h3 className="text-sm font-black flex items-center gap-1.5 text-white">
+                        🚀 Quick Onboarding Guide
+                    </h3>
+                    <p className="text-[11px] text-blue-100/90 mt-1 font-semibold">
+                        Welcome to CropCure! Let's get you set up in 4 simple steps:
+                    </p>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-5 text-xs font-semibold">
+                        <div className="p-3 bg-white/10 rounded-2xl">
+                            <p className="font-extrabold">1. 🚜 Add Plot</p>
+                            <p className="text-[10px] text-blue-100/85 mt-1 font-medium">Click "+ Add Plot" to map your field.</p>
+                        </div>
+                        <div className="p-3 bg-white/10 rounded-2xl">
+                            <p className="font-extrabold">2. 🩺 Diagnose</p>
+                            <p className="text-[10px] text-blue-100/85 mt-1 font-medium">Upload a leaf photo to diagnose issues.</p>
+                        </div>
+                        <div className="p-3 bg-white/10 rounded-2xl">
+                            <p className="font-extrabold">3. 💧 Irrigation</p>
+                            <p className="text-[10px] text-blue-100/85 mt-1 font-medium">Get customized water volume needs.</p>
+                        </div>
+                        <div className="p-3 bg-white/10 rounded-2xl">
+                            <p className="font-extrabold">4. 🐛 Pest Warnings</p>
+                            <p className="text-[10px] text-blue-100/85 mt-1 font-medium">Monitor weekly infection warnings.</p>
+                        </div>
+                    </div>
+                    
+                    <button
+                        onClick={() => {
+                            localStorage.setItem('hasSeenOnboarding', 'true');
+                            setShowOnboarding(false);
+                        }}
+                        className="mt-5 px-5 py-2 bg-white hover:bg-slate-50 text-blue-600 border-none font-black text-xs rounded-xl cursor-pointer transition shadow-md active:scale-95"
+                    >
+                        Got it, let's farm!
+                    </button>
+                </div>
+            )}
+
             {/* Core Farming Tools Section */}
             <div className="mb-14 text-left">
                 <div className="mb-6">
@@ -254,11 +305,7 @@ const Dashboard = () => {
                         <button 
                             disabled={loading}
                             onClick={() => {
-                                if (plots.length > 0) {
-                                    setSelectedPlotForIrrigation(plots[0]);
-                                } else {
-                                    setIsModalOpen(true);
-                                }
+                                setSelectedPlotForIrrigation(plots.length > 0 ? plots[0] : { isManual: true });
                             }}
                             className="w-full mt-6 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 text-white font-extrabold rounded-xl text-xs border-none cursor-pointer shadow-sm active:scale-[0.98] transition-all"
                         >
@@ -293,13 +340,18 @@ const Dashboard = () => {
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed font-medium">{lang.analyticsDesc}</p>
                         </div>
                         <button 
-                            onClick={() => navigate('/crops')}
+                            onClick={() => navigate('/health-tracking')}
                             className="w-full mt-6 py-2.5 px-4 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl text-xs border-none cursor-pointer shadow-sm active:scale-[0.98] transition-all"
                         >
                             {lang.analyticsBtn}
                         </button>
                     </div>
                 </div>
+            </div>
+
+            {/* Seasonal Pest Alerts Section */}
+            <div className="mb-14">
+                <PestPredictionCard />
             </div>
 
             {/* How It Works Section */}

@@ -1,6 +1,9 @@
 import { GoogleGenAI } from '@google/genai';
 import Diagnosis from '../models/Diagnosis.js';
 import Plot from '../models/Plot.js';
+import DiseaseHistory from '../models/DiseaseHistory.js';
+import fs from 'fs';
+import path from 'path';
 
 // Lazy client initialization to avoid ES Module import hoisting issues
 let aiInstance = null;
@@ -89,6 +92,42 @@ export const analyzeCrop = async (req, res) => {
                 chemical: aiData.treatmentPlan.chemical,
             },
             isContagious: aiData.isContagious,
+        });
+
+        // Save the uploaded image buffer to disk for historical reference
+        let photoUrl = '';
+        try {
+            const uploadDir = './uploads';
+            if (!fs.existsSync(uploadDir)) {
+                fs.mkdirSync(uploadDir, { recursive: true });
+            }
+            const fileExt = req.file.mimetype.split('/')[1] || 'jpg';
+            const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}.${fileExt}`;
+            const filePath = path.join(uploadDir, fileName);
+            fs.writeFileSync(filePath, req.file.buffer);
+            photoUrl = `/uploads/${fileName}`;
+        } catch (fileErr) {
+            console.error("Error saving diagnosis image to disk:", fileErr);
+        }
+
+        // Calculate health status percentage (0-100)
+        const isHealthy = aiData.diseaseName.toLowerCase().includes('healthy') ||
+                          aiData.diseaseName.toLowerCase().includes('स्वस्थ') ||
+                          aiData.diseaseName.toLowerCase().includes('saludable');
+        const healthStatus = isHealthy ? 100 : Math.max(0, Math.round(100 - (aiData.confidenceScore * 100)));
+
+        // Create DiseaseHistory automatically
+        await DiseaseHistory.create({
+            userId: req.user.id,
+            farmId: plot.farm || null,
+            cropId: plot._id,
+            diseaseDetected: aiData.diseaseName,
+            confidence: Math.round(aiData.confidenceScore * 100),
+            treatmentApplied: 'None',
+            notes: `Auto-diagnosed via CropCure AI. Contagious: ${aiData.isContagious}`,
+            photoUrl,
+            timestamp: new Date(),
+            healthStatus
         });
 
         // 8. Return the saved record to the frontend

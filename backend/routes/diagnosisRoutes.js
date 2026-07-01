@@ -2,6 +2,7 @@ import express from 'express';
 import { analyzeCrop, getDiagnosesByPlot, getAllDiagnoses } from '../controllers/diagnosisController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { upload } from '../middleware/uploadMiddleware.js';
+import { gateDiagnosisLimit } from '../middleware/subscriptionGate.js';
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ router.route('/').get(getAllDiagnoses);
 
 // Note: 'image' must match the form-data key sent by the React frontend
 router.route('/:plotId')
-    .post(upload.single('image'), analyzeCrop)
+    .post(upload.single('image'), gateDiagnosisLimit, analyzeCrop)
     .get(getDiagnosesByPlot);
 
 export default router;

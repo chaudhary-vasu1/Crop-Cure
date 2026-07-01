@@ -41,40 +41,56 @@ export const registerUser = async (req, res) => {
         const { username, identifier, password, otp } = req.body;
         const formattedIdentifier = formatIdentifier(identifier);
         
-        // 1. Verify OTP first
+        // 1. Search by email OR phone depending on what they typed
+        const searchQuery = isEmail(formattedIdentifier) ? { email: formattedIdentifier } : { phone: formattedIdentifier };
+        let user = await User.findOne(searchQuery);
+        
+        if (user && user.isVerified) {
+            return res.status(400).json({ message: 'User already exists with this email or phone number' });
+        }
+
+        if (!user) {
+            // 2. Save user/password BEFORE OTP is marked as verified
+            user = await User.create({ 
+                username, 
+                email: isEmail(formattedIdentifier) ? formattedIdentifier : undefined, 
+                phone: isEmail(formattedIdentifier) ? undefined : formattedIdentifier,
+                password,
+                isVerified: false
+            });
+        } else {
+            // Update details for retry
+            user.username = username;
+            user.password = password;
+            await user.save();
+        }
+
+        // Add validation to confirm password was hashed and saved to database
+        const checkUser = await User.findById(user._id).select('+password');
+        if (!checkUser || !checkUser.password || !checkUser.password.startsWith('$2')) {
+            throw new Error('Password was not properly hashed and saved');
+        }
+
+        // 3. Verify OTP
         const data = otpStore.get(formattedIdentifier);
         if (!data || data.otp !== otp || Date.now() > data.expires) {
             return res.status(400).json({ message: 'Invalid or expired OTP' });
         }
 
-        // 2. Search by email OR phone depending on what they typed
-        const searchQuery = isEmail(formattedIdentifier) ? { email: formattedIdentifier } : { phone: formattedIdentifier };
-        const userExists = await User.findOne(searchQuery);
-        
-        if (userExists) return res.status(400).json({ message: 'User already exists with this email or phone number' });
+        // 4. Mark user as verified
+        user.isVerified = true;
+        await user.save();
 
-        // 3. Save to the correct column in MongoDB
-        const user = await User.create({ 
-            username, 
-            email: isEmail(formattedIdentifier) ? formattedIdentifier : undefined, 
-            phone: isEmail(formattedIdentifier) ? undefined : formattedIdentifier,
-            password 
-        });
-
-        // 4. Clean up OTP from store since it's successfully consumed
+        // 5. Clean up OTP from store since it's successfully consumed
         otpStore.delete(formattedIdentifier);
 
-        if (user) {
-            res.status(201).json({ 
-                _id: user._id, 
-                username: user.username, 
-                email: user.email, 
-                phone: user.phone,
-                token: generateToken(user._id) 
-            });
-        } else {
-            res.status(400).json({ message: 'Invalid user data received' });
-        }
+        res.status(201).json({ 
+            _id: user._id, 
+            username: user.username, 
+            email: user.email, 
+            phone: user.phone,
+            token: generateToken(user._id) 
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
@@ -90,6 +106,11 @@ export const loginUser = async (req, res) => {
         const user = await User.findOne(searchQuery).select('+password');
 
         if (user && (await user.matchPassword(password))) {
+            // Auto-verify if they managed to log in successfully
+            if (!user.isVerified) {
+                user.isVerified = true;
+                await user.save();
+            }
             res.status(200).json({ 
                 _id: user._id, 
                 username: user.username, 
@@ -115,7 +136,11 @@ export const requestOtp = async (req, res) => {
         console.log(`\n--- OTP REQUESTED ---`);
         console.log(`Target: ${formattedIdentifier}`);
         console.log(`Type: ${isEmail(formattedIdentifier) ? 'Email' : 'Phone Number'}`);
-        console.log(`Generated OTP: ${otp}`); 
+        if (process.env.NODE_ENV === 'development') {
+            console.log(`Generated OTP: ${otp}`); 
+        } else {
+            console.log(`Generated OTP: [REDACTED]`);
+        }
         console.log(`---------------------\n`);
 
         otpStore.set(formattedIdentifier, { otp, expires: Date.now() + 300000 });

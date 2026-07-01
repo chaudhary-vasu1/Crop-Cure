@@ -7,6 +7,11 @@ const plotSchema = new mongoose.Schema(
             required: true,
             ref: 'User',
         },
+        farm: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Farm',
+            required: false
+        },
         name: {
             type: String,
             required: [true, 'Please add a plot name'],

@@ -14,6 +14,15 @@ import plotRoutes from './routes/plotRoutes.js';
 import diagnosisRoutes from './routes/diagnosisRoutes.js';
 import irrigationRoutes from './routes/irrigationRoutes.js';
 import weatherRoutes from './routes/weatherRoutes.js';
+import farmRoutes from './routes/farmRoutes.js';
+import diseaseHistoryRoutes from './routes/diseaseHistoryRoutes.js';
+import pestForecastRoutes from './routes/pestForecastRoutes.js';
+import marketplaceRoutes from './routes/marketplaceRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+import forumRoutes from './routes/forumRoutes.js';
+import subscriptionRoutes from './routes/subscriptionRoutes.js';
+
+import path from 'path';
 
 // Initialize Express app
 const app = express();
@@ -30,6 +39,9 @@ app.use((req, res, next) => {
 // Enable CORS for frontend requests
 app.use(cors());
 
+// Serve static uploaded files
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
 // Parse JSON request bodies
 app.use(express.json());
 
@@ -44,6 +56,13 @@ app.use('/api/plots', plotRoutes);
 app.use('/api/diagnostics', diagnosisRoutes);
 app.use('/api/irrigation', irrigationRoutes);
 app.use('/api/weather', weatherRoutes);
+app.use('/api/farms', farmRoutes);
+app.use('/api/farm', diseaseHistoryRoutes);
+app.use('/api/pest-forecast', pestForecastRoutes);
+app.use('/api/marketplace', marketplaceRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/forum', forumRoutes);
+app.use('/api/subscription', subscriptionRoutes);
 
 // =============================
 // Health Check Route

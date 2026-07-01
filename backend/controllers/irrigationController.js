@@ -47,3 +47,33 @@ export const getIrrigationAdvice = async (req, res) => {
         });
     }
 };
+
+// @desc    Get irrigation recommendation by manual inputs
+// @route   POST /api/irrigation/recommend
+// @access  Private
+export const getRecommendationWithoutPlot = async (req, res) => {
+    try {
+        const { location, cropType, soilType, area } = req.body;
+        
+        if (!location || !cropType || !soilType || !area) {
+            return res.status(400).json({ message: 'All inputs (location, cropType, soilType, area) are required.' });
+        }
+
+        // Fetch real-time weather
+        const weatherData = await getLocalWeather(location);
+
+        // Calculate irrigation advice
+        const advice = calculateIrrigationNeeds(weatherData, soilType);
+
+        res.status(200).json({
+            currentWeather: weatherData,
+            recommendation: advice
+        });
+    } catch (error) {
+        console.error("Irrigation Recommend Error:", error);
+        res.status(500).json({ 
+            message: 'Failed to compute irrigation recommendations.', 
+            error: error.message 
+        });
+    }
+};

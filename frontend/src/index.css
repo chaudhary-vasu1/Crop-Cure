@@ -25,7 +25,7 @@
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  body.dark {
+  .dark body {
     background-color: #030712; /* Gray 950 */
     color: #f9fafb; /* Gray 50 */
   }
@@ -41,8 +41,9 @@
   button:focus-visible, 
   input:focus-visible, 
   select:focus-visible, 
-  textarea:focus-visible {
-    outline: 2px solid #10b981; /* Emerald 500 */
+  textarea:focus-visible,
+  a:focus-visible {
+    outline: 3px solid #10b981; /* Emerald 500 */
     outline-offset: 2px;
   }
 }

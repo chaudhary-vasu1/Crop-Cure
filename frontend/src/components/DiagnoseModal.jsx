@@ -68,6 +68,8 @@ const DiagnoseModal = ({ isOpen, onClose, plot }) => {
     };
     const lang = t[language] || t.en;
 
+    const [isDragging, setIsDragging] = useState(false);
+
     if (!isOpen || !plot) return null;
 
     const handleFileChange = (e) => {
@@ -132,14 +134,35 @@ const DiagnoseModal = ({ isOpen, onClose, plot }) => {
                 {/* Upload Section (Hides if AI has returned a diagnosis) */}
                 {!diagnosis ? (
                     <div className="space-y-5">
-                        <div className="flex flex-col items-center justify-center p-6 border-2 border-emerald-200/60 dark:border-emerald-950 border-dashed rounded-2xl bg-emerald-50/20 dark:bg-emerald-950/5 relative overflow-hidden group">
+                        <div 
+                            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                            onDragLeave={() => setIsDragging(false)}
+                            onDrop={(e) => {
+                                e.preventDefault();
+                                setIsDragging(false);
+                                const selected = e.dataTransfer.files[0];
+                                if (selected) {
+                                    setFile(selected);
+                                    setPreview(URL.createObjectURL(selected));
+                                    setDiagnosis(null); 
+                                    setError(null);
+                                }
+                            }}
+                            className={`flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-2xl relative overflow-hidden group transition ${
+                                isDragging 
+                                    ? 'border-emerald-500 bg-emerald-500/10' 
+                                    : 'border-emerald-200/60 dark:border-emerald-950 bg-emerald-50/20 dark:bg-emerald-950/5'
+                            }`}
+                        >
                             {preview ? (
                                 <img src={preview} alt="Crop preview" className="object-cover max-h-60 rounded-xl mb-4 shadow-sm border border-slate-200 dark:border-gray-800" />
                             ) : (
-                                <div className="flex flex-col items-center py-6 text-slate-450 dark:text-slate-500 text-center">
+                                <div className="flex flex-col items-center py-6 text-slate-450 dark:text-slate-550 text-center">
                                     <Upload size={32} className="mb-2 text-emerald-500" />
                                     <p className="text-xs font-bold uppercase tracking-wider text-slate-450 mt-1">{lang.uploadPhoto}</p>
-                                    <p className="text-[10px] text-slate-400 dark:text-slate-550 mt-1 font-semibold">{lang.selectClear}</p>
+                                    <p className="text-[10px] text-slate-400 dark:text-slate-550 mt-1 font-semibold">
+                                        {language === 'hi' ? 'यहाँ फ़ाइल खींचें और छोड़ें या ब्राउज़ करें' : 'Drag & Drop file here, or select clear leaf picture'}
+                                    </p>
                                 </div>
                             )}
                             

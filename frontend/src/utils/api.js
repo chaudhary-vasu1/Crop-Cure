@@ -2,7 +2,8 @@ import axios from 'axios';
 
 const api = axios.create({
     // Use environment variable or default to local backend URL
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api' 
+    baseURL: import.meta.env.VITE_API_URL || 
+             (import.meta.env.REACT_APP_BACKEND_URL ? `${import.meta.env.REACT_APP_BACKEND_URL}/api` : 'http://localhost:5000/api')
 });
 
 // Interceptor to attach the token to every request automatically

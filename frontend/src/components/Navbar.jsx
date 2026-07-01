@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Sprout, Settings, LogOut, Moon, Sun, User, Layers } from 'lucide-react';
+import { Home, Sprout, Settings, LogOut, Moon, Sun, User, Layers, Activity, ShoppingBag, MessageSquare, Award } from 'lucide-react';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { AppContext } from '../context/AppContext';
@@ -17,7 +17,11 @@ const Navbar = () => {
             weather: 'Weather Center',
             settings: 'Settings',
             logout: 'Logout',
-            profile: 'Profile'
+            profile: 'Profile',
+            health: 'Crop Health',
+            marketplace: 'Marketplace',
+            forum: 'Forum',
+            pricing: 'Pricing'
         },
         es: {
             dashboard: 'Panel',
@@ -26,7 +30,11 @@ const Navbar = () => {
             weather: 'Clima',
             settings: 'Ajustes',
             logout: 'Cerrar Sesión',
-            profile: 'Perfil'
+            profile: 'Perfil',
+            health: 'Salud',
+            marketplace: 'Mercado',
+            forum: 'Foro',
+            pricing: 'Planes'
         },
         hi: {
             dashboard: 'डैशबोर्ड',
@@ -35,7 +43,11 @@ const Navbar = () => {
             weather: 'मौसम केंद्र',
             settings: 'सेटिंग्स',
             logout: 'लॉगआउट',
-            profile: 'प्रोफाइल'
+            profile: 'प्रोफाइल',
+            health: 'फसल स्वास्थ्य',
+            marketplace: 'कृषि बाजार',
+            forum: 'सामुदायिक मंच',
+            pricing: 'योजनाएं'
         }
     };
     const lang = t[language] || t.en;
@@ -45,7 +57,10 @@ const Navbar = () => {
         { name: lang.farms, path: '/farms', icon: Layers },
         { name: lang.crops, path: '/crops', icon: Sprout },
         { name: lang.weather, path: '/weather', icon: Sun },
-        { name: lang.settings, path: '/settings', icon: Settings },
+        { name: lang.health, path: '/health-tracking', icon: Activity },
+        { name: lang.marketplace, path: '/marketplace', icon: ShoppingBag },
+        { name: lang.forum, path: '/forum', icon: MessageSquare },
+        { name: lang.pricing, path: '/pricing', icon: Award },
     ];
 
     // Helper to get user initial
@@ -130,6 +145,28 @@ const Navbar = () => {
                     </button>
                 </div>
             </div>
+
+            {/* Mobile Bottom Navigation Bar */}
+            <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-900/95 backdrop-blur-md border-t border-slate-200/50 dark:border-gray-800/60 py-2.5 px-4 flex items-center justify-around z-50 shadow-xl">
+                {navItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = location.pathname === item.path;
+                    return (
+                        <Link
+                            key={item.path}
+                            to={item.path}
+                            className={`flex flex-col items-center gap-1 bg-transparent border-none text-center cursor-pointer transition ${
+                                isActive 
+                                    ? 'text-emerald-500'
+                                    : 'text-slate-400 dark:text-slate-500 hover:text-slate-650'
+                            }`}
+                        >
+                            <Icon size={16} />
+                            <span className="text-[8px] font-black tracking-tight uppercase truncate max-w-[50px]">{item.name}</span>
+                        </Link>
+                    );
+                })}
+            </nav>
         </header>
     );
 };
