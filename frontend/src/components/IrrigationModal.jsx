@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
+import { createPortal } from 'react-dom';
 import api from '../utils/api';
 import { AppContext } from '../context/AppContext';
 import { X, Loader2, ShieldAlert, Sliders, Layers } from 'lucide-react';
@@ -186,7 +187,7 @@ const IrrigationModal = ({ isOpen, onClose, plot }) => {
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/75 backdrop-blur-md animate-fade-in">
             <div className="w-full max-w-md max-h-[85vh] overflow-y-auto scrollbar-thin bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/50 rounded-3xl shadow-2xl relative animate-scale-in text-left overflow-hidden">
                 
@@ -433,7 +434,8 @@ const IrrigationModal = ({ isOpen, onClose, plot }) => {
                     )}
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 
