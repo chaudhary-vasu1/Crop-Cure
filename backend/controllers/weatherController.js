@@ -1,8 +1,14 @@
 import axios from 'axios';
 import { GoogleGenAI } from '@google/genai';
 
-// Initialize the Gemini SDK
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// Lazy client initialization to avoid ES Module import hoisting issues
+let aiInstance = null;
+const getAi = () => {
+    if (!aiInstance) {
+        aiInstance = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    }
+    return aiInstance;
+};
 
 // @desc    Get live weather data
 // @route   GET /api/weather
@@ -29,7 +35,7 @@ export const getWeather = async (req, res) => {
         try {
             const prompt = `Identify the nearest major city, town, or district in India (recognized by standard weather services like OpenWeatherMap) for the village or location: "${rawCity}". Return ONLY the name of that city/district in English, with absolutely no punctuation, no bold tags, and no introductory or explanatory text (e.g. return "Meerut" or "Hapur").`;
             
-            const aiResponse = await ai.models.generateContent({
+            const aiResponse = await getAi().models.generateContent({
                 model: 'gemini-2.5-flash',
                 contents: prompt
             });
@@ -81,7 +87,7 @@ export const reverseGeocode = async (req, res) => {
         console.log(`AI Reverse geocoding Lat: ${lat}, Lng: ${lng}...`);
         const prompt = `You are a precise geocoder. Given the latitude: ${lat} and longitude: ${lng} in India, identify the nearest village, town, and district name. Return ONLY the resolved location name in English (e.g. "Sardhana, Meerut" or "Noida, Gautam Buddha Nagar"), with absolutely no extra sentences, punctuation, or bold tags.`;
         
-        const aiResponse = await ai.models.generateContent({
+        const aiResponse = await getAi().models.generateContent({
             model: 'gemini-2.5-flash',
             contents: prompt
         });

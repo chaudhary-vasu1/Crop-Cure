@@ -2,8 +2,14 @@ import { GoogleGenAI } from '@google/genai';
 import Diagnosis from '../models/Diagnosis.js';
 import Plot from '../models/Plot.js';
 
-// Initialize the Gemini SDK
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// Lazy client initialization to avoid ES Module import hoisting issues
+let aiInstance = null;
+const getAi = () => {
+    if (!aiInstance) {
+        aiInstance = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    }
+    return aiInstance;
+};
 
 // @desc    Analyze crop image and save diagnosis
 // @route   POST /api/diagnostics/:plotId
@@ -53,7 +59,7 @@ export const analyzeCrop = async (req, res) => {
         `;
 
         // 5. Call the Gemini API
-        const response = await ai.models.generateContent({
+        const response = await getAi().models.generateContent({
             model: 'gemini-2.5-flash',
             contents: [prompt, imagePart],
             config: {
