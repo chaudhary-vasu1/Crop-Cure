@@ -84,7 +84,13 @@ export const loginUser = async (req, res) => {
         const { email, password } = req.body; // 'email' field handles both identifiers here
         const formattedIdentifier = formatIdentifier(email);
 
-        const searchQuery = isEmail(formattedIdentifier) ? { email: formattedIdentifier } : { phone: formattedIdentifier };
+        const searchQuery = {
+            $or: [
+                { email: formattedIdentifier },
+                { phone: formattedIdentifier },
+                { username: { $regex: new RegExp(`^${email.trim().replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}$`, 'i') } }
+            ]
+        };
         const user = await User.findOne(searchQuery).select('+password');
 
         if (user && (await user.matchPassword(password))) {
