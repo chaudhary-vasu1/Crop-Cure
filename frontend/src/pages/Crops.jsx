@@ -90,7 +90,7 @@ const Crops = () => {
         const fetchData = async () => {
             try {
                 const [diagRes, plotsRes] = await Promise.all([
-                    api.get('/diagnostics'),
+                    api.get(`/diagnostics?lang=${language}`),
                     api.get('/plots')
                 ]);
                 setDiagnoses(diagRes.data);
@@ -102,7 +102,7 @@ const Crops = () => {
             }
         };
         fetchData();
-    }, []);
+    }, [language]);
 
     // Filter logic
     const filteredDiagnoses = diagnoses.filter(diag => {

@@ -103,17 +103,79 @@ export const analyzeCrop = async (req, res) => {
     }
 };
 
+// Helper to translate list of diagnoses on the fly
+const translateDiagnoses = async (diagnoses, lang) => {
+    if (!lang || lang === 'en') return diagnoses;
+    
+    const textToTranslate = [];
+    diagnoses.forEach((d, idx) => {
+        textToTranslate.push({
+            idx,
+            diseaseName: d.diseaseName,
+            organic: d.treatmentPlan?.organic || '',
+            chemical: d.treatmentPlan?.chemical || ''
+        });
+    });
+
+    if (textToTranslate.length === 0) return diagnoses;
+
+    let targetLanguage = 'Hindi (हिंदी)';
+    if (lang === 'es') targetLanguage = 'Spanish (Español)';
+
+    const prompt = `You are an expert translator. Translate the following array of crop diagnoses text into ${targetLanguage}.
+Keep agricultural terminology accurate. Output ONLY a valid JSON array of objects representing the translations. Do not include markdown code blocks or wrapping.
+
+Schema:
+[
+  {
+    "idx": number,
+    "diseaseName": "Translated disease name",
+    "organic": "Translated organic treatment",
+    "chemical": "Translated chemical treatment"
+  }
+]
+
+Data to translate:
+${JSON.stringify(textToTranslate, null, 2)}`;
+
+    try {
+        const response = await getAi().models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: { responseMimeType: "application/json" }
+        });
+        const translatedArray = JSON.parse(response.text);
+        
+        const clonedDiagnoses = JSON.parse(JSON.stringify(diagnoses));
+        translatedArray.forEach(item => {
+            const orig = clonedDiagnoses[item.idx];
+            if (orig) {
+                orig.diseaseName = item.diseaseName;
+                if (!orig.treatmentPlan) orig.treatmentPlan = {};
+                orig.treatmentPlan.organic = item.organic;
+                orig.treatmentPlan.chemical = item.chemical;
+            }
+        });
+        return clonedDiagnoses;
+    } catch (err) {
+        console.error("Failed to translate diagnoses:", err);
+        return diagnoses;
+    }
+};
+
 // @desc    Get all diagnoses for a specific plot
 // @route   GET /api/diagnostics/:plotId
 // @access  Private
 export const getDiagnosesByPlot = async (req, res) => {
     try {
+        const { lang } = req.query;
         const diagnoses = await Diagnosis.find({ 
             plot: req.params.plotId, 
             user: req.user.id 
         }).sort({ createdAt: -1 });
         
-        res.status(200).json(diagnoses);
+        const localized = await translateDiagnoses(diagnoses, lang);
+        res.status(200).json(localized);
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch diagnoses', error: error.message });
     }
@@ -124,10 +186,13 @@ export const getDiagnosesByPlot = async (req, res) => {
 // @access  Private
 export const getAllDiagnoses = async (req, res) => {
     try {
+        const { lang } = req.query;
         const diagnoses = await Diagnosis.find({ user: req.user.id || req.user._id })
             .populate('plot', 'name cropType location')
             .sort({ createdAt: -1 });
-        res.status(200).json(diagnoses);
+
+        const localized = await translateDiagnoses(diagnoses, lang);
+        res.status(200).json(localized);
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch diagnoses', error: error.message });
     }
