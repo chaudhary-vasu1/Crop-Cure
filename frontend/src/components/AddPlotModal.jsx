@@ -35,7 +35,14 @@ const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
             saving: "Saving...",
             errorGps: "Geolocation is not supported by your browser",
             errorGpsFetch: "Failed to auto-detect location. Please enter it manually.",
-            errorGpsDenied: "Geolocation access denied. Please type your location manually."
+            errorGpsDenied: "Geolocation access denied. Please type your location manually.",
+            valLoamy: "Loamy",
+            valClay: "Clay",
+            valSandy: "Sandy",
+            valSilt: "Silt",
+            valDrip: "Drip",
+            valSprinkler: "Sprinkler",
+            valManual: "Manual"
         },
         es: {
             title: "🚜 Agregar Parcela",
@@ -55,7 +62,14 @@ const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
             saving: "Guardando...",
             errorGps: "La geolocalización no es compatible con su navegador",
             errorGpsFetch: "No se pudo detectar la ubicación automáticamente. Ingrésela manualmente.",
-            errorGpsDenied: "Acceso a la geolocalización denegado. Escriba su ubicación manualmente."
+            errorGpsDenied: "Acceso a la geolocalización denegado. Escriba su ubicación manualmente.",
+            valLoamy: "Franco / Limoso",
+            valClay: "Arcilloso",
+            valSandy: "Arenoso",
+            valSilt: "Limo",
+            valDrip: "Goteo",
+            valSprinkler: "Aspersor",
+            valManual: "Manual"
         },
         hi: {
             title: "🚜 नया प्लॉट जोड़ें",
@@ -75,7 +89,14 @@ const AddPlotModal = ({ isOpen, onClose, onPlotAdded }) => {
             saving: "सहेज रहा है...",
             errorGps: "जियोलोकेशन आपके ब्राउज़र द्वारा समर्थित नहीं है",
             errorGpsFetch: "स्थान का स्वतः पता लगाने में विफल। कृपया इसे मैन्युअल रूप से दर्ज करें।",
-            errorGpsDenied: "जियोलोकेशन अनुमति अस्वीकार कर दी गई। कृपया स्थान टाइप करें।"
+            errorGpsDenied: "जियोलोकेशन अनुमति अस्वीकार कर दी गई। कृपया स्थान टाइप करें।",
+            valLoamy: "दोमट मिट्टी",
+            valClay: "चिकनी मिट्टी",
+            valSandy: "बलुई मिट्टी",
+            valSilt: "गाद मिट्टी",
+            valDrip: "टपकन सिंचाई (Drip)",
+            valSprinkler: "फव्वारा सिंचाई (Sprinkler)",
+            valManual: "मैन्युअल सिंचाई"
         }
     };
     const lang = t[language] || t.en;
