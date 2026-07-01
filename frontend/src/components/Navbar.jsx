@@ -14,6 +14,7 @@ const Navbar = () => {
             dashboard: 'Dashboard',
             farms: 'My Farms',
             crops: 'My Crops',
+            weather: 'Weather Center',
             settings: 'Settings',
             logout: 'Logout',
             profile: 'Profile'
@@ -22,6 +23,7 @@ const Navbar = () => {
             dashboard: 'Panel',
             farms: 'Mis Parcelas',
             crops: 'Mis Cultivos',
+            weather: 'Clima',
             settings: 'Ajustes',
             logout: 'Cerrar Sesión',
             profile: 'Perfil'
@@ -30,6 +32,7 @@ const Navbar = () => {
             dashboard: 'डैशबोर्ड',
             farms: 'मेरे खेत',
             crops: 'मेरी फसलें',
+            weather: 'मौसम केंद्र',
             settings: 'सेटिंग्स',
             logout: 'लॉगआउट',
             profile: 'प्रोफाइल'
@@ -41,6 +44,7 @@ const Navbar = () => {
         { name: lang.dashboard, path: '/', icon: Home },
         { name: lang.farms, path: '/farms', icon: Layers },
         { name: lang.crops, path: '/crops', icon: Sprout },
+        { name: lang.weather, path: '/weather', icon: Sun },
         { name: lang.settings, path: '/settings', icon: Settings },
     ];
 

@@ -7,7 +7,6 @@ import PlotCard from '../components/PlotCard';
 import AddPlotModal from '../components/AddPlotModal';
 import DiagnoseModal from '../components/DiagnoseModal';
 import IrrigationModal from '../components/IrrigationModal';
-import WeatherWidget from '../components/WeatherWidget';
 
 const Dashboard = () => {
     const { language } = useContext(AppContext);
@@ -227,18 +226,7 @@ const Dashboard = () => {
                             <p className="text-xs text-gray-505 dark:text-gray-400 mt-2 leading-relaxed">{lang.weatherDesc}</p>
                         </div>
                         <button 
-                            onClick={() => {
-                                const weatherWidget = document.getElementById('weather-widget-container');
-                                if (weatherWidget) {
-                                    weatherWidget.scrollIntoView({ behavior: 'smooth' });
-                                }
-                                setTimeout(() => {
-                                    const changeCityBtn = document.getElementById('change-city-btn');
-                                    if (changeCityBtn) {
-                                        changeCityBtn.click();
-                                    }
-                                }, 350);
-                            }}
+                            onClick={() => navigate('/weather')}
                             className="w-full mt-6 py-2 px-4 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl text-xs border-none cursor-pointer shadow-sm group-hover:scale-[1.02] transition"
                         >
                             {lang.weatherBtn}
@@ -260,11 +248,6 @@ const Dashboard = () => {
                         </button>
                     </div>
                 </div>
-            </div>
-
-            {/* Weather Widget */}
-            <div id="weather-widget-container" className="scroll-mt-20">
-                <WeatherWidget defaultCity={defaultCity} />
             </div>
 
 
