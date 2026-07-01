@@ -132,10 +132,11 @@ const Register = () => {
         const formattedId = getFormattedIdentifier();
 
         try {
+            const cleanPassword = password.trim();
             const res = await api.post('/auth/register', { 
                 username, 
                 identifier: formattedId, 
-                password
+                password: cleanPassword
             });
             login(res.data);
             navigate('/');
