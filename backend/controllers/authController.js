@@ -73,6 +73,7 @@ export const registerUser = async (req, res) => {
             token: generateToken(user._id) 
         });
     } catch (error) {
+        console.error("Registration endpoint error details:", error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
