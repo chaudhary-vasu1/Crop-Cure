@@ -144,7 +144,9 @@ const Login = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const res = await api.post('/auth/login', { email: identifier, password });
+            const cleanIdentifier = identifier.trim();
+            const cleanPassword = password.trim();
+            const res = await api.post('/auth/login', { email: cleanIdentifier, password: cleanPassword });
             login(res.data);
             navigate('/');
         } catch (err) {
@@ -281,6 +283,8 @@ const Login = () => {
                                         placeholder={lang.placeholderId}
                                         value={identifier}
                                         onChange={(e) => setIdentifier(e.target.value)} 
+                                        autoCapitalize="none"
+                                        autoCorrect="off"
                                         className="w-full px-4 py-3 bg-slate-50/50 dark:bg-gray-950/50 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white dark:focus:bg-gray-900 transition-all text-sm font-medium text-slate-800 dark:text-white"
                                         required 
                                     />
@@ -304,6 +308,8 @@ const Login = () => {
                                         placeholder="••••••••" 
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)} 
+                                        autoCapitalize="none"
+                                        autoCorrect="off"
                                         className="w-full px-4 py-3 bg-slate-50/50 dark:bg-gray-950/50 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white dark:focus:bg-gray-900 transition-all text-sm font-medium text-slate-800 dark:text-white"
                                         required 
                                     />
