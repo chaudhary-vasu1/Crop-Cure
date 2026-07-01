@@ -5,7 +5,7 @@ import PlotCard from '../components/PlotCard';
 import AddPlotModal from '../components/AddPlotModal';
 import DiagnoseModal from '../components/DiagnoseModal';
 import IrrigationModal from '../components/IrrigationModal';
-import { Plus, Info, LayoutGrid, Loader2 } from 'lucide-react';
+import { Plus, Loader2 } from 'lucide-react';
 
 const Farms = () => {
     const { language } = useContext(AppContext);
@@ -14,26 +14,32 @@ const Farms = () => {
     const t = {
         en: { 
             title: "My Farm Plots", 
+            subtitle: "Manage your crops, physical plots, and watering methods.",
             addPlot: "+ Add Plot", 
             loading: "Retrieving farm registry...", 
+            emptyTitle: "No plots registered",
             empty: "You haven't added any plots yet.",
-            confirmDelete: "Are you sure you want to delete this plot?",
+            btnCreateFirst: "Create Your First Plot",
             failedDelete: "Failed to delete plot"
         },
         es: {
             title: "Mis Parcelas de Campo",
+            subtitle: "Administre sus cultivos, parcelas físicas y métodos de riego.",
             addPlot: "+ Añadir Parcela",
             loading: "Cargando sus parcelas...",
+            emptyTitle: "Sin parcelas registradas",
             empty: "Aún no ha añadido ninguna parcela.",
-            confirmDelete: "¿Está seguro de que desea eliminar esta parcela?",
+            btnCreateFirst: "Cree su Primera Parcela",
             failedDelete: "Error al eliminar la parcela"
         },
         hi: { 
             title: "मेरे खेत के प्लॉट", 
+            subtitle: "अपनी फसलों, भौतिक भूखंडों और सिंचाई के तरीकों का प्रबंधन करें।",
             addPlot: "+ प्लॉट जोड़ें", 
             loading: "आपके प्लॉट लोड हो रहे हैं...", 
+            emptyTitle: "कोई प्लॉट पंजीकृत नहीं",
             empty: "आपने अभी तक कोई प्लॉट नहीं जोड़ा है।",
-            confirmDelete: "क्या आप वाकई इस प्लॉट को हटाना चाहते हैं?",
+            btnCreateFirst: "अपना पहला प्लॉट बनाएं",
             failedDelete: "प्लॉट हटाने में विफल"
         }
     };
@@ -82,7 +88,7 @@ const Farms = () => {
                         {lang.title}
                     </h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5 font-medium">
-                        Manage your crops, physical plots, and watering methods.
+                        {lang.subtitle}
                     </p>
                 </div>
                 <button
@@ -96,7 +102,7 @@ const Farms = () => {
 
             {/* Plots Listing Grid */}
             {loading ? (
-                <div className="flex flex-col justify-center items-center py-24 gap-3 text-slate-400 dark:text-slate-500">
+                <div className="flex flex-col justify-center items-center py-24 gap-3 text-slate-450 dark:text-slate-500">
                     <Loader2 size={36} className="animate-spin text-emerald-500" />
                     <p className="text-sm font-bold animate-pulse">{lang.loading}</p>
                 </div>
@@ -106,14 +112,14 @@ const Farms = () => {
                         🚜
                     </div>
                     <div className="max-w-xs">
-                        <h4 className="text-base font-extrabold text-slate-800 dark:text-slate-200">No plots registered</h4>
+                        <h4 className="text-base font-extrabold text-slate-800 dark:text-slate-200">{lang.emptyTitle}</h4>
                         <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 font-medium leading-relaxed">{lang.empty}</p>
                     </div>
                     <button
                         onClick={() => setIsModalOpen(true)}
                         className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold border-none cursor-pointer transition shadow-sm active:scale-95"
                     >
-                        Create Your First Plot
+                        {lang.btnCreateFirst}
                     </button>
                 </div>
             ) : (

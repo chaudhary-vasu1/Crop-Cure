@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import api from '../utils/api';
+import { AppContext } from '../context/AppContext';
 import { 
     Search, MapPin, Wind, Droplets, Sunrise, Sunset, 
     Eye, Gauge, Sparkles, CloudRain, ArrowLeft, Loader2 
@@ -14,6 +15,79 @@ const WeatherCenter = () => {
     const [gpsLoading, setGpsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [searchCity, setSearchCity] = useState('');
+
+    const { language } = useContext(AppContext);
+
+    // Translations mapping
+    const t = {
+        en: {
+            title: "Weather Center",
+            subtitle: "Real-time farm weather metrics & agricultural advisory",
+            searchPlaceholder: "Search city or village...",
+            btnSearch: "Search",
+            btnGps: "GPS",
+            detecting: "Detecting...",
+            liveForecast: "Live Forecast",
+            feelsLike: "/ Feels like ",
+            advisoryTitle: "AI Agricultural Advisory",
+            metricsTitle: "Today's Weather Metrics",
+            outlookTitle: "5-Day Outlook",
+            loading: "Retrieving weather updates...",
+            humidity: "Humidity",
+            windSpeed: "Wind Speed",
+            pressure: "Pressure",
+            visibility: "Visibility",
+            sunrise: "Sunrise",
+            sunset: "Sunset",
+            errorGeolocation: "Geolocation is not supported by your browser",
+            errorGpsAccess: "Geolocation access denied. Please type your location manually."
+        },
+        es: {
+            title: "Centro Meteorológico",
+            subtitle: "Métricas del clima del campo en tiempo real y asesoría agrícola",
+            searchPlaceholder: "Buscar ciudad o pueblo...",
+            btnSearch: "Buscar",
+            btnGps: "GPS",
+            detecting: "Detectando...",
+            liveForecast: "Pronóstico en Vivo",
+            feelsLike: "/ Sensación térmica ",
+            advisoryTitle: "Asesoría Agrícola por IA",
+            metricsTitle: "Métricas del Clima de Hoy",
+            outlookTitle: "Pronóstico de 5 Días",
+            loading: "Obteniendo actualizaciones climáticas...",
+            humidity: "Humedad",
+            windSpeed: "Velocidad del Viento",
+            pressure: "Presión",
+            visibility: "Visibilidad",
+            sunrise: "Amanecer",
+            sunset: "Atardecer",
+            errorGeolocation: "La geolocalización no es compatible con su navegador",
+            errorGpsAccess: "Acceso a la geolocalización denegado. Escriba su ubicación manualmente."
+        },
+        hi: {
+            title: "मौसम केंद्र",
+            subtitle: "वास्तविक समय के कृषि मौसम मापदंड और कृषि सलाह",
+            searchPlaceholder: "शहर या गाँव खोजें...",
+            btnSearch: "खोजें",
+            btnGps: "जीपीएस",
+            detecting: "खोज रहा है...",
+            liveForecast: "लाइव पूर्वानुमान",
+            feelsLike: "/ महसूस होता है ",
+            advisoryTitle: "एआई कृषि सलाह",
+            metricsTitle: "आज का मौसम विवरण",
+            outlookTitle: "5-दिवसीय दृष्टिकोण",
+            loading: "मौसम अपडेट प्राप्त किए जा रहे हैं...",
+            humidity: "आर्द्रता",
+            windSpeed: "हवा की गति",
+            pressure: "वायुमंडलीय दबाव",
+            visibility: "दृश्यता (Visibility)",
+            sunrise: "सूर्योदय",
+            sunset: "सूर्यास्त",
+            errorGeolocation: "जियोलोकेशन आपके ब्राउज़र द्वारा समर्थित नहीं है",
+            errorGpsAccess: "जियोलोकेशन अनुमति अस्वीकार कर दी गई। कृपया स्थान टाइप करें।"
+        }
+    };
+    const lang = t[language] || t.en;
 
     // Fetch full weather details (current + forecast + AI advisory)
     const fetchWeatherDetails = async (params = {}) => {
@@ -56,7 +130,7 @@ const WeatherCenter = () => {
     // GPS Auto-detect location
     const handleGpsWeather = () => {
         if (!navigator.geolocation) {
-            alert("Geolocation is not supported by your browser");
+            alert(lang.errorGeolocation);
             return;
         }
         setGpsLoading(true);
@@ -68,7 +142,7 @@ const WeatherCenter = () => {
             },
             (err) => {
                 console.error("GPS access error:", err);
-                alert("Geolocation access denied. Please type your location manually.");
+                alert(lang.errorGpsAccess);
                 setGpsLoading(false);
             }
         );
@@ -77,7 +151,10 @@ const WeatherCenter = () => {
     // Helper to format date string to weekday
     const formatDay = (dateStr) => {
         const dateObj = new Date(dateStr);
-        return dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        return dateObj.toLocaleDateString(
+            language === 'hi' ? 'hi-IN' : language === 'es' ? 'es-ES' : 'en-US',
+            { weekday: 'short', month: 'short', day: 'numeric' }
+        );
     };
 
     // Helper to convert timestamp to local time string
@@ -99,10 +176,10 @@ const WeatherCenter = () => {
                     </button>
                     <div>
                         <h1 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight flex items-center gap-2">
-                            🌤️ Weather Center
+                            🌤️ {lang.title}
                         </h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5 font-medium">
-                            Real-time farm weather metrics & agricultural advisory
+                            {lang.subtitle}
                         </p>
                     </div>
                 </div>
@@ -113,10 +190,10 @@ const WeatherCenter = () => {
                         <div className="relative flex-1 md:flex-none">
                             <input 
                                 type="text"
-                                placeholder="Search city or village..."
+                                placeholder={lang.searchPlaceholder}
                                 value={searchCity}
                                 onChange={(e) => setSearchCity(e.target.value)}
-                                className="w-full md:w-56 pl-9 pr-4 py-2.5 border border-slate-200 dark:border-gray-800 rounded-xl bg-white dark:bg-gray-900 text-slate-800 dark:text-white text-xs outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                                className="w-full md:w-56 pl-9 pr-4 py-2.5 border border-slate-200 dark:border-gray-800 rounded-xl bg-white dark:bg-gray-905 text-slate-850 dark:text-white text-xs outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
                             />
                             <Search size={14} className="absolute left-3 top-3.5 text-slate-400" />
                         </div>
@@ -124,7 +201,7 @@ const WeatherCenter = () => {
                             type="submit"
                             className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-xs border-none cursor-pointer transition shadow-sm active:scale-95"
                         >
-                            Search
+                            {lang.btnSearch}
                         </button>
                     </form>
                     <button 
@@ -134,7 +211,7 @@ const WeatherCenter = () => {
                         title="Auto-detect location using GPS"
                     >
                         <MapPin size={14} className={gpsLoading ? "animate-pulse" : ""} />
-                        <span>{gpsLoading ? "Detecting..." : "GPS"}</span>
+                        <span>{gpsLoading ? lang.detecting : lang.btnGps}</span>
                     </button>
                 </div>
             </div>
@@ -150,7 +227,7 @@ const WeatherCenter = () => {
             {loading ? (
                 <div className="flex flex-col justify-center items-center py-32 gap-3 text-slate-400 dark:text-slate-500">
                     <Loader2 size={36} className="animate-spin text-emerald-500" />
-                    <p className="text-sm font-bold animate-pulse">Retrieving weather updates...</p>
+                    <p className="text-sm font-bold animate-pulse">{lang.loading}</p>
                 </div>
             ) : weatherData ? (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -165,7 +242,7 @@ const WeatherCenter = () => {
                             <div className="flex justify-between items-start z-10 relative">
                                 <div>
                                     <span className="px-3 py-1 bg-white/25 backdrop-blur-md rounded-full text-[10px] font-extrabold uppercase tracking-wider">
-                                        Live Forecast
+                                        {lang.liveForecast}
                                     </span>
                                     <h2 className="text-3xl font-black mt-4 tracking-tight text-white">
                                         {weatherData.current.city}
@@ -186,7 +263,7 @@ const WeatherCenter = () => {
                                     {weatherData.current.temp}°C
                                 </span>
                                 <span className="text-xs opacity-85 font-extrabold uppercase tracking-wider">
-                                    / Feels like {weatherData.current.feelsLike}°C
+                                    {lang.feelsLike}{weatherData.current.feelsLike}°C
                                 </span>
                             </div>
                         </div>
@@ -195,7 +272,7 @@ const WeatherCenter = () => {
                         <div className="p-6 border border-emerald-100 dark:border-emerald-950/45 bg-emerald-50/20 dark:bg-emerald-950/10 rounded-3xl">
                             <div className="flex items-center gap-2 mb-4 text-emerald-700 dark:text-emerald-400">
                                 <Sparkles size={16} className="animate-bounce" />
-                                <h3 className="text-base font-extrabold tracking-tight">AI Agricultural Advisory</h3>
+                                <h3 className="text-base font-extrabold tracking-tight">{lang.advisoryTitle}</h3>
                             </div>
                             <div className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed space-y-2 whitespace-pre-line font-semibold pl-1">
                                 {weatherData.advisory}
@@ -205,7 +282,7 @@ const WeatherCenter = () => {
                         {/* Detailed Metrics Section */}
                         <div>
                             <h3 className="text-lg font-black text-slate-800 dark:text-white mb-4 tracking-tight">
-                                Today's Weather Metrics
+                                {lang.metricsTitle}
                             </h3>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                 <div className="p-4 bg-white dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/50 rounded-2xl flex items-center gap-3 shadow-sm hover:shadow-md transition">
@@ -213,7 +290,7 @@ const WeatherCenter = () => {
                                         <Droplets size={16} />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Humidity</p>
+                                        <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">{lang.humidity}</p>
                                         <p className="text-sm font-extrabold text-slate-800 dark:text-white mt-0.5">{weatherData.current.humidity}%</p>
                                     </div>
                                 </div>
@@ -223,7 +300,7 @@ const WeatherCenter = () => {
                                         <Wind size={16} />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Wind Speed</p>
+                                        <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">{lang.windSpeed}</p>
                                         <p className="text-sm font-extrabold text-slate-800 dark:text-white mt-0.5">{weatherData.current.windSpeed} m/s</p>
                                     </div>
                                 </div>
@@ -233,7 +310,7 @@ const WeatherCenter = () => {
                                         <Gauge size={16} />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Pressure</p>
+                                        <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">{lang.pressure}</p>
                                         <p className="text-sm font-extrabold text-slate-800 dark:text-white mt-0.5">{weatherData.current.pressure} hPa</p>
                                     </div>
                                 </div>
@@ -243,7 +320,7 @@ const WeatherCenter = () => {
                                         <Eye size={16} />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Visibility</p>
+                                        <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">{lang.visibility}</p>
                                         <p className="text-sm font-extrabold text-slate-800 dark:text-white mt-0.5">{weatherData.current.visibility} km</p>
                                     </div>
                                 </div>
@@ -253,7 +330,7 @@ const WeatherCenter = () => {
                                         <Sunrise size={16} />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Sunrise</p>
+                                        <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">{lang.sunrise}</p>
                                         <p className="text-sm font-extrabold text-slate-800 dark:text-white mt-0.5">{formatTime(weatherData.current.sunrise)}</p>
                                     </div>
                                 </div>
@@ -263,7 +340,7 @@ const WeatherCenter = () => {
                                         <Sunset size={16} />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Sunset</p>
+                                        <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">{lang.sunset}</p>
                                         <p className="text-sm font-extrabold text-slate-800 dark:text-white mt-0.5">{formatTime(weatherData.current.sunset)}</p>
                                     </div>
                                 </div>
@@ -275,7 +352,7 @@ const WeatherCenter = () => {
                     {/* Right: 5-Day Forecast Grid */}
                     <div>
                         <h3 className="text-lg font-black text-slate-800 dark:text-white mb-4 tracking-tight flex items-center gap-2">
-                            📅 5-Day Outlook
+                            {lang.outlookTitle}
                         </h3>
                         <div className="flex flex-col gap-3">
                             {weatherData.forecast.map((dayForecast, idx) => (
@@ -290,7 +367,7 @@ const WeatherCenter = () => {
                                             className="w-10 h-10 shrink-0 bg-slate-50 dark:bg-gray-800 rounded-xl"
                                         />
                                         <div>
-                                            <p className="text-xs font-black text-slate-800 dark:text-white">
+                                            <p className="text-xs font-black text-slate-805 dark:text-white">
                                                 {formatDay(dayForecast.date)}
                                             </p>
                                             <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 mt-0.5 capitalize">

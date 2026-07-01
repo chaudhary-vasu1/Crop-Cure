@@ -1,12 +1,68 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import api from '../utils/api';
-import { X, Droplets, Loader2, CloudRain, ShieldAlert, Sparkles } from 'lucide-react';
+import { AppContext } from '../context/AppContext';
+import { X, Loader2, ShieldAlert } from 'lucide-react';
 
 const IrrigationModal = ({ isOpen, onClose, plot }) => {
     const [loading, setLoading] = useState(true);
     const [adviceData, setAdviceData] = useState(null);
     const [volumes, setVolumes] = useState({ liters: '0', gallons: '0' });
     const [error, setError] = useState(null);
+
+    const { language } = useContext(AppContext);
+
+    // Translations mapping
+    const t = {
+        en: {
+            title: "💧 Smart Irrigation",
+            subtitleAcres: "Acres of",
+            calculating: "Calculating crop water needs...",
+            errorAdvice: "Failed to fetch live irrigation plan.",
+            btnClose: "Close",
+            tempLabel: "Local Temperature",
+            humidityLabel: "Humidity",
+            volLabel: "Volume Needed",
+            galLabel: "In Gallons",
+            freqLabel: "⏱ Frequency:",
+            waterLevelLabel: "🚰 Water Level:",
+            urgencyLabel: "⚠️ Urgency:",
+            btnAck: "Acknowledge Schedule",
+            pauseIrrigation: "Pause Irrigation"
+        },
+        es: {
+            title: "💧 Riego Inteligente",
+            subtitleAcres: "Acres de",
+            calculating: "Calculando necesidades de agua...",
+            errorAdvice: "No se pudo obtener el plan de riego en vivo.",
+            btnClose: "Cerrar",
+            tempLabel: "Temperatura Local",
+            humidityLabel: "Humedad",
+            volLabel: "Volumen Necesario",
+            galLabel: "En Galones",
+            freqLabel: "⏱ Frecuencia:",
+            waterLevelLabel: "🚰 Nivel de Agua:",
+            urgencyLabel: "⚠️ Urgencia:",
+            btnAck: "Aceptar Programación",
+            pauseIrrigation: "Pausar Riego"
+        },
+        hi: {
+            title: "💧 स्मार्ट सिंचाई",
+            subtitleAcres: "एकड़ फसल:",
+            calculating: "फसल पानी की जरूरतों की गणना की जा रही है...",
+            errorAdvice: "लाइव सिंचाई योजना प्राप्त करने में विफल।",
+            btnClose: "बंद करें",
+            tempLabel: "स्थानीय तापमान",
+            humidityLabel: "आर्द्रता",
+            volLabel: "आवश्यक मात्रा",
+            galLabel: "गैलन में",
+            freqLabel: "⏱ आवृत्ति (Frequency):",
+            waterLevelLabel: "🚰 जल स्तर (Level):",
+            urgencyLabel: "⚠️ तात्कालिकता:",
+            btnAck: "शेड्यूल स्वीकार करें",
+            pauseIrrigation: "सिंचाई रोकें"
+        }
+    };
+    const lang = t[language] || t.en;
 
     useEffect(() => {
         if (isOpen && plot) {
@@ -24,7 +80,7 @@ const IrrigationModal = ({ isOpen, onClose, plot }) => {
                     setVolumes(calculated);
                 } catch (err) {
                     console.error("Error fetching irrigation advice:", err);
-                    setError("Failed to fetch live irrigation plan.");
+                    setError(lang.errorAdvice);
                 } finally {
                     setLoading(false);
                 }
@@ -75,16 +131,16 @@ const IrrigationModal = ({ isOpen, onClose, plot }) => {
                         <X size={16} />
                     </button>
                     <h2 className="text-xl font-black flex justify-center items-center gap-1.5 text-white">
-                        💧 Smart Irrigation
+                        {lang.title}
                     </h2>
-                    <p className="opacity-90 mt-1.5 text-xs font-semibold">{plot.name} ({plot.area} Acres of {plot.cropType})</p>
+                    <p className="opacity-90 mt-1.5 text-xs font-semibold">{plot.name} ({plot.area} {lang.subtitleAcres} {plot.cropType})</p>
                 </div>
 
                 <div className="p-6">
                     {loading ? (
                         <div className="flex flex-col justify-center items-center py-16 gap-3 text-slate-450 dark:text-slate-500">
                             <Loader2 size={32} className="animate-spin text-blue-500" />
-                            <p className="text-xs font-bold animate-pulse">Calculating crop water needs...</p>
+                            <p className="text-xs font-bold animate-pulse">{lang.calculating}</p>
                         </div>
                     ) : error ? (
                         <div className="text-center py-8 flex flex-col items-center gap-4">
@@ -94,7 +150,7 @@ const IrrigationModal = ({ isOpen, onClose, plot }) => {
                                 onClick={onClose} 
                                 className="px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs border-none cursor-pointer transition"
                             >
-                                Close
+                                {lang.btnClose}
                             </button>
                         </div>
                     ) : (
@@ -104,13 +160,13 @@ const IrrigationModal = ({ isOpen, onClose, plot }) => {
                             {adviceData.currentWeather && (
                                 <div className="flex items-center justify-between p-3.5 bg-blue-50/20 dark:bg-blue-950/10 border border-blue-100 dark:border-blue-950 rounded-xl text-xs">
                                     <div>
-                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Local Temperature</p>
+                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">{lang.tempLabel}</p>
                                         <p className="text-sm font-extrabold text-slate-800 dark:text-slate-200 capitalize mt-0.5">
                                             {adviceData.currentWeather.temp}°C, {adviceData.currentWeather.description}
                                         </p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Humidity</p>
+                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">{lang.humidityLabel}</p>
                                         <p className="text-sm font-extrabold text-slate-800 dark:text-slate-200 mt-0.5">{adviceData.currentWeather.humidity}%</p>
                                     </div>
                                 </div>
@@ -123,7 +179,7 @@ const IrrigationModal = ({ isOpen, onClose, plot }) => {
                                         ? 'bg-yellow-50 text-yellow-700 dark:bg-yellow-950/20 dark:text-yellow-400 border border-yellow-250/20' 
                                         : 'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400 border border-green-250/20'
                                 }`}>
-                                    {adviceData.recommendation.action}
+                                    {adviceData.recommendation.action === 'Pause Irrigation' ? lang.pauseIrrigation : adviceData.recommendation.action}
                                 </span>
                                 <h3 className="text-sm font-extrabold text-slate-850 dark:text-slate-100 px-2 leading-relaxed">
                                     {adviceData.recommendation.reason}
@@ -134,11 +190,11 @@ const IrrigationModal = ({ isOpen, onClose, plot }) => {
                             {adviceData.recommendation.action !== 'Pause Irrigation' && (
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="bg-blue-50/20 dark:bg-blue-950/10 border border-blue-100/50 dark:border-blue-950 p-4 rounded-xl text-center">
-                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Volume Needed</p>
+                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">{lang.volLabel}</p>
                                         <p className="text-lg font-black text-blue-600 dark:text-blue-400 mt-1">{volumes.liters} L</p>
                                     </div>
                                     <div className="bg-blue-50/20 dark:bg-blue-950/10 border border-blue-100/50 dark:border-blue-950 p-4 rounded-xl text-center">
-                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">In Gallons</p>
+                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">{lang.galLabel}</p>
                                         <p className="text-lg font-black text-blue-600 dark:text-blue-400 mt-1">{volumes.gallons} G</p>
                                     </div>
                                 </div>
@@ -146,16 +202,16 @@ const IrrigationModal = ({ isOpen, onClose, plot }) => {
 
                             {/* Schedule Details */}
                             <div className="space-y-2 pt-2 border-t border-slate-150 dark:border-gray-800">
-                                <div className="flex justify-between items-center bg-slate-50 dark:bg-gray-950/50 p-3 rounded-xl text-xs font-semibold">
-                                    <span className="text-slate-500 dark:text-slate-400">⏱️ Frequency:</span>
+                                <div className="flex justify-between items-center bg-slate-50 dark:bg-gray-955/50 p-3 rounded-xl text-xs font-semibold">
+                                    <span className="text-slate-500 dark:text-slate-400">{lang.freqLabel}</span>
                                     <span className="font-extrabold text-slate-800 dark:text-slate-200">{adviceData.recommendation.frequency}</span>
                                 </div>
-                                <div className="flex justify-between items-center bg-slate-50 dark:bg-gray-950/50 p-3 rounded-xl text-xs font-semibold">
-                                    <span className="text-slate-500 dark:text-slate-400">🚰 Water Level:</span>
+                                <div className="flex justify-between items-center bg-slate-50 dark:bg-gray-955/50 p-3 rounded-xl text-xs font-semibold">
+                                    <span className="text-slate-500 dark:text-slate-400">{lang.waterLevelLabel}</span>
                                     <span className="font-extrabold text-slate-800 dark:text-slate-200">{adviceData.recommendation.waterVolume}</span>
                                 </div>
-                                <div className="flex justify-between items-center bg-slate-50 dark:bg-gray-950/50 p-3 rounded-xl text-xs font-semibold">
-                                    <span className="text-slate-500 dark:text-slate-400">⚠️ Urgency:</span>
+                                <div className="flex justify-between items-center bg-slate-50 dark:bg-gray-955/50 p-3 rounded-xl text-xs font-semibold">
+                                    <span className="text-slate-500 dark:text-slate-400">{lang.urgencyLabel}</span>
                                     <span className={`font-extrabold uppercase tracking-wide text-[10px] px-2 py-0.5 rounded ${
                                         adviceData.recommendation.urgency === 'High' 
                                             ? 'bg-red-50 text-red-700 dark:bg-red-950/20 dark:text-red-400 border border-red-200/20' 
@@ -168,7 +224,7 @@ const IrrigationModal = ({ isOpen, onClose, plot }) => {
                                 onClick={onClose}
                                 className="w-full py-3 font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition shadow-md border-none cursor-pointer text-xs active:scale-95 mt-4"
                             >
-                                Acknowledge Schedule
+                                {lang.btnAck}
                             </button>
                         </div>
                     )}
