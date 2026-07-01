@@ -35,10 +35,9 @@ const formatIdentifier = (identifier) => {
     return identifier.trim().toLowerCase();
 };
 
-// --- REGISTER USER (Manual Registration) ---
 export const registerUser = async (req, res) => {
     try {
-        const { username, identifier, password, otp } = req.body;
+        const { username, identifier, password } = req.body;
         const formattedIdentifier = formatIdentifier(identifier);
         
         // 1. Search by email OR phone depending on what they typed
@@ -50,39 +49,21 @@ export const registerUser = async (req, res) => {
         }
 
         if (!user) {
-            // 2. Save user/password BEFORE OTP is marked as verified
+            // Create user directly
             user = await User.create({ 
                 username, 
                 email: isEmail(formattedIdentifier) ? formattedIdentifier : undefined, 
                 phone: isEmail(formattedIdentifier) ? undefined : formattedIdentifier,
                 password,
-                isVerified: false
+                isVerified: true
             });
         } else {
-            // Update details for retry
+            // Update details and mark verified directly
             user.username = username;
             user.password = password;
+            user.isVerified = true;
             await user.save();
         }
-
-        // Add validation to confirm password was hashed and saved to database
-        const checkUser = await User.findById(user._id).select('+password');
-        if (!checkUser || !checkUser.password || !checkUser.password.startsWith('$2')) {
-            throw new Error('Password was not properly hashed and saved');
-        }
-
-        // 3. Verify OTP
-        const data = otpStore.get(formattedIdentifier);
-        if (!data || data.otp !== otp || Date.now() > data.expires) {
-            return res.status(400).json({ message: 'Invalid or expired OTP' });
-        }
-
-        // 4. Mark user as verified
-        user.isVerified = true;
-        await user.save();
-
-        // 5. Clean up OTP from store since it's successfully consumed
-        otpStore.delete(formattedIdentifier);
 
         res.status(201).json({ 
             _id: user._id, 

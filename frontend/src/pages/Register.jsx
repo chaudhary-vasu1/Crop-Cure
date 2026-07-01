@@ -120,33 +120,11 @@ const Register = () => {
         return finalIdentifier;
     };
 
-    // STEP 1: Request the OTP from the backend
-    const handleSendOtp = async (e) => {
+    // Submit Registration data directly without OTP
+    const handleRegister = async (e) => {
         e.preventDefault();
         if (!username || !identifier || !password) {
-            alert(lang.fillFields);
-            return;
-        }
-
-        setLoading(true);
-        const formattedId = getFormattedIdentifier();
-
-        try {
-            await api.post('/auth/request-otp', { identifier: formattedId });
-            setIsOtpSent(true);
-            alert(`${lang.otpSent}${formattedId}!`);
-        } catch (err) {
-            alert(err.response?.data?.message || 'Failed to send OTP. Please try again.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // STEP 2: Submit Registration data along with OTP verification
-    const handleRegisterAndVerify = async (e) => {
-        e.preventDefault();
-        if (!otp) {
-            alert(lang.enterOtpError);
+            alert(lang.fillFields || 'Please fill in all fields');
             return;
         }
 
@@ -157,13 +135,12 @@ const Register = () => {
             const res = await api.post('/auth/register', { 
                 username, 
                 identifier: formattedId, 
-                password, 
-                otp
+                password
             });
             login(res.data);
             navigate('/');
         } catch (err) {
-            alert(err.response?.data?.message || 'Registration failed. Please check your OTP.');
+            alert(err.response?.data?.message || 'Registration failed. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -231,14 +208,14 @@ const Register = () => {
 
                     <div className="mb-8">
                         <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                            {isOtpSent ? lang.verifyTitle : lang.title}
+                            {lang.title}
                         </h2>
                         <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-1">
-                            {isOtpSent ? lang.verifySub : lang.subtitle}
+                            {lang.subtitle}
                         </p>
                     </div>
 
-                    <form onSubmit={isOtpSent ? handleRegisterAndVerify : handleSendOtp} className="space-y-4">
+                    <form onSubmit={handleRegister} className="space-y-4">
                         
                         {/* Username Input */}
                         <div>
@@ -250,7 +227,6 @@ const Register = () => {
                                 placeholder={lang.usernamePlaceholder}
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)} 
-                                disabled={isOtpSent}
                                 className="w-full px-4 py-3 bg-slate-50/50 dark:bg-gray-950/50 disabled:bg-slate-100 dark:disabled:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white dark:focus:bg-gray-900 transition-all text-sm font-medium text-slate-800 dark:text-white"
                                 required 
                             />
@@ -266,7 +242,6 @@ const Register = () => {
                                 placeholder={lang.placeholderId}
                                 value={identifier}
                                 onChange={(e) => setIdentifier(e.target.value)} 
-                                disabled={isOtpSent}
                                 className="w-full px-4 py-3 bg-slate-50/50 dark:bg-gray-950/50 disabled:bg-slate-100 dark:disabled:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white dark:focus:bg-gray-900 transition-all text-sm font-medium text-slate-800 dark:text-white"
                                 required 
                             />
@@ -282,29 +257,10 @@ const Register = () => {
                                 placeholder={lang.passwordPlaceholder}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)} 
-                                disabled={isOtpSent}
                                 className="w-full px-4 py-3 bg-slate-50/50 dark:bg-gray-950/50 disabled:bg-slate-100 dark:disabled:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white dark:focus:bg-gray-900 transition-all text-sm font-medium text-slate-800 dark:text-white"
                                 required 
                             />
                         </div>
-
-                        {/* Conditional OTP Field */}
-                        {isOtpSent && (
-                            <div className="animate-fade-in">
-                                <label className="block text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
-                                    {lang.otpLabel}
-                                </label>
-                                <input 
-                                    type="text" 
-                                    placeholder={lang.otpPlaceholder}
-                                    value={otp}
-                                    maxLength={6}
-                                    onChange={(e) => setOtp(e.target.value)} 
-                                    className="w-full px-4 py-3 bg-emerald-50/50 dark:bg-emerald-950/20 border-2 border-emerald-500 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 text-center text-lg font-black tracking-widest text-emerald-700 dark:text-emerald-400"
-                                    required 
-                                />
-                            </div>
-                        )}
                         
                         {/* Action Button */}
                         <button 
@@ -312,21 +268,10 @@ const Register = () => {
                             disabled={loading}
                             className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-400 text-white font-bold rounded-xl text-sm border-none cursor-pointer transition-all shadow-md active:scale-[0.98] mt-6 flex items-center justify-center gap-2"
                         >
-                            {loading ? lang.processing : isOtpSent ? lang.btnVerifyRegister : lang.btnRequestOtp}
+                            {loading ? lang.processing : lang.title}
                             <ChevronRight size={16} />
                         </button>
                     </form>
-
-                    {/* Back tracking option to clear OTP screen if typo made */}
-                    {isOtpSent && (
-                        <button 
-                            onClick={() => setIsOtpSent(false)} 
-                            className="w-full mt-4 bg-transparent border-none text-xs font-bold text-slate-500 dark:text-slate-400 cursor-pointer hover:underline flex items-center justify-center gap-1.5"
-                        >
-                            <CornerDownLeft size={14} />
-                            <span>{lang.changeDetails}</span>
-                        </button>
-                    )}
 
                     {/* Login Link */}
                     <div className="mt-8 pt-6 border-t border-slate-100 dark:border-gray-800 text-center text-xs text-slate-500 dark:text-slate-400">
