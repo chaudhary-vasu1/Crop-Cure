@@ -211,19 +211,17 @@ export const verifyOtp = async (req, res) => {
     }
 };
 
-// --- RESET PASSWORD ---
+// --- RESET PASSWORD (Simple — no OTP required) ---
 export const resetPassword = async (req, res) => {
     try {
-        const { identifier, otp, newPassword } = req.body;
+        const { identifier, newPassword } = req.body;
         const formattedIdentifier = formatIdentifier(identifier);
-        
-        // 1. Check if the OTP is valid
-        const data = otpStore.get(formattedIdentifier);
-        if (!data || data.otp !== otp || Date.now() > data.expires) {
-            return res.status(400).json({ message: 'Invalid or expired OTP' });
+
+        if (!formattedIdentifier || !newPassword) {
+            return res.status(400).json({ message: 'Please provide your email/phone and a new password.' });
         }
 
-        // 2. Find the user in the database
+        // Find the user in the database
         const searchQuery = isEmail(formattedIdentifier) ? { email: formattedIdentifier } : { phone: formattedIdentifier };
         const user = await User.findOne(searchQuery);
 
@@ -231,12 +229,9 @@ export const resetPassword = async (req, res) => {
             return res.status(404).json({ message: 'No account found with this email or phone number.' });
         }
 
-        // 3. Update the password and save
+        // Update the password and save
         user.password = newPassword; 
         await user.save(); // Your User model will automatically hash the new password!
-
-        // 4. Delete the OTP so it can't be reused
-        otpStore.delete(formattedIdentifier);
         
         res.status(200).json({ message: 'Password reset successfully. You can now log in!' });
     } catch (error) {

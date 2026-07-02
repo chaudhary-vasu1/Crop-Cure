@@ -108,11 +108,17 @@ export const getPestForecast = async (req, res) => {
 
         let crops = getSeasonalCrops();
 
+        // Allow frontend to override with a specific crop via query param
+        if (req.query.crop) {
+            crops = [req.query.crop.toLowerCase().trim()];
+        }
+
         if (farmId && farmId !== 'all') {
             farm = await Farm.findById(farmId);
             if (farm) {
                 location = farm.location;
-                if (farm.crops && farm.crops.length > 0) {
+                // Only use farm crops if no explicit crop was selected
+                if (!req.query.crop && farm.crops && farm.crops.length > 0) {
                     crops = farm.crops;
                 }
             }

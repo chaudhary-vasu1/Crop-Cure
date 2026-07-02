@@ -12,8 +12,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     
     // Forgot Password State
-    const [view, setView] = useState('login'); // 'login' | 'forgot-request' | 'forgot-reset'
-    const [otp, setOtp] = useState('');
+    const [view, setView] = useState('login'); // 'login' | 'forgot'
     const [newPassword, setNewPassword] = useState('');
 
     const { login } = useContext(AuthContext);
@@ -33,21 +32,13 @@ const Login = () => {
             loggingIn: "Logging in...",
             donthave: "Don't have an account?",
             registerHere: "Register here",
-            recoverTitle: "Recover Password",
-            recoverSub: "Enter your credentials to receive a 6-digit verification code",
-            sendOtp: "Send Recovery OTP",
-            sending: "Sending...",
-            backLogin: "Back to Login",
-            newPassTitle: "Choose New Password",
-            newPassSub: "Enter the OTP sent to your recovery channel to reset credentials",
-            otpLabel: "6-Digit Verification Code",
+            recoverTitle: "Reset Password",
+            recoverSub: "Enter your registered email or phone and choose a new password",
             newPassLabel: "New Password",
             newPassPlaceholder: "Create a strong password",
-            updating: "Updating...",
+            updating: "Resetting...",
             resetBtn: "Reset Password",
-            changePhoneEmail: "Change Phone/Email",
-            errorOtp: "Please enter your email or phone number first.",
-            otpSent: "Recovery OTP sent to ",
+            backLogin: "Back to Login",
             successReset: "Password reset success",
             fillFields: "Please fill out all fields.",
             promoTitle: "Optimize Field Yields and Prevent Fungal Infections.",
@@ -68,21 +59,13 @@ const Login = () => {
             loggingIn: "Iniciando sesión...",
             donthave: "¿No tiene una cuenta?",
             registerHere: "Regístrese aquí",
-            recoverTitle: "Recuperar Contraseña",
-            recoverSub: "Ingrese sus credenciales para recibir un código de verificación de 6 dígitos",
-            sendOtp: "Enviar OTP de Recuperación",
-            sending: "Enviando...",
-            backLogin: "Volver a Iniciar Sesión",
-            newPassTitle: "Elegir Nueva Contraseña",
-            newPassSub: "Ingrese la OTP enviada a su canal de recuperación para restablecer credenciales",
-            otpLabel: "Código de Verificación de 6 Dígitos",
+            recoverTitle: "Restablecer Contraseña",
+            recoverSub: "Ingrese su correo o teléfono registrado y elija una nueva contraseña",
             newPassLabel: "Nueva Contraseña",
             newPassPlaceholder: "Cree una contraseña segura",
-            updating: "Actualizando...",
+            updating: "Restableciendo...",
             resetBtn: "Restablecer Contraseña",
-            changePhoneEmail: "Cambiar Teléfono/Correo",
-            errorOtp: "Ingrese su correo o número de teléfono primero.",
-            otpSent: "¡OTP de recuperación enviado a ",
+            backLogin: "Volver a Iniciar Sesión",
             successReset: "Contraseña restablecida con éxito",
             fillFields: "Complete todos los campos.",
             promoTitle: "Optimice el rendimiento de su campo y prevenga hongos.",
@@ -103,21 +86,13 @@ const Login = () => {
             loggingIn: "लॉग इन हो रहा है...",
             donthave: "खाता नहीं है?",
             registerHere: "यहाँ पंजीकरण करें",
-            recoverTitle: "पासवर्ड पुनर्प्राप्त करें",
-            recoverSub: "6-अंकीय सत्यापन कोड प्राप्त करने के लिए अपनी क्रेडेंशियल दर्ज करें",
-            sendOtp: "रिकवरी ओटीपी भेजें",
-            sending: "भेजा जा रहा है...",
-            backLogin: "लॉगिन पर वापस जाएं",
-            newPassTitle: "नया पासवर्ड चुनें",
-            newPassSub: "क्रेडेंशियल रीसेट करने के लिए रिकवरी चैनल पर भेजा गया ओटीपी दर्ज करें",
-            otpLabel: "6-अंकीय सत्यापन कोड",
+            recoverTitle: "पासवर्ड रीसेट करें",
+            recoverSub: "अपना पंजीकृत ईमेल या फोन दर्ज करें और एक नया पासवर्ड चुनें",
             newPassLabel: "नया पासवर्ड",
             newPassPlaceholder: "एक मजबूत पासवर्ड बनाएं",
-            updating: "अपडेट हो रहा है...",
+            updating: "रीसेट हो रहा है...",
             resetBtn: "पासवर्ड रीसेट करें",
-            changePhoneEmail: "फोन/ईमेल बदलें",
-            errorOtp: "कृपया पहले अपना ईमेल या फोन नंबर दर्ज करें।",
-            otpSent: "रिकवरी ओटीपी भेजा गया है: ",
+            backLogin: "लॉगिन पर वापस जाएं",
             successReset: "पासवर्ड सफलतापूर्वक रीसेट किया गया",
             fillFields: "कृपया सभी फ़ील्ड भरें।",
             promoTitle: "फसल की पैदावार बढ़ाएं और रोगों से बचाएं।",
@@ -163,46 +138,26 @@ const Login = () => {
         }
     };
 
-    // --- REQUEST OTP FOR PASSWORD RESET ---
-    const handleSendResetOtp = async (e) => {
-        e.preventDefault();
-        if (!identifier) return alert(lang.errorOtp);
-        
-        setLoading(true);
-        const formattedId = getFormattedIdentifier();
-        try {
-            await api.post('/auth/request-otp', { identifier: formattedId });
-            setView('forgot-reset'); // Move to the OTP entry screen
-            alert(`${lang.otpSent}${formattedId}!`);
-        } catch (err) {
-            alert(err.response?.data?.message || 'Failed to send OTP.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // --- VERIFY OTP & CHANGE PASSWORD ---
+    // --- DIRECT PASSWORD RESET (No OTP) ---
     const handleResetPassword = async (e) => {
         e.preventDefault();
-        if (!otp || !newPassword) return alert(lang.fillFields);
+        if (!identifier || !newPassword) return alert(lang.fillFields);
 
         setLoading(true);
         const formattedId = getFormattedIdentifier();
         try {
             const res = await api.post('/auth/reset-password', { 
                 identifier: formattedId, 
-                otp, 
                 newPassword 
             });
             alert(res.data.message || lang.successReset);
             
             // Reset form and go back to normal login screen
             setPassword('');
-            setOtp('');
             setNewPassword('');
             setView('login');
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to reset password. Check your OTP.');
+            alert(err.response?.data?.message || 'Failed to reset password.');
         } finally {
             setLoading(false);
         }
@@ -304,7 +259,7 @@ const Login = () => {
                                         </label>
                                         <button 
                                             type="button" 
-                                            onClick={() => setView('forgot-request')} 
+                                            onClick={() => setView('forgot')} 
                                             className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-transparent border-none cursor-pointer hover:underline p-0"
                                         >
                                             {lang.forgotPassword}
@@ -334,8 +289,8 @@ const Login = () => {
                         </>
                     )}
 
-                    {/* --- FORGOT PASSWORD: ASK FOR EMAIL/PHONE --- */}
-                    {view === 'forgot-request' && (
+                    {/* --- FORGOT PASSWORD: ENTER EMAIL/PHONE & NEW PASSWORD DIRECTLY --- */}
+                    {view === 'forgot' && (
                         <div className="animate-fade-in">
                             <div className="mb-6">
                                 <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -346,7 +301,7 @@ const Login = () => {
                                 </p>
                             </div>
                             
-                            <form onSubmit={handleSendResetOtp} className="space-y-4">
+                            <form onSubmit={handleResetPassword} className="space-y-4">
                                 <div>
                                     <label className="block text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
                                         {lang.emailOrPhone}
@@ -361,53 +316,6 @@ const Login = () => {
                                     />
                                 </div>
 
-                                <button 
-                                    type="submit" 
-                                    disabled={loading} 
-                                    className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-450 text-white font-bold rounded-xl text-sm border-none cursor-pointer transition-all shadow-md active:scale-[0.98] mt-6 flex items-center justify-center gap-1.5"
-                                >
-                                    {loading ? lang.sending : lang.sendOtp}
-                                </button>
-                            </form>
-
-                            <button 
-                                onClick={() => setView('login')} 
-                                className="w-full mt-4 bg-transparent border-none text-xs font-bold text-slate-500 dark:text-slate-400 cursor-pointer hover:underline flex items-center justify-center gap-1.5"
-                            >
-                                <CornerDownLeft size={14} />
-                                <span>{lang.backLogin}</span>
-                            </button>
-                        </div>
-                    )}
-
-                    {/* --- FORGOT PASSWORD: ENTER OTP & NEW PASSWORD --- */}
-                    {view === 'forgot-reset' && (
-                        <div className="animate-fade-in">
-                            <div className="mb-6">
-                                <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                                    {lang.newPassTitle}
-                                </h2>
-                                <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-1">
-                                    {lang.newPassSub}
-                                </p>
-                            </div>
-                            
-                            <form onSubmit={handleResetPassword} className="space-y-4">
-                                <div>
-                                    <label className="block text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
-                                        {lang.otpLabel}
-                                    </label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="123456" 
-                                        value={otp}
-                                        maxLength={6}
-                                        onChange={(e) => setOtp(e.target.value)} 
-                                        className="w-full px-4 py-3 bg-emerald-50/50 dark:bg-emerald-950/20 border-2 border-emerald-500 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 text-center text-lg font-black tracking-widest text-emerald-700 dark:text-emerald-400"
-                                        required 
-                                    />
-                                </div>
-                                
                                 <div>
                                     <label className="block text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
                                         {lang.newPassLabel}
@@ -430,13 +338,13 @@ const Login = () => {
                                     {loading ? lang.updating : lang.resetBtn}
                                 </button>
                             </form>
-                            
+
                             <button 
-                                onClick={() => setView('forgot-request')} 
+                                onClick={() => setView('login')} 
                                 className="w-full mt-4 bg-transparent border-none text-xs font-bold text-slate-500 dark:text-slate-400 cursor-pointer hover:underline flex items-center justify-center gap-1.5"
                             >
                                 <CornerDownLeft size={14} />
-                                <span>{lang.changePhoneEmail}</span>
+                                <span>{lang.backLogin}</span>
                             </button>
                         </div>
                     )}

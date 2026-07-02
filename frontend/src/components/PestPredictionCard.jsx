@@ -11,6 +11,7 @@ const PestPredictionCard = () => {
     const [showPrefsModal, setShowPrefsModal] = useState(false);
     const [updatingPrefs, setUpdatingPrefs] = useState(false);
     const [calAdded, setCalAdded] = useState({});
+    const [selectedCrop, setSelectedCrop] = useState('auto');
 
     const t = {
         en: {
@@ -22,6 +23,8 @@ const PestPredictionCard = () => {
             measuresTitle: "Preventive Measures",
             btnCalendar: "Schedule Spray",
             btnPrefs: "Alert Preferences",
+            cropLabel: "Select Crop",
+            cropAuto: "🌱 Seasonal (Auto)",
             preferencesTitle: "Notification Settings",
             subscribed: "Opt-in to alerts",
             freqLabel: "Frequency",
@@ -40,6 +43,8 @@ const PestPredictionCard = () => {
             measuresTitle: "Medidas Preventivas",
             btnCalendar: "Programar Fumigación",
             btnPrefs: "Ajustes de Alerta",
+            cropLabel: "Seleccionar Cultivo",
+            cropAuto: "🌱 Estacional (Auto)",
             preferencesTitle: "Configuración de Notificación",
             subscribed: "Recibir alertas",
             freqLabel: "Frecuencia",
@@ -58,6 +63,8 @@ const PestPredictionCard = () => {
             measuresTitle: "निवारक उपाय",
             btnCalendar: "छिड़काव अनुसूची",
             btnPrefs: "चेतावनी प्राथमिकताएं",
+            cropLabel: "फसल चुनें",
+            cropAuto: "🌱 मौसमी (ऑटो)",
             preferencesTitle: "अधिसूचना सेटिंग्स",
             subscribed: "अलर्ट प्राप्त करें",
             freqLabel: "आवृत्ति (Frequency)",
@@ -70,10 +77,24 @@ const PestPredictionCard = () => {
     };
     const lang = t[language] || t.en;
 
+    const cropOptions = [
+        { value: 'auto', label: lang.cropAuto },
+        { value: 'rice', label: '🌾 Rice' },
+        { value: 'wheat', label: '🌾 Wheat' },
+        { value: 'sugarcane', label: '🎋 Sugarcane' },
+        { value: 'corn', label: '🌽 Corn' },
+        { value: 'cotton', label: '☁️ Cotton' },
+        { value: 'soybean', label: '🫘 Soybean' },
+        { value: 'mustard', label: '🌼 Mustard' },
+        { value: 'barley', label: '🌾 Barley' },
+        { value: 'chickpea', label: '🫘 Chickpea' },
+    ];
+
     const fetchForecast = async () => {
         setLoading(true);
         try {
-            const response = await api.get(`/pest-forecast/${selectedFarm}`);
+            const cropParam = selectedCrop !== 'auto' ? `?crop=${selectedCrop}` : '';
+            const response = await api.get(`/pest-forecast/${selectedFarm}${cropParam}`);
             setForecastData(response.data);
             
             // Get user subscription settings from api
@@ -93,7 +114,7 @@ const PestPredictionCard = () => {
 
     useEffect(() => {
         fetchForecast();
-    }, [selectedFarm]);
+    }, [selectedFarm, selectedCrop]);
 
     const handleSavePreferences = async (e) => {
         e.preventDefault();
@@ -148,13 +169,24 @@ const PestPredictionCard = () => {
                         {lang.subtitle}
                     </p>
                 </div>
-                <button
-                    onClick={() => setShowPrefsModal(true)}
-                    className="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 dark:bg-gray-950 dark:hover:bg-gray-800 border border-slate-200/40 dark:border-gray-800 text-xs font-bold text-slate-700 dark:text-slate-200 rounded-xl cursor-pointer flex items-center gap-1.5 transition"
-                >
-                    <Bell size={13} className="text-emerald-500" />
-                    <span>{lang.btnPrefs}</span>
-                </button>
+                <div className="flex items-center gap-2">
+                    <select
+                        value={selectedCrop}
+                        onChange={(e) => setSelectedCrop(e.target.value)}
+                        className="px-3 py-2 bg-slate-50 dark:bg-gray-950 border border-slate-200/40 dark:border-gray-800 text-xs font-bold text-slate-700 dark:text-slate-200 rounded-xl cursor-pointer outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
+                    >
+                        {cropOptions.map(opt => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                    </select>
+                    <button
+                        onClick={() => setShowPrefsModal(true)}
+                        className="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 dark:bg-gray-950 dark:hover:bg-gray-800 border border-slate-200/40 dark:border-gray-800 text-xs font-bold text-slate-700 dark:text-slate-200 rounded-xl cursor-pointer flex items-center gap-1.5 transition"
+                    >
+                        <Bell size={13} className="text-emerald-500" />
+                        <span>{lang.btnPrefs}</span>
+                    </button>
+                </div>
             </div>
 
             {/* Quick weather variables displaying rule insights */}
